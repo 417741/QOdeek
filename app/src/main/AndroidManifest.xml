@@ -12,8 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QOdeep">
+        <!-- 模块设置页：既是桌面启动入口，也是 QQ 设置页入口点击后打开的页面。
+             继承 ComponentActivity（不能用 AppCompatActivity，寄生环境窗口主题继承自 QQ 壳
+             Activity，AppCompatActivity 会因主题非 Theme.AppCompat 崩溃导致 QQ 重启）。 -->
         <activity
-            android:name=".MainActivity"
+            android:name=".SettingsActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.QOdeep"
@@ -24,13 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- 模块设置页：QQ 设置页入口点击后打开此页面 -->
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.QOdeep" />
 
         <!-- LSPosed 模块标识：缺少这些，LSPosed 无法把本 App 识别为 Xposed 模块 -->
         <meta-data

@@ -78,7 +78,8 @@ object DexKitFinder {
 
                 XposedBridge.log("[QOdeep] DexKit 查找方法中...")
                 progressIndex = 0
-                progressTotal = tasks.sumOf { runCatching { it.getQueryMap().size }.getOrDefault(0) }
+                // 只统计真实查询；占位槽（slot4~slot16）是功能预留，不参与扫描与进度
+                progressTotal = tasks.sumOf { runCatching { it.realQueryKeys().size }.getOrDefault(0) }
                 // 第一源：宿主 APK 本身，正常安装包一次即可全部命中
                 scanSource("host apk", tasks) { DexKitBridge.create(sourceDir) }
 
@@ -109,7 +110,11 @@ object DexKitFinder {
     private fun scanBridge(bridge: DexKitBridge, tasks: List<DexKitTask>) {
         for (task in tasks) {
             runCatching {
+                val real = task.realQueryKeys()
                 for ((name, query) in task.getQueryMap()) {
+                    // 占位槽（slot4~slot16）是为后续功能预留的空查询，字符串必然不存在，
+                    // 扫一遍是纯浪费启动时间，直接跳过（缓存/进度都不算它）
+                    if (name !in real) continue
                     val key = "${task.tag}->$name"
                     if (DexKitCache.contains(key)) continue
                     queryOne(bridge, key, query)
@@ -120,7 +125,8 @@ object DexKitFinder {
 
     private fun queryOne(bridge: DexKitBridge, key: String, query: BaseFinder) {
         progressIndex++
-        progressKey = "正在查找 $progressIndex / $progressTotal"
+        // 对齐 QEdge 的进度文案：直接展示当前查找的 key + 序号
+        progressKey = "$key ($progressIndex/$progressTotal)"
         when (query) {
             is FindClass -> {
                 val descriptor = bridge.findClass(query).firstOrNull()?.descriptor

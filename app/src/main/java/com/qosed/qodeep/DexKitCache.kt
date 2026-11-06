@@ -100,10 +100,10 @@ object DexKitCache {
         }.getOrDefault(false)
     }
 
-    /** 所有已注册任务的 key 是否都已就绪。 */
+    /** 所有已注册任务的「真实查询」是否都已就绪（占位槽不参与判断）。 */
     fun validateAllTasks(): Boolean {
         val keys = DexKitTaskRegistry.tasks.flatMap { task ->
-            task.getQueryMap().keys.map { "${task.tag}->$it" }
+            task.realQueryKeys().map { "${task.tag}->$it" }
         }
         return keys.isNotEmpty() && keys.all { cacheMap.containsKey(it) }
     }

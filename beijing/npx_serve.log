@@ -1,0 +1,5 @@
+ INFO  Accepting connections at http://localhost:8765
+ HTTP  2026/11/7 02:43:25 127.0.0.1 GET /player.html
+ HTTP  2026/11/7 02:43:25 127.0.0.1 Returned 301 in 8 ms
+ HTTP  2026/11/7 02:43:25 127.0.0.1 GET /player
+ HTTP  2026/11/7 02:43:25 127.0.0.1 Returned 200 in 3 ms

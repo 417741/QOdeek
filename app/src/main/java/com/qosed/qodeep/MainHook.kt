@@ -1,7 +1,6 @@
 package com.qosed.qodeep
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -11,9 +10,11 @@ import android.os.Handler
 import android.os.Looper
 import dalvik.system.BaseDexClassLoader
 import de.robv.android.xposed.IXposedHookLoadPackage
+import de.robv.android.xposed.IXposedHookZygoteInit
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
+import android.widget.TextView
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import org.luckypray.dexkit.query.FindClass
 import org.luckypray.dexkit.query.base.BaseFinder
@@ -34,9 +35,21 @@ import java.util.concurrent.atomic.AtomicBoolean
  * 拿到真实类后：hook 设置页列表构建方法，构造独立分组插到「账号与安全」上方，
  * 条目点击 -> 打开本模块 SettingsActivity。
  */
-class MainHook : IXposedHookLoadPackage, DexKitTask {
+class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
 
     override val tag: String = "SettingInject"
+
+    /**
+     * Zygote 阶段（早于任何 app 进程 fork）：StartupParam.modulePath 是 LSPosed 传入的
+     * 模块 APK 绝对路径，这是唯一不依赖 PackageManager 的权威来源——QQ 进程里
+     * getApplicationInfo/getPackageInfo 因 Android 11+ 包可见性过滤必然抛
+     * NameNotFoundException，ClassLoder 内存加载又挖不到文件路径（实测均失败）。
+     * Env 在 zygote 赋值后随 fork 继承到 QQ 进程，后续 initEnv 无需再找。
+     */
+    override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
+        runCatching { Env.moduleApkPath = startupParam.modulePath.orEmpty() }
+            .onFailure { XposedBridge.log("[QOdeep] initZygote 获取 modulePath 失败: $it") }
+    }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (lpparam.packageName != QQ_PACKAGE) return
@@ -72,7 +85,7 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
             searchPackages("com.tencent.mobileqq.setting.processor")
             matcher { usingStrings("itemProcessors") }
         }
-        // 占位任务：先把查找任务数对齐到 16 个（对应后续 16 个功能），
+        // 占位任务：把查找任务数对齐到 16 个（对应后续 16 个功能），
         // 每个槽位用当前必然不存在的字符串占位，后续加功能时逐个替换成真实查询。
         for (i in 4..16) {
             queries["slot$i"] = FindClass().apply {
@@ -82,6 +95,10 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         }
         return queries
     }
+
+    // 真实查询只有 3 个（provider / simpleItemProcessor / settingSection）。
+    // slot4~slot16 是占位，扫不到是正常的，不应计入「缓存完整」判断。
+    override fun realQueryKeys(): Set<String> = setOf("provider", "simpleItemProcessor", "settingSection")
 
     // ---------------- 启动双路：QFix 补丁 loader + BaseApplicationImpl 兜底 ----------------
 
@@ -186,6 +203,8 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         initEnv(hostContext)
         runCatching { Parasitics.init(hostContext) }
             .onFailure { XposedBridge.log("[QOdeep] 活动寄生初始化失败: $it") }
+        runCatching { hookEmbeddingRules(Env.hostClassLoader) }
+            .onFailure { XposedBridge.log("[QOdeep] 分屏规则过滤挂载失败: $it") }
         DexKitCache.init()
         DexKitTaskRegistry.register(this)
 
@@ -239,14 +258,13 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
                 fired = true
                 mainHandler.post {
                     if (finished) return@post
-                    val d = android.app.AlertDialog.Builder(activity)
-                        .setTitle("QOdeep")
-                        .setMessage("准备开始查找...")
-                        .setCancelable(false)
-                        .create()
+                    // QEdge 风格：白色圆角卡片 + 标题 + 当前查找 key。
+                    // 默认 AlertDialog 会被 QQ 深色主题渲染成黑底，观感突兀，改用自绘 view。
+                    val d = buildProgressCard(activity)
                     dialog = d
                     runCatching { d.show() }
                     // 轮询 DexKitFinder.progressKey 刷新进度文本；完成时关闭对话框
+                    val msg = d.window?.findViewById<TextView>(MSG_ID)
                     val tick = object : Runnable {
                         override fun run() {
                             val cur = dialog ?: return
@@ -255,7 +273,7 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
                                 dialog = null
                                 return
                             }
-                            cur.setMessage(DexKitFinder.progressKey ?: "正在查找方法中...")
+                            msg?.text = DexKitFinder.progressKey ?: "正在查找方法中..."
                             mainHandler.postDelayed(this, 200)
                         }
                     }
@@ -271,19 +289,94 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         })
     }
 
+    /** QEdge 风格进度卡片：白底圆角、黑色粗体标题、灰色当前查找 key，无默认对话框黑框。 */
+    private fun buildProgressCard(activity: Activity): android.app.AlertDialog {
+        val dm = activity.resources.displayMetrics
+        val dp = { v: Int -> (v * dm.density).toInt() }
+        val card = android.widget.LinearLayout(activity).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(dp(24), dp(20), dp(24), dp(20))
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(android.graphics.Color.WHITE)
+                cornerRadius = dp(16).toFloat()
+            }
+        }
+        val title = android.widget.TextView(activity).apply {
+            text = "QOdeep 查找方法中"
+            setTextColor(0xFF222222.toInt())
+            textSize = 17f
+            paint.isFakeBoldText = true
+            id = android.view.View.generateViewId()
+        }
+        val msg = android.widget.TextView(activity).apply {
+            text = "准备开始查找..."
+            setTextColor(0xFF8A8A8A.toInt())
+            textSize = 13f
+            id = MSG_ID
+            setPadding(0, dp(10), 0, 0)
+        }
+        card.addView(title)
+        card.addView(msg)
+        return android.app.AlertDialog.Builder(activity).setView(card).setCancelable(false).create()
+            .apply {
+                window?.run {
+                    setBackgroundDrawableResource(android.R.color.transparent)
+                    setDimAmount(0.25f)
+                }
+            }
+    }
+
     private fun initEnv(hostContext: Context) {
         Env.hostContext = hostContext
+        // 1) 宿主 APK 路径 + 模块数据目录：只依赖 hostContext，与模块包可见性无关。
+        //    之前把这两行和 getApplicationInfo 放在同一个 runCatching 里，
+        //    getApplicationInfo 一旦抛 NameNotFoundException（寄生环境常见）就会
+        //    连带 moduleDataDir 也不赋值 → 缓存路径变成相对路径 → 永远写不进磁盘。
         runCatching {
             Env.hostApkPath = hostContext.applicationInfo.sourceDir.orEmpty()
-            val pm = hostContext.packageManager
-            val appInfo = pm.getApplicationInfo(MODULE_PACKAGE, 0)
-            Env.moduleNativeLibDir = appInfo.nativeLibraryDir.orEmpty()
-            Env.moduleApkPath = appInfo.sourceDir.orEmpty()
+        }.onFailure { XposedBridge.log("[QOdeep] 宿主 APK 路径获取失败: $it") }
+
+        runCatching {
             val externalDir = hostContext.getExternalFilesDir(null)?.parentFile
             Env.moduleDataDir = externalDir?.let { "${it.absolutePath}/QOdeep/" }
                 ?: "${Environment.getExternalStorageDirectory().absolutePath}/Android/data/$QQ_PACKAGE/QOdeep/"
+        }.onFailure { XposedBridge.log("[QOdeep] 模块数据目录获取失败: $it") }
+
+        // 2) 模块 APK 路径：codeSource 在 LSPosed 环境返回空（实测），改为从加载模块
+        //    类的 ClassLoader 里挖 BaseDexClassLoader.pathList.dexElements[*].path——
+        //    LSPosed 用 DexClassLoader 加载模块 APK，elements 里就有模块 APK 绝对路径，
+        //    完全不依赖 PackageManager，绕开包可见性过滤的 NameNotFoundException。
+        if (Env.moduleApkPath.isEmpty()) {
+            Env.moduleApkPath = runCatching {
+                val cl = MainHook::class.java.classLoader ?: return@runCatching ""
+                val pathList = cl.javaClass.superclass
+                    .getDeclaredField("pathList").apply { isAccessible = true }.get(cl)
+                    ?: return@runCatching ""
+                val elements = pathList.javaClass
+                    .getDeclaredField("dexElements").apply { isAccessible = true }.get(pathList) as? Array<*>
+                elements.orEmpty().mapNotNull { el ->
+                    runCatching {
+                        (el ?: return@mapNotNull null).javaClass
+                            .getDeclaredField("path").apply { isAccessible = true }.get(el) as? String
+                    }.getOrNull()
+                }.firstOrNull { it?.contains("qodeep", ignoreCase = true) == true }.orEmpty()
+            }.getOrDefault("")
+            XposedBridge.log("[QOdeep] ClassLoader 推导模块 APK 路径: ${Env.moduleApkPath.ifEmpty { "(空)" }}")
+        }
+        // 3) 模块 native lib 目录：优先 getApplicationInfo，失败用模块 APK 路径推导。
+        runCatching {
+            val pm = hostContext.packageManager
+            val appInfo = pm.getApplicationInfo(MODULE_PACKAGE, 0)
+            Env.moduleNativeLibDir = appInfo.nativeLibraryDir.orEmpty()
+            if (Env.moduleApkPath.isEmpty()) Env.moduleApkPath = appInfo.sourceDir.orEmpty()
         }.onFailure {
-            XposedBridge.log("[QOdeep] 初始化环境失败: $it")
+            XposedBridge.log("[QOdeep] getApplicationInfo 获取模块信息失败，用 codeSource 兜底: $it")
+        }
+        if (Env.moduleNativeLibDir.isEmpty() && Env.moduleApkPath.isNotEmpty()) {
+            runCatching {
+                val apkDir = Env.moduleApkPath.substringBeforeLast('/')
+                Env.moduleNativeLibDir = "$apkDir/lib/arm64"
+            }.onFailure { XposedBridge.log("[QOdeep] native lib 目录推导失败: $it") }
         }
     }
 
@@ -299,6 +392,92 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         }
         temporaryUnhooks.clear()
     }
+
+    // ---------------- 嵌入分屏规则过滤 ----------------
+
+    private val ruleFilterLogged = AtomicBoolean(false)
+
+    /**
+     * QQ 设置页的 Activity 嵌入分屏（右侧半屏面板）规则由 androidx.window 在 QQ 进程内注册。
+     * hook 规则的读/写入口，剔除会把模块壳 Activity 抓进半屏的 SplitPairRule，
+     * 让模块页以「同任务 + 直接全屏盖在 QQ 上」的方式打开（不产生第二个任务卡片、无抖动）。
+     */
+    private fun hookEmbeddingRules(loader: ClassLoader) {
+        var hooked = 0
+        for (name in arrayOf(
+            "androidx.window.embedding.RuleController",   // androidx.window 1.2+
+            "androidx.window.embedding.SplitController"   // 旧版 1.0/1.1
+        )) {
+            val cls = runCatching { loader.loadClass(name) }.getOrNull() ?: continue
+            for (m in cls.declaredMethods) {
+                val isSetter = m.name == "setRules" || m.name == "setSplitRules"
+                val isGetter = m.parameterCount == 0 && (m.name == "getRules" || m.name == "getSplitRules")
+                val isRegistrar = m.name == "registerRule" && m.parameterCount == 1
+                if (!isSetter && !isGetter && !isRegistrar) continue
+                runCatching {
+                    XposedBridge.hookMethod(m, object : XC_MethodHook() {
+                        override fun beforeHookedMethod(param: MethodHookParam) {
+                            if (isRegistrar) {
+                                if (param.args[0] != null && isBlockingRule(param.args[0])) {
+                                    param.setResult(null) // 吞掉会分屏壳 Activity 的规则注册
+                                }
+                            } else {
+                                param.args.forEachIndexed { i, a ->
+                                    (a as? Set<*>)?.let { param.args[i] = filterEmbeddingRules(it) }
+                                }
+                            }
+                        }
+                        override fun afterHookedMethod(param: MethodHookParam) {
+                            (param.result as? Set<*>)?.let { param.result = filterEmbeddingRules(it) }
+                        }
+                    })
+                    hooked++
+                }
+            }
+        }
+        XposedBridge.log("[QOdeep] 嵌入分屏规则过滤已挂载，hook 方法数=$hooked")
+    }
+
+    /** 剔除会把壳 Activity 抓进分屏的规则；没有命中时原集合原样返回。 */
+    private fun filterEmbeddingRules(rules: Set<*>): Set<*> {
+        var changed = false
+        val out = LinkedHashSet<Any>(rules.size)
+        for (r in rules) {
+            if (r != null && isBlockingRule(r)) {
+                changed = true
+                if (ruleFilterLogged.compareAndSet(false, true)) {
+                    XposedBridge.log("[QOdeep] 剔除分屏规则: ${r.javaClass.simpleName} ${ruleDesc(r)}")
+                }
+                continue
+            }
+            if (r != null) out.add(r)
+        }
+        return if (changed) out else rules
+    }
+
+    private fun isBlockingRule(rule: Any): Boolean {
+        val cls = rule.javaClass
+        val primary = runCatching { cls.getMethod("getPrimaryActivityName").invoke(rule) }.getOrNull()
+        val secondary = runCatching { cls.getMethod("getSecondaryActivityName").invoke(rule) }.getOrNull()
+        val p = compName(primary)
+        val s = compName(secondary)
+        // 精确命中：secondary 就是我们可能借用的壳 Activity
+        if (Parasitics.isShellActivity(s)) return true
+        // 通配 secondary（未指定 secondary）：设置页发起的分屏会把一切子页（含壳）抓进右半屏
+        if (s == null && p != null && p.lowercase().contains("setting")) return true
+        return false
+    }
+
+    private fun ruleDesc(rule: Any): String {
+        val p = runCatching { rule.javaClass.getMethod("getPrimaryActivityName").invoke(rule) }.getOrNull()
+        val s = runCatching { rule.javaClass.getMethod("getSecondaryActivityName").invoke(rule) }.getOrNull()
+        return "primary=${compName(p)} secondary=${compName(s)}"
+    }
+
+    /** 兼容 androidx.window 的 ComponentName 与 android 的 ComponentName。 */
+    private fun compName(any: Any?): String? = runCatching {
+        any!!.javaClass.getMethod("getClassName").invoke(any)?.toString()
+    }.getOrNull()
 
     // ---------------- 设置页注入 ----------------
 
@@ -539,26 +718,28 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
     private fun openSettings(context: Context) {
         try {
             Parasitics.ensureInitialized(context)
-            // 单例：已有模块页任务在后台就直接带回前台，避免 MULTIPLE_TASK 每次点击都新建任务
-            val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
-            val existing = am?.let { findModuleTask(it) } ?: -1
-            if (existing >= 0) {
-                runCatching { am?.moveTaskToFront(existing, 0) }
-                return
-            }
             // 用 QQ 进程内的 context 构造 Intent，组件包名会保持为宿主包名，
             // 从而避开 QQ 客户端「离开 QQ」检测；真正类名由 Parasitics 在 binder 层换壳。
+            // 同任务启动：页面直接全屏盖在 QQ 上面，最近任务里不会多出卡片；
+            // 曾导致半屏抖动的 QQ 嵌入分屏规则已由 hookEmbeddingRules 在源头过滤。
             val intent = Intent(context, SettingsActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-                // 逃出 QQ 设置页的嵌入分屏：新任务不参与 split，直接全屏、无「从右边抖到左边」；
-                // 上面的复用检查保证不会因 MULTIPLE_TASK 堆出多个任务。
-                addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
                 // 寄生页面与 MainHook 不同 ClassLoader，Env 字段不通，把环境随 Intent 带过去
                 putExtra(SettingsActivity.ENV_DATA_DIR, Env.moduleDataDir)
                 putExtra(SettingsActivity.ENV_NATIVE_LIB_DIR, Env.moduleNativeLibDir)
                 putExtra(SettingsActivity.ENV_HOST_APK, Env.hostApkPath)
+                putExtra(SettingsActivity.ENV_MODULE_APK, Env.moduleApkPath)
+            }
+            // 同时持久化一份环境，供寄生页在 Activity 被系统重建/进程重启后 Intent 丢失 extra 时兜底恢复
+            runCatching {
+                context.getSharedPreferences("qodeep_env", Context.MODE_PRIVATE).edit()
+                    .putString("dataDir", Env.moduleDataDir)
+                    .putString("nativeLibDir", Env.moduleNativeLibDir)
+                    .putString("hostApk", Env.hostApkPath)
+                    .putString("moduleApk", Env.moduleApkPath)
+                    .apply()
             }
             context.startActivity(intent, buildFullscreenOptions(context))
             XposedBridge.log("[QOdeep] 已在 QQ 内打开设置页（寄生）")
@@ -567,41 +748,19 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         }
     }
 
-    /** 按 taskDescription 标记查找已存在的模块页任务 id，找不到返回 -1。 */
-    private fun findModuleTask(am: ActivityManager): Int {
-        val tasks = runCatching { am.getRunningTasks(64) }.getOrNull() ?: return -1
-        for (t in tasks) {
-            // TaskDescription.label 在不同 compileSdk 上字段名有差异，反射读取最稳
-            val label = runCatching {
-                val desc = t.javaClass.getField("description").get(t) ?: return@runCatching null
-                desc.javaClass.getMethod("getLabel").invoke(desc)?.toString()
-            }.getOrNull()
-            if (label == MODULE_TASK_LABEL) return t.id
-        }
-        return -1
-    }
-
     /**
-     * 构造「瞬开 + 逃出 QQ 嵌入分屏」的启动选项：
-     * 1. makeCustomAnimation(0, 0) —— 去掉转场动画，点击后页面直接出现（对齐 FunBox 观感）；
-     * 2. 显式声明全屏窗口模式 —— 系统的嵌入逻辑遇到明确窗口模式的启动会跳过嵌入；
-     * 3. alwaysExpand（Android 13+ 隐藏 API）—— 声明此启动必须铺满整屏。
-     * 两者都失败时返回 null，退回普通启动。
+     * 构造「瞬开」启动选项：仅 makeCustomAnimation(0, 0) 去掉转场动画，
+     * 点击后页面直接出现（对齐 FunBox 观感）。
+     *
+     * 不再用 setLaunchWindowingMode(FULLSCREEN)/setLaunchAlwaysExpand 强制窗口模式：
+     * 在 QQ 嵌入分屏环境下，这两个隐藏 API 会让系统先把 Activity 按半屏面板布局、
+     * 再切换到全屏，造成「抖动一下再进入」。分屏问题已由 hookEmbeddingRules 在
+     * 源头过滤（剔除会抓壳 Activity 的 SplitPairRule），无需在这里二次强制。
      */
-    private fun buildFullscreenOptions(context: Context): android.os.Bundle? {
-        val opts = android.app.ActivityOptions.makeCustomAnimation(context, 0, 0)
+    private fun buildFullscreenOptions(context: Context): android.os.Bundle? =
         runCatching {
-            android.app.ActivityOptions::class.java
-                .getMethod("setLaunchWindowingMode", Int::class.javaPrimitiveType!!)
-                .invoke(opts, 1) // WindowConfiguration.WINDOWING_MODE_FULLSCREEN
-        }
-        runCatching {
-            android.app.ActivityOptions::class.java
-                .getMethod("setLaunchAlwaysExpand")
-                .invoke(opts)
-        }
-        return runCatching { opts.toBundle() }.getOrNull()
-    }
+            android.app.ActivityOptions.makeCustomAnimation(context, 0, 0).toBundle()
+        }.getOrNull()
 
     companion object {
         private val initialized = AtomicBoolean(false)
@@ -613,6 +772,7 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         private const val ENTRY_TITLE = "QOdeep"
         private const val BOTTOM_TITLE = ""
         private const val ENTRY_TYPE = 100
-        private const val MODULE_TASK_LABEL = "QOdeep模块页"
+        // 进度卡片里"当前查找 key"文本的 view id（自绘 AlertDialog 内容用）
+        private const val MSG_ID = 0x60de0001
     }
 }

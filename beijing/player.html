@@ -19,15 +19,11 @@
   var cv = document.getElementById('cv');
   var key = new URLSearchParams(location.search).get('key') || 'duanwu';
 
-  function gameFrame(data) {
-    var dw = data && data.width, dh = data && data.height;
-    var dx = data && data.x, dy = data && data.y;
-    var sane = [dw, dh, dx, dy].every(Number.isFinite)
-      && dw > 600 && dw < 1400 && dh > 1100 && dh < 2000;
-    var cx = sane ? dx + dw / 2 : 0;
-    var cy = sane ? dy + dh / 2 : 0;
-    return { x: cx - GAME_W / 2, y: cy - GAME_H / 2, width: GAME_W, height: GAME_H };
-  }
+  // 取景固定为 720×1280 设计画布、中心 (0,0)。
+  // 封面图正是该画布的渲染（实测 720×1280），骨骼内容围绕原点分布，
+  // 固定中心 + 统一竖屏 cover 才能和封面逐像素对齐（覆盖瞬间不晃、不闪暗），
+  // 同时保证高度铺满（状态栏拼接）、切换节气缩放一致。
+  var view = { cx: 0, cy: 0, w: GAME_W, h: GAME_H };
 
   function fetchText(url) { return fetch(url).then(function (r) { return r.text(); }); }
   function fetchBuffer(url) { return fetch(url).then(function (r) { return r.arrayBuffer(); }); }
@@ -51,10 +47,16 @@
       .then(function (a) {
         var img = a[0], atlasText = a[1], binBuf = a[2];
         var gl = cv.getContext('webgl', {
-          alpha: true, premultipliedAlpha: false,
-          antialias: true, preserveDrawingBuffer: true
+          alpha: true, premultipliedAlpha: false, antialias: true
         });
         if (!gl) { document.title = 'err:no webgl'; return; }
+
+        // WebGL context 被系统回收（退后台/刷视频等 GPU 占用场景）后动画会永久停住、
+        // 露出空白，这里监听丢失事件自动重载页面以重建 context、恢复动画。
+        cv.addEventListener('webglcontextlost', function (e) {
+          e.preventDefault();
+          location.reload();
+        }, false);
 
         // 按屏幕物理分辨率渲染（devicePixelRatio），不再固定 720×1280 被拉伸导致模糊
         function resize() {
@@ -87,8 +89,6 @@
         skeleton.updateWorldTransform();
 
         var renderer = new SPINE.webgl.SceneRenderer(cv, ctx);
-        var box = gameFrame(data);
-        var view = { cx: box.x + box.width / 2, cy: box.y + box.height / 2 };
 
         var last = 0;
         function frame(now) {
@@ -100,8 +100,8 @@
           skeleton.updateWorldTransform();
           gl.clearColor(0, 0, 0, 0);
           gl.clear(gl.COLOR_BUFFER_BIT);
-          // cover 取景：把 720×1280 设计画布按屏幕比例放大铺满（保留原网站裁剪观感）
-          var s = Math.max(cv.width / GAME_W, cv.height / GAME_H); // 像素/世界单位
+          // cover 取景：统一 720×1280 设计画布，高度铺满（状态栏拼接），居中裁剪
+          var s = Math.max(cv.width / view.w, cv.height / view.h); // 像素/世界单位
           gl.viewport(0, 0, cv.width, cv.height);
           renderer.begin();
           renderer.camera.setViewport(cv.width, cv.height);

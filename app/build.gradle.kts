@@ -15,8 +15,8 @@ android {
         applicationId = "com.qosed.qodeep"
         minSdk = 30
         targetSdk = 36
-        versionCode = 7
-        versionName = "0.0.7"
+        versionCode = 42
+        versionName = "0.0.42"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -92,6 +92,15 @@ dependencies {
     // DexKit：运行时在宿主 dex 里动态查找混淆后的类，适配未知 QQ 版本
     implementation(libs.dexkit)
     implementation(libs.protobuf.javalite)
+
+    // 传统 View 栈 UI（对齐 FunBox）：毛玻璃卡片 + 弹窗 + 图片加载 + 动画
+    implementation(libs.androidx.appcompat)
+    implementation(libs.google.material)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.glide)
+    implementation(libs.lottie)
+    implementation(libs.xpopup)
+    implementation(libs.blurview)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

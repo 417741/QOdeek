@@ -75,6 +75,10 @@ object Parasitics {
         return className.startsWith("$MODULE_PACKAGE.")
     }
 
+    /** 该类名是否是寄生可用的壳 Activity（供分屏规则过滤判断）。 */
+    fun isShellActivity(className: String?): Boolean =
+        className != null && ACTIVITY_CANDIDATES.contains(className)
+
     // ---------------- 初始化 ----------------
 
     fun init(hostContext: Context) {

@@ -20,6 +20,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://api.xposed.info/") }
+        // BlurView / XPopup 发布在 JitPack
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
