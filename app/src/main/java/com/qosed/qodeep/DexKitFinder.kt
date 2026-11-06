@@ -7,6 +7,12 @@ import org.luckypray.dexkit.query.FindClass
 import org.luckypray.dexkit.query.base.BaseFinder
 import java.io.File
 
+/**
+ * DexKit 扫描器。
+ *
+ * 在后台线程扫描宿主 APK（必要时再扫运行时 dex），把每个任务的命中结果写入 DexKitCache。
+ * 全部完成后调用 onFinished —— 由 MainHook 继续安装设置页 hook。
+ */
 object DexKitFinder {
 
     @Volatile
@@ -16,6 +22,8 @@ object DexKitFinder {
         if (libLoaded) return true
         synchronized(this) {
             if (libLoaded) return true
+            // 寄生 ClassLoader 下 System.loadLibrary 找不到模块 APK 里的 so，
+            // 必须用安装目录的绝对路径加载。
             val dir = Env.moduleNativeLibDir
             if (dir.isNotEmpty()) {
                 val so = File(dir, System.mapLibraryName("dexkit"))
@@ -41,19 +49,17 @@ object DexKitFinder {
         }
     }
 
+    /** 当前进度文本，供设置页进度弹窗显示；null 表示未在查找 */
     @Volatile
     var progressKey: String? = null
 
     @Volatile
-    var toastContext: android.content.Context? = null
+    private var progressIndex = 0
 
-    private fun toast(text: String) {
-        val ctx = toastContext ?: Env.hostContext ?: return
-        android.os.Handler(android.os.Looper.getMainLooper()).post {
-            runCatching { android.widget.Toast.makeText(ctx, text, android.widget.Toast.LENGTH_SHORT).show() }
-        }
-    }
+    @Volatile
+    private var progressTotal = 0
 
+    /** 后台扫描；无论成败最后都回调 onFinished（保证硬编码兜底也能装上）。 */
     fun doFind(onFinished: () -> Unit) {
         val thread = Thread({
             try {
@@ -63,6 +69,7 @@ object DexKitFinder {
                     return@Thread
                 }
                 val tasks = DexKitTaskRegistry.tasks
+                // 页面侧 Env.hostContext 为空，用 Intent 传来的 hostApkPath 兜底
                 val sourceDir = Env.hostApkPath.ifEmpty { Env.hostContext?.applicationInfo?.sourceDir.orEmpty() }
                 if (sourceDir.isEmpty()) {
                     XposedBridge.log("[QOdeep] 宿主 sourceDir 为空，跳过查找")
@@ -70,16 +77,20 @@ object DexKitFinder {
                 }
 
                 XposedBridge.log("[QOdeep] DexKit 查找方法中...")
+                progressIndex = 0
+                progressTotal = tasks.sumOf { runCatching { it.getQueryMap().size }.getOrDefault(0) }
+                // 第一源：宿主 APK 本身，正常安装包一次即可全部命中
                 scanSource("host apk", tasks) { DexKitBridge.create(sourceDir) }
 
+                // 第二源：运行时已加载的 dex（壳包的真实代码在运行时 dex 里）
                 if (hasUnresolved(tasks)) {
                     scanRuntimeDex(tasks)
                 }
 
+                // 全部扫完统一留痕，避免单源扫不到就写空串把缓存锁死
                 markUnresolved(tasks)
                 DexKitCache.saveCache()
                 XposedBridge.log("[QOdeep] DexKit 查找完成")
-                toast("QOdeep 查找完成")
             } catch (t: Throwable) {
                 XposedBridge.log("[QOdeep] DexKit 查找失败: $t")
             } finally {
@@ -108,8 +119,8 @@ object DexKitFinder {
     }
 
     private fun queryOne(bridge: DexKitBridge, key: String, query: BaseFinder) {
-        progressKey = key
-        toast("QOdeep 查找方法中\n$key")
+        progressIndex++
+        progressKey = "正在查找 $progressIndex / $progressTotal"
         when (query) {
             is FindClass -> {
                 val descriptor = bridge.findClass(query).firstOrNull()?.descriptor
@@ -141,6 +152,9 @@ object DexKitFinder {
         tasks.any { task ->
             runCatching {
                 task.getQueryMap().keys.any { name ->
+                    // 占位槽位（slot 前缀）用宿主 dex 里不存在的字符串占位，永远不会命中；
+                    // 若算进 hasUnresolved，会导致每次冷启动都去扫 QQ 运行时补丁 dex，
+                    // 轻则很慢、重则卡死，设置页入口迟迟装不上。只有真实 key 未命中才扫运行时 dex。
                     if (name.startsWith("slot")) return@any false
                     !DexKitCache.contains("${task.tag}->$name")
                 }

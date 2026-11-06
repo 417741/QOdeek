@@ -7,6 +7,12 @@ import org.luckypray.dexkit.wrap.DexMethod
 import java.io.File
 import java.lang.reflect.Method
 
+/**
+ * DexKit 查找结果缓存。
+ *
+ * 缓存放在宿主 App 的外部数据目录（宿主进程可写），文件名带宿主 APK 指纹校验：
+ * 换包/更新后旧缓存作废，自动触发重扫。每个任务 key 有值（含空串=查过没命中）即视为完整。
+ */
 object DexKitCache {
 
     private const val NOT_FOUND = ""
@@ -20,6 +26,7 @@ object DexKitCache {
     }
 
     private fun hostFingerprint(): String {
+        // 页面侧 Env.hostContext 为空，用 Intent 传来的 hostApkPath 兜底
         val apk = Env.hostApkPath.ifEmpty { Env.hostContext?.applicationInfo?.sourceDir.orEmpty() }
         if (apk.isEmpty()) return ""
         val f = File(apk)
@@ -30,6 +37,7 @@ object DexKitCache {
         cacheMap[key] = descriptor
     }
 
+    /** 标记该 key 已查找但没命中（区别于「没查过」），避免每次启动都误判缓存不完整而全量重扫 */
     fun putUnresolved(key: String) {
         if (!cacheMap.containsKey(key)) cacheMap[key] = NOT_FOUND
     }
@@ -46,6 +54,7 @@ object DexKitCache {
         getDescriptor(key)?.let { DexMethod(it).getMethodInstance(Env.hostClassLoader) }
             ?: throw NoSuchMethodException(key)
 
+    /** 从磁盘读取缓存；失败/指纹变化返回 false（需重扫）。 */
     fun initCache(): Boolean {
         val f = cacheFile ?: return false
         if (!f.exists()) return false
@@ -71,6 +80,7 @@ object DexKitCache {
         }.getOrDefault(false)
     }
 
+    /** 原子写入磁盘（先写 tmp 再 rename），多进程同时扫描也不会写坏。 */
     fun saveCache(): Boolean {
         val f = cacheFile ?: return false
         return runCatching {
@@ -90,6 +100,7 @@ object DexKitCache {
         }.getOrDefault(false)
     }
 
+    /** 所有已注册任务的 key 是否都已就绪。 */
     fun validateAllTasks(): Boolean {
         val keys = DexKitTaskRegistry.tasks.flatMap { task ->
             task.getQueryMap().keys.map { "${task.tag}->$it" }

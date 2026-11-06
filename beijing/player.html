@@ -55,7 +55,17 @@
           antialias: true, preserveDrawingBuffer: true
         });
         if (!gl) { document.title = 'err:no webgl'; return; }
-        cv.width = GAME_W; cv.height = GAME_H;
+
+        // 按屏幕物理分辨率渲染（devicePixelRatio），不再固定 720×1280 被拉伸导致模糊
+        function resize() {
+          var dpr = Math.max(window.devicePixelRatio || 1, 1);
+          var w = Math.round(window.innerWidth * dpr);
+          var h = Math.round(window.innerHeight * dpr);
+          if (w > 0 && h > 0 && (cv.width !== w || cv.height !== h)) {
+            cv.width = w; cv.height = h;
+          }
+        }
+        resize();
 
         var ctx = new SPINE.webgl.ManagedWebGLRenderingContext(gl);
         var tex = new SPINE.webgl.GLTexture(ctx, img);
@@ -77,14 +87,12 @@
         skeleton.updateWorldTransform();
 
         var renderer = new SPINE.webgl.SceneRenderer(cv, ctx);
-        renderer.camera.setViewport(GAME_W, GAME_H);
         var box = gameFrame(data);
-        var view = { zoom: box.width / GAME_W, cx: box.x + box.width / 2, cy: box.y + box.height / 2 };
-        gl.viewport(0, 0, GAME_W, GAME_H);
+        var view = { cx: box.x + box.width / 2, cy: box.y + box.height / 2 };
 
         var last = 0;
         function frame(now) {
-          requestAnimationFrame(frame);
+          resize();
           var dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
           last = now;
           state.update(dt);
@@ -92,14 +100,28 @@
           skeleton.updateWorldTransform();
           gl.clearColor(0, 0, 0, 0);
           gl.clear(gl.COLOR_BUFFER_BIT);
+          // cover 取景：把 720×1280 设计画布按屏幕比例放大铺满（保留原网站裁剪观感）
+          var s = Math.max(cv.width / GAME_W, cv.height / GAME_H); // 像素/世界单位
+          gl.viewport(0, 0, cv.width, cv.height);
           renderer.begin();
+          renderer.camera.setViewport(cv.width, cv.height);
           renderer.camera.position.x = view.cx;
           renderer.camera.position.y = view.cy;
-          renderer.camera.zoom = view.zoom;
+          renderer.camera.zoom = 1 / s;
           renderer.drawSkeleton(skeleton, false);
           renderer.end();
         }
-        requestAnimationFrame(frame);
+        // rAF 主循环；半屏面板/未获焦窗口里 rAF 可能被系统节流甚至暂停，
+        // 用定时器兜底驱动，保证任何窗口状态下背景都在渲染
+        requestAnimationFrame(function loop(now) {
+          requestAnimationFrame(loop);
+          try { frame(now); } catch (e) { document.title = 'err:' + (e && e.message); }
+        });
+        setInterval(function () {
+          if (performance.now() - last >= 40) {
+            try { frame(performance.now()); } catch (e) {}
+          }
+        }, 40);
         document.title = 'ok';
       })
       .catch(function (e) { document.title = 'err:' + (e && e.message); });
