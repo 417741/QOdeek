@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -31,6 +33,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -71,6 +75,10 @@ class SettingsActivity : ComponentActivity() {
         // 寄生打开时窗口主题继承自 QQ 壳 Activity（深色/黑底），强制换成系统亮色主题
         runCatching { setTheme(android.R.style.Theme_Material_Light_NoActionBar) }
         super.onCreate(savedInstanceState)
+        // 给任务打标记，供 MainHook 用 moveTaskToFront 复用（避免每次点击都新建任务）
+        runCatching {
+            setTaskDescription(android.app.ActivityManager.TaskDescription("QOdeep模块页"))
+        }
         // 沉浸式：背景动画铺到状态栏/导航栏底下
         runCatching {
             androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -119,7 +127,9 @@ private fun SettingsPage() {
     // 未选择过时跟随清单第一张（默认端午）；已选择过则用保存值
     val activeKey = bgKey ?: current?.key ?: "duanwu"
 
-    Box(Modifier.fillMaxSize().background(Color(0xFFF2F4F8))) {
+    Box(Modifier.fillMaxSize().background(Color(0xFF101820))) {
+        // 即时封面：点开瞬间就有画面（不再白屏），动画渲染出来后自然覆盖在它上面
+        CoverBackdrop(activeKey, bgDir, Modifier.fillMaxSize())
         // 动态 Spine 背景（资源解压完成后再加载），铺满全屏
         JieqiBackground(activeKey, bgDir, Modifier.fillMaxSize())
 
@@ -127,6 +137,8 @@ private fun SettingsPage() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -307,14 +319,68 @@ private fun DexKitSection() {
     }
 
     if (showDone) {
-        AlertDialog(
+        // 完成提示卡：点外部/返回键都不关闭，只能点「重启 QQ」按钮，点击后自动重启 QQ
+        Dialog(
             onDismissRequest = { showDone = false },
-            confirmButton = {
-                TextButton(onClick = { showDone = false }) { Text(text = "知道了") }
-            },
-            title = { Text(text = "查找完成", fontSize = 18.sp) },
-            text = { Text(text = "DexKit 缓存已重建，重启 QQ 后生效", fontSize = 15.sp) }
-        )
+            properties = DialogProperties(
+                dismissOnClickOutside = false,
+                dismissOnBackPress = false,
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 40.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFFFFFFF))
+                    .padding(24.dp)
+            ) {
+                Text(
+                    text = "查找完成",
+                    color = Color(0xFF111111),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = "DexKit 缓存已重建，重启 QQ 后生效",
+                    color = Color(0xFF555555),
+                    fontSize = 16.sp,
+                    lineHeight = 22.sp
+                )
+                Spacer(Modifier.height(20.dp))
+                Button(
+                    onClick = {
+                        showDone = false
+                        runCatching {
+                            // shell 独立进程不受 QQ 进程死亡影响：1 秒后把 QQ 重新拉起
+                            Runtime.getRuntime().exec(
+                                arrayOf(
+                                    "sh", "-c",
+                                    "sleep 1; monkey -p com.tencent.mobileqq -c android.intent.category.LAUNCHER 1"
+                                )
+                            )
+                        }
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            runCatching { android.os.Process.killProcess(android.os.Process.myPid()) }
+                        }, 300)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3D7FFF))
+                ) {
+                    Text(
+                        text = "重启 QQ",
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
     }
 
     errorMsg?.let { msg ->
@@ -442,6 +508,35 @@ private fun BgPickerDialog(
             }
         }
     )
+}
+
+/** 全屏静态封面：点开瞬间即有画面（优先解压目录，未解压完时直接从模块 APK 单文件提取），
+ *  动画 WebView 渲染后自然覆盖在它上面，因此无需任何切换/淡出逻辑。 */
+@Composable
+private fun CoverBackdrop(key: String, dir: File?, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val bmp by produceState<ImageBitmap?>(initialValue = null, key, dir) {
+        value = withContext(Dispatchers.IO) {
+            runCatching {
+                // 1) 解压目录里已有封面 → 直接读（最快路径）
+                val f = dir?.let { File(it, "${key}_cover.jpg") }
+                if (f != null && f.exists()) {
+                    BitmapFactory.decodeFile(f.absolutePath)?.asImageBitmap()
+                } else {
+                    // 2) 首次进入资源还没解压完 → 从模块 APK 提取单个封面文件（毫秒级）
+                    val info = context.packageManager.getApplicationInfo("com.qosed.qodeep", 0)
+                    val apk = info.sourceDir ?: return@runCatching null
+                    ZipFile(File(apk)).use { zip ->
+                        val e = zip.getEntry("assets/${key}_cover.jpg") ?: return@runCatching null
+                        zip.getInputStream(e).use { BitmapFactory.decodeStream(it) }?.asImageBitmap()
+                    }
+                }
+            }.getOrNull()
+        }
+    }
+    bmp?.let {
+        Image(bitmap = it, contentDescription = null, modifier = modifier, contentScale = ContentScale.Crop)
+    }
 }
 
 /** 从解压目录加载节令封面缩略图。 */

@@ -1,8 +1,14 @@
 package com.qosed.qodeep
 
+import android.app.Activity
+import android.app.ActivityManager
+import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import dalvik.system.BaseDexClassLoader
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
@@ -189,11 +195,80 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
             installSettingHook()
         } else {
             XposedBridge.log("[QOdeep] DexKit 缓存缺失，开始查找方法")
-            DexKitFinder.doFind {
+            findWithProgressUi(hostContext) {
                 runCatching { installSettingHook() }
                     .onFailure { XposedBridge.log("[QOdeep] 设置页 hook 安装失败: $it") }
             }
         }
+    }
+
+    /**
+     * 带进度弹窗的后台扫描：缓存被删后重进 QQ 时，对齐其它模块「弹出查找提示」的体验——
+     * 等宿主第一个 Activity 显示后在其上弹不可取消的对话框，实时刷新进度，扫完自动关闭。
+     * 扫描快于首屏完成时则不弹，避免一闪而过。
+     */
+    private fun findWithProgressUi(hostContext: Context, onDone: () -> Unit) {
+        val mainHandler = Handler(Looper.getMainLooper())
+        var finished = false
+        var dialog: android.app.AlertDialog? = null
+
+        fun close() {
+            finished = true
+            mainHandler.post {
+                runCatching { dialog?.dismiss() }
+                dialog = null
+            }
+        }
+
+        DexKitFinder.doFind {
+            runCatching { onDone() }
+                .onFailure { XposedBridge.log("[QOdeep] 设置页 hook 安装失败: $it") }
+            close()
+        }
+
+        // registerActivityLifecycleCallbacks 在 Application 上，hostContext 是宿主 Application 实例
+        val app = hostContext.applicationContext as? Application
+        if (app == null) {
+            // 拿不到 Application 实例就退化为静默扫描
+            return
+        }
+        app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+            private var fired = false
+            override fun onActivityResumed(activity: Activity) {
+                if (fired || finished) return
+                fired = true
+                mainHandler.post {
+                    if (finished) return@post
+                    val d = android.app.AlertDialog.Builder(activity)
+                        .setTitle("QOdeep")
+                        .setMessage("准备开始查找...")
+                        .setCancelable(false)
+                        .create()
+                    dialog = d
+                    runCatching { d.show() }
+                    // 轮询 DexKitFinder.progressKey 刷新进度文本；完成时关闭对话框
+                    val tick = object : Runnable {
+                        override fun run() {
+                            val cur = dialog ?: return
+                            if (finished) {
+                                runCatching { cur.dismiss() }
+                                dialog = null
+                                return
+                            }
+                            cur.setMessage(DexKitFinder.progressKey ?: "正在查找方法中...")
+                            mainHandler.postDelayed(this, 200)
+                        }
+                    }
+                    mainHandler.post(tick)
+                }
+            }
+            override fun onActivityCreated(p0: Activity, p1: Bundle?) {}
+            override fun onActivityStarted(p0: Activity) {}
+            override fun onActivityPaused(p0: Activity) {}
+            override fun onActivityStopped(p0: Activity) {}
+            override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {}
+            override fun onActivityDestroyed(p0: Activity) {}
+        })
     }
 
     private fun initEnv(hostContext: Context) {
@@ -464,22 +539,68 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
     private fun openSettings(context: Context) {
         try {
             Parasitics.ensureInitialized(context)
+            // 单例：已有模块页任务在后台就直接带回前台，避免 MULTIPLE_TASK 每次点击都新建任务
+            val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+            val existing = am?.let { findModuleTask(it) } ?: -1
+            if (existing >= 0) {
+                runCatching { am?.moveTaskToFront(existing, 0) }
+                return
+            }
             // 用 QQ 进程内的 context 构造 Intent，组件包名会保持为宿主包名，
             // 从而避开 QQ 客户端「离开 QQ」检测；真正类名由 Parasitics 在 binder 层换壳。
             val intent = Intent(context, SettingsActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+                // 逃出 QQ 设置页的嵌入分屏：新任务不参与 split，直接全屏、无「从右边抖到左边」；
+                // 上面的复用检查保证不会因 MULTIPLE_TASK 堆出多个任务。
+                addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
                 // 寄生页面与 MainHook 不同 ClassLoader，Env 字段不通，把环境随 Intent 带过去
                 putExtra(SettingsActivity.ENV_DATA_DIR, Env.moduleDataDir)
                 putExtra(SettingsActivity.ENV_NATIVE_LIB_DIR, Env.moduleNativeLibDir)
                 putExtra(SettingsActivity.ENV_HOST_APK, Env.hostApkPath)
             }
-            context.startActivity(intent)
+            context.startActivity(intent, buildFullscreenOptions(context))
             XposedBridge.log("[QOdeep] 已在 QQ 内打开设置页（寄生）")
         } catch (t: Throwable) {
             XposedBridge.log("[QOdeep] 打开设置页失败: $t")
         }
+    }
+
+    /** 按 taskDescription 标记查找已存在的模块页任务 id，找不到返回 -1。 */
+    private fun findModuleTask(am: ActivityManager): Int {
+        val tasks = runCatching { am.getRunningTasks(64) }.getOrNull() ?: return -1
+        for (t in tasks) {
+            // TaskDescription.label 在不同 compileSdk 上字段名有差异，反射读取最稳
+            val label = runCatching {
+                val desc = t.javaClass.getField("description").get(t) ?: return@runCatching null
+                desc.javaClass.getMethod("getLabel").invoke(desc)?.toString()
+            }.getOrNull()
+            if (label == MODULE_TASK_LABEL) return t.id
+        }
+        return -1
+    }
+
+    /**
+     * 构造「瞬开 + 逃出 QQ 嵌入分屏」的启动选项：
+     * 1. makeCustomAnimation(0, 0) —— 去掉转场动画，点击后页面直接出现（对齐 FunBox 观感）；
+     * 2. 显式声明全屏窗口模式 —— 系统的嵌入逻辑遇到明确窗口模式的启动会跳过嵌入；
+     * 3. alwaysExpand（Android 13+ 隐藏 API）—— 声明此启动必须铺满整屏。
+     * 两者都失败时返回 null，退回普通启动。
+     */
+    private fun buildFullscreenOptions(context: Context): android.os.Bundle? {
+        val opts = android.app.ActivityOptions.makeCustomAnimation(context, 0, 0)
+        runCatching {
+            android.app.ActivityOptions::class.java
+                .getMethod("setLaunchWindowingMode", Int::class.javaPrimitiveType!!)
+                .invoke(opts, 1) // WindowConfiguration.WINDOWING_MODE_FULLSCREEN
+        }
+        runCatching {
+            android.app.ActivityOptions::class.java
+                .getMethod("setLaunchAlwaysExpand")
+                .invoke(opts)
+        }
+        return runCatching { opts.toBundle() }.getOrNull()
     }
 
     companion object {
@@ -492,5 +613,6 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         private const val ENTRY_TITLE = "QOdeep"
         private const val BOTTOM_TITLE = ""
         private const val ENTRY_TYPE = 100
+        private const val MODULE_TASK_LABEL = "QOdeep模块页"
     }
 }

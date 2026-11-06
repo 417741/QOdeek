@@ -15,8 +15,8 @@ android {
         applicationId = "com.qosed.qodeep"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.0.1"
+        versionCode = 7
+        versionName = "0.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -62,8 +62,8 @@ android {
 
 // gradlew 一键打包：构建 release 后改名 QOdeep.apk 复制到项目根目录
 tasks.register("一键打包") {
-    group = "build"
-    description = "Build signed release APK and copy it to project root as QOdeep.apk"
+    group = "打包"
+    description = "构建正式签名 APK 并复制为项目根目录的 QOdeep.apk"
     dependsOn("assembleRelease")
     // 配置期先捕获路径，避免 doLast 里引用 Project 破坏 configuration cache
     val apkDir = layout.buildDirectory.dir("outputs/apk/release").get().asFile
