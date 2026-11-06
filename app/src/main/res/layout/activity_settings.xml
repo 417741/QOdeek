@@ -6,9 +6,12 @@
     │    ├─ ImageView  静态封面（点开瞬间即有画面，Glide 加载）
     │    ├─ WebView    Spine 节令动画背景（透明，铺满，代码里加载）
     │    └─ TextView   资源准备中提示
-    └─ ScrollView 卡片列（每张卡一个 BlurView 真毛玻璃）
-       关键：BlurView 的采样源是 bgLayer 而不是整个 root ——
-       快照里只可能存在背景内容，卡片/图标/UI 残影永远混不进毛玻璃。
+    └─ ScrollView 卡片列
+       每张卡 = FrameLayout，内含一张「模糊底图」ImageView：
+       用封面的极小图（~72px）放大铺满卡片并按位置矩阵对齐背景，
+       放大插值天然呈高斯模糊质感 —— 不依赖 BlurView 的实时快照，
+       其离屏 GPU 渲染在 QQ 寄生环境会输出灰色错位图（灰块/灰晕），
+       此方案零渲染依赖，独立 App 与寄生环境画面必然一致。
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
@@ -63,11 +66,20 @@
             android:paddingBottom="28dp">
 
             <!-- 标题卡：logo + 名称 -->
-            <eightbitlab.com.blurview.BlurView
+            <FrameLayout
                 android:id="@+id/cardTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_frosted_card">
+                android:background="@drawable/bg_frosted_card"
+                android:clipToOutline="true"
+                android:outlineProvider="background">
+
+                <ImageView
+                    android:id="@+id/glassTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="matrix"
+                    android:contentDescription="@null" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -111,15 +123,24 @@
                         android:textColor="#9AA0A6"
                         android:textSize="13sp" />
                 </LinearLayout>
-            </eightbitlab.com.blurview.BlurView>
+            </FrameLayout>
 
             <!-- 更换背景卡：chip + 标题/副标题 + 当前值 + 箭头 -->
-            <eightbitlab.com.blurview.BlurView
+            <FrameLayout
                 android:id="@+id/cardBg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_frosted_card">
+                android:background="@drawable/bg_frosted_card"
+                android:clipToOutline="true"
+                android:outlineProvider="background">
+
+                <ImageView
+                    android:id="@+id/glassBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="matrix"
+                    android:contentDescription="@null" />
 
                 <LinearLayout
                     android:id="@+id/bgRow"
@@ -175,15 +196,24 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
-            </eightbitlab.com.blurview.BlurView>
+            </FrameLayout>
 
             <!-- DexKit 缓存卡：状态行 + 重建入口 + 说明 -->
-            <eightbitlab.com.blurview.BlurView
+            <FrameLayout
                 android:id="@+id/cardDexkit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_frosted_card">
+                android:background="@drawable/bg_frosted_card"
+                android:clipToOutline="true"
+                android:outlineProvider="background">
+
+                <ImageView
+                    android:id="@+id/glassDex"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="matrix"
+                    android:contentDescription="@null" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -270,7 +300,7 @@
                         android:textColor="#FF9500"
                         android:textSize="12sp" />
                 </LinearLayout>
-            </eightbitlab.com.blurview.BlurView>
+            </FrameLayout>
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

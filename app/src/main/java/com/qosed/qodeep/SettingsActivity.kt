@@ -21,9 +21,6 @@ import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import eightbitlab.com.blurview.BlurView
-import com.lxj.xpopup.XPopup
-import com.lxj.xpopup.core.CenterPopupView
 import org.json.JSONObject
 import java.io.File
 import java.util.zip.ZipFile
@@ -181,46 +178,98 @@ class SettingsActivity : ComponentActivity() {
         val bgCover = findViewById<ImageView>(R.id.bgCover)
         val bgAnim = findViewById<WebView>(R.id.bgAnim)
         val tvHint = findViewById<TextView>(R.id.tvHint)
-        val cardTitle = findViewById<BlurView>(R.id.cardTitle)
-        val cardBg = findViewById<BlurView>(R.id.cardBg)
-        val cardDexkit = findViewById<BlurView>(R.id.cardDexkit)
+        val cardTitle = findViewById<FrameLayout>(R.id.cardTitle)
+        val cardBg = findViewById<FrameLayout>(R.id.cardBg)
+        val cardDexkit = findViewById<FrameLayout>(R.id.cardDexkit)
+
+        // 卡片毛玻璃底：纯代码自绘（半透明白渐变 + 22dp 圆角 + 白描边）。
+        // 不用 XML drawable —— 寄生环境资源引用不可靠，而且圆角还决定玻璃层的裁剪轮廓。
+        fun frostedCardBg(): GradientDrawable {
+            val radius = 22f * resources.displayMetrics.density
+            return GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = radius
+                colors = intArrayOf(0xE6FFFFFF.toInt(), 0xB3FFFFFF.toInt())
+                orientation = GradientDrawable.Orientation.TOP_BOTTOM
+                setStroke((1f * resources.displayMetrics.density).toInt(), 0x59FFFFFF)
+            }
+        }
+        for (c in listOf(cardTitle, cardBg, cardDexkit)) {
+            c.background = frostedCardBg()
+            c.clipToOutline = true
+            c.outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
+        }
         val tvCurrentBg = findViewById<TextView>(R.id.tvCurrentBg)
         val tvDexReady = findViewById<TextView>(R.id.tvDexReady)
         val tvDexDesc = findViewById<TextView>(R.id.tvDexDesc)
         val dexRebuildRow = findViewById<LinearLayout>(R.id.dexRebuildRow)
         val tvRebuild = findViewById<TextView>(R.id.tvRebuild)
 
-        // 三张卡片：真·高斯模糊毛玻璃（实时采样底下封面 + 动画 WebView）
-        // 关键：显式指定 RenderEffectBlur（纯 GPU 的 RenderNode 实现）。
-        // BlurView 2.0.6 的默认算法在 SDK_INT < 31 时走 RenderScriptBlur，
-        // RenderScript 在 Android 12+ 已废弃、部分国产 ROM 直接 native 崩溃，
-        // 表现为「点击入口 QQ 秒重启」。这里强制走 RenderEffect，彻底绕开 RenderScript。
-        val blurAlgorithm = if (Build.VERSION.SDK_INT >= 31) {
-            eightbitlab.com.blurview.RenderEffectBlur()
-        } else {
-            // 低版本系统退回到 SDK 默认分支（RenderScript），旧系统 RenderScript 是稳定可用的
-            null
-        }
-        // 模糊采样源：独立背景层 bgLayer（只含封面 + WebView）。
-        // 之前直接采 root，快照链路里路过卡片/图标层，窗口尺寸/位置在寄生壳的
-        // 进场动画期间抖动时，会把 UI 残影放大糊成一坨灰色（用户截图里的"一大坨黑"）。
-        // 采样源换成 bgLayer 后，快照里只可能存在背景内容。
-        val bgLayer = findViewById<FrameLayout>(R.id.bgLayer)
-        // setupWith 延后到首帧布局完成（post）：确保 init 时拿到真实尺寸，
-        // 避免 0x0 初始化产生错误大小的模糊位图被拉伸成色块。
-        root.post {
-            for (card in listOf(cardTitle, cardBg, cardDexkit)) {
-                card.clipToOutline = true
-                val facade = if (blurAlgorithm != null) {
-                    card.setupWith(bgLayer, blurAlgorithm)
-                } else {
-                    card.setupWith(bgLayer)
-                }
-                facade.setFrameClearDrawable(window.decorView.background)
-                    .setBlurEnabled(true)
-                    .setBlurRadius(18f)
+        // ---- 卡片毛玻璃（确定性实现，不用 BlurView）----
+        // BlurView 的实时快照模糊依赖离屏 GPU 渲染，在 QQ 寄生环境会输出灰色
+        // 错位图（卡片上方矩形灰块、弹窗后椭圆灰晕），独立 App 正常——环境不可控。
+        // 替代：把封面解码成 ~64px 小图（放大插值天然呈高斯模糊质感），铺到卡片
+        // 底层并用 Matrix 与全屏背景按位置对齐。零渲染依赖，两端画面必然一致。
+        val glassViews = listOf(
+            findViewById<ImageView>(R.id.glassTitle),
+            findViewById<ImageView>(R.id.glassBg),
+            findViewById<ImageView>(R.id.glassDex)
+        )
+        val glassCards = listOf(cardTitle, cardBg, cardDexkit)
+        var glassBitmap: android.graphics.Bitmap? = null
+        var glassJob = 0
+
+        fun refreshGlass() {
+            val bmp = glassBitmap ?: return
+            val rw = root.width
+            val rh = root.height
+            if (rw <= 0 || rh <= 0) return
+            val bw = bmp.width.toFloat()
+            val bh = bmp.height.toFloat()
+            if (bw <= 0f || bh <= 0f) return
+            // 与 bgCover 相同的 centerCrop 几何，把小图放大到全屏坐标系
+            val s = maxOf(rw / bw, rh / bh)
+            val dx = (rw - bw * s) / 2f
+            val dy = (rh - bh * s) / 2f
+            val rootLoc = IntArray(2)
+            root.getLocationOnScreen(rootLoc)
+            for (i in glassViews.indices) {
+                val g = glassViews[i]
+                if (g.width <= 0) continue
+                val loc = IntArray(2)
+                glassCards[i].getLocationOnScreen(loc)
+                val m = android.graphics.Matrix()
+                m.setScale(s, s)
+                m.postTranslate(dx - (loc[0] - rootLoc[0]), dy - (loc[1] - rootLoc[1]))
+                g.imageMatrix = m
             }
         }
+
+        fun setGlassCover(f: File?) {
+            if (f == null) return
+            val job = ++glassJob
+            Thread {
+                // 采样步长：把封面缩到宽 ~64px，放大后自然模糊
+                val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                runCatching { android.graphics.BitmapFactory.decodeFile(f.absolutePath, bounds) }
+                var sample = 1
+                while (bounds.outWidth / (sample * 2) >= 64) sample *= 2
+                val bmp = runCatching {
+                    android.graphics.BitmapFactory.decodeFile(
+                        f.absolutePath,
+                        android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
+                    )
+                }.getOrNull()
+                main.post {
+                    if (job != glassJob || bmp == null) return@post
+                    glassBitmap = bmp
+                    for (g in glassViews) g.setImageBitmap(bmp)
+                    refreshGlass()
+                }
+            }.start()
+        }
+        root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> refreshGlass() }
+        findViewById<View>(R.id.scroll).viewTreeObserver.addOnScrollChangedListener { refreshGlass() }
 
         // 彩色圆角图标块（FunBox 风格）：14% 透明度底 + 前景色字符
         fun chip(host: FrameLayout, glyph: String, argb: Int) {
@@ -264,6 +313,8 @@ class SettingsActivity : ComponentActivity() {
             val cover = bgDir?.let { File(it, "${active}_cover.jpg") }
             if (cover != null && cover.exists()) {
                 Glide.with(this).load(cover).centerCrop().into(bgCover)
+                // 卡片毛玻璃底图同步换成新封面（换背景时毛玻璃跟着变）
+                setGlassCover(cover)
             }
             // 动态 Spine 背景：WebView 加载（资源就绪后只 load 一次）
             if (bgDir != null && animLoadedKey != active) {
@@ -275,15 +326,19 @@ class SettingsActivity : ComponentActivity() {
 
         setupWebView(bgAnim) { bgDir }
 
-        // 更换背景卡 → XPopup 宫格选择弹窗
+        // 自研弹窗宿主（弃用 XPopup 弹窗壳：库资源在寄生环境解析错乱出灰团/圆角失效）
+        val popupHost = KitPopupHost(this)
+
+        // 更换背景卡 → 宫格选择弹窗
         findViewById<LinearLayout>(R.id.bgRow).setOnClickListener {
             if (items.isEmpty() || bgDir == null) return@setOnClickListener
-            val popup = BgPickerPopup(mctx, items, bgKey ?: items.firstOrNull()?.key ?: "duanwu", bgDir) { key ->
+            val sheet = BgPickerSheet(mctx, items, bgKey ?: items.firstOrNull()?.key ?: "duanwu", bgDir) { key ->
                 prefs.edit().putString("bg_key", key).apply()
                 bgKey = key
                 refreshCurrent()
             }
-            XPopup.Builder(mctx).asCustom(popup).show()
+            popupHost.showCenter(sheet)
+            sheet.onDismiss = { popupHost.dismiss() }
         }
 
         // DexKit 缓存状态读取（后台线程，避免 IO 卡主线程）
@@ -297,7 +352,7 @@ class SettingsActivity : ComponentActivity() {
             }
         }.start()
 
-        // 重建入口 → XPopup 进度弹窗（模态，轮询 progressKey）→ 完成/失败弹窗
+        // 重建入口 → 进度弹窗（模态，轮询 progressKey）→ 完成/失败弹窗
         dexRebuildRow.setOnClickListener {
             if (rebuilding) return@setOnClickListener
             rebuilding = true
@@ -305,18 +360,15 @@ class SettingsActivity : ComponentActivity() {
             tvDexReady.setTextColor(0xFF8A8A8A.toInt())
             tvDexReady.text = "查找中..."
             tvDexDesc.text = "正在重新查找，请稍候..."
-            val progress = DexProgressPopup(mctx)
+            val progress = DexProgressSheet(mctx)
             val progressTicker = object : Runnable {
                 override fun run() {
                     progress.setKey(DexKitFinder.progressKey ?: "准备开始...")
                     main.postDelayed(this, 100)
                 }
             }
-            XPopup.Builder(mctx)
-                .dismissOnTouchOutside(false)
-                .dismissOnBackPressed(false)
-                .asCustom(progress)
-                .show()
+            // 模态进度弹窗：遮罩不可点关
+            popupHost.showCenter(progress, cancelable = false)
             main.post(progressTicker)
             Thread {
                 runCatching {
@@ -324,43 +376,34 @@ class SettingsActivity : ComponentActivity() {
                     DexKitFinder.doFind {
                         main.post {
                             main.removeCallbacks(progressTicker)
-                            progress.dismiss()
                             rebuilding = false
                             tvRebuild.setTextColor(0xFF222222.toInt())
-                            XPopup.Builder(mctx)
-                                .dismissOnTouchOutside(false)
-                                .dismissOnBackPressed(false)
-                                // 显式传按钮文案：寄生资源环境下 XPopup 库布局里的默认字符串引用
-                                // 会解析失败退化成 "@资源ID" 字面量，不能依赖默认文案
-                                .asConfirm(
-                                    "查找完成", "DexKit 缓存已重建，重启 QQ 后生效",
-                                    "取消", "确定",
-                                    {
-                                        runCatching {
-                                            // shell 独立进程不受 QQ 进程死亡影响：1 秒后把 QQ 重新拉起
-                                            Runtime.getRuntime().exec(
-                                                arrayOf(
-                                                    "sh", "-c",
-                                                    "sleep 1; monkey -p com.tencent.mobileqq -c android.intent.category.LAUNCHER 1"
-                                                )
+                            popupHost.confirm(
+                                "查找完成", "DexKit 缓存已重建，重启 QQ 后生效",
+                                cancelable = false,
+                                onOk = {
+                                    runCatching {
+                                        // shell 独立进程不受 QQ 进程死亡影响：1 秒后把 QQ 重新拉起
+                                        Runtime.getRuntime().exec(
+                                            arrayOf(
+                                                "sh", "-c",
+                                                "sleep 1; monkey -p com.tencent.mobileqq -c android.intent.category.LAUNCHER 1"
                                             )
-                                        }
-                                        main.postDelayed({
-                                            runCatching { android.os.Process.killProcess(android.os.Process.myPid()) }
-                                        }, 300)
-                                    }, null, false
-                                ).show()
+                                        )
+                                    }
+                                    main.postDelayed({
+                                        runCatching { android.os.Process.killProcess(android.os.Process.myPid()) }
+                                    }, 300)
+                                }
+                            )
                         }
                     }
                 }.onFailure {
                     main.post {
                         main.removeCallbacks(progressTicker)
-                        progress.dismiss()
                         rebuilding = false
                         tvRebuild.setTextColor(0xFF222222.toInt())
-                        XPopup.Builder(mctx)
-                            .asConfirm("查找失败", "重建失败: ${it.message}", "取消", "确定", {}, null, false)
-                            .show()
+                        popupHost.confirm("查找失败", "重建失败: ${it.message}")
                     }
                 }
             }.start()
@@ -499,18 +542,22 @@ class SettingsActivity : ComponentActivity() {
 }
 
 /** 更换背景弹窗：三列宫格显示各节令静态封面，点选立即生效并持久化。 */
-class BgPickerPopup(
+class BgPickerSheet(
     context: Context,
     private val items: List<JieqiCatalog.Item>,
     private val currentKey: String,
     private val dir: File?,
     private val onSelect: (String) -> Unit
-) : CenterPopupView(context) {
+) : LinearLayout(context) {
 
-    override fun getImplLayoutId(): Int = R.layout.popup_bg_picker
+    /** 点选或关闭时由宿主调用 */
+    var onDismiss: (() -> Unit)? = null
 
-    override fun onCreate() {
-        super.onCreate()
+    init {
+        // 寄生环境必须用模块 ClassLoader + 模块资源 inflate
+        android.view.LayoutInflater.from(context).inflate(R.layout.popup_bg_picker, this, true)
+        // 圆角白底用纯代码自绘，覆盖 XML 里的 drawable 引用（寄生环境资源引用不可靠）
+        background = roundedWhite(context)
         val grid = findViewById<RecyclerView>(R.id.bgGrid)
         grid.layoutManager = GridLayoutManager(context, 3)
         grid.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -530,7 +577,7 @@ class BgPickerPopup(
                 val radius = 10f * context.resources.displayMetrics.density
                 val bg = GradientDrawable().apply {
                     cornerRadius = radius
-                    setColor(0xFFEDEDED.toInt())
+                    setColor(0xFFFFFFFF.toInt())
                     setStroke(
                         if (selected) (2f * context.resources.displayMetrics.density).toInt() else 0,
                         0xFF0A7AFF.toInt()
@@ -540,20 +587,68 @@ class BgPickerPopup(
                 iv.clipToOutline = true
                 tv.text = item.name
                 tv.setTextColor(if (selected) 0xFF0A7AFF.toInt() else 0xFF8A8A8A.toInt())
+                // 缩略图不用 Glide（寄生环境图片加载不可靠，失败时留灰块）：
+                // 直接用 BitmapFactory 同步读本地封面，读不到就保持白底，绝不出现灰块。
                 val cover = dir?.let { File(it, "${item.key}_cover.jpg") }
                 if (cover != null && cover.exists()) {
-                    Glide.with(context).load(cover).centerCrop().into(iv)
+                    val bmp = runCatching {
+                        android.graphics.BitmapFactory.decodeFile(cover.absolutePath)
+                    }.getOrNull()
+                    if (bmp != null) iv.setImageBitmap(bmp) else iv.setImageDrawable(null)
+                } else {
+                    iv.setImageDrawable(null)
                 }
-                h.itemView.setOnClickListener { onSelect(item.key); dismiss() }
+                h.itemView.setOnClickListener {
+                    onSelect(item.key)
+                    onDismiss?.invoke()
+                }
             }
         }
     }
 }
 
 /** DexKit 重建进度弹窗：模态，外部轮询更新当前任务 key。 */
-class DexProgressPopup(context: Context) : CenterPopupView(context) {
+class DexProgressSheet(context: Context) : FrameLayout(context) {
 
-    override fun getImplLayoutId(): Int = R.layout.popup_dex_progress
+    /** 关闭时由宿主调用 */
+    var onDismiss: (() -> Unit)? = null
+
+    private val bar: View
+
+    init {
+        android.view.LayoutInflater.from(context).inflate(R.layout.popup_dex_progress, this, true)
+        // 圆角白底纯代码自绘，覆盖 XML 里的 drawable 引用（寄生环境资源引用不可靠）
+        background = roundedWhite(context)
+        // 进度条：纯代码不确定动画（一个来回扫动的蓝色圆角条），
+        // 不用系统 ProgressBar（其 indeterminate 动画资源在寄生环境会渲染成灰块）
+        bar = View(context).apply {
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = 3f * context.resources.displayMetrics.density
+                setColor(0xFF0A7AFF.toInt())
+            }
+        }
+        val host = findViewById<View>(R.id.progress)
+        (host as ViewGroup).addView(bar, ViewGroup.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT))
+        val anim = object : Runnable {
+            private var dir = 1
+            private var frac = 0f
+            override fun run() {
+                frac += 0.03f * dir
+                if (frac >= 1f) { frac = 1f; dir = -1 }
+                if (frac <= 0f) { frac = 0f; dir = 1 }
+                val w = host.width
+                if (w > 0) {
+                    val bw = (w * 0.4f).toInt()
+                    val left = (frac * (w - bw)).toInt()
+                    bar.layout(left, 0, left + bw, host.height)
+                    bar.visibility = View.VISIBLE
+                }
+                postDelayed(this, 16)
+            }
+        }
+        post(anim)
+    }
 
     fun setKey(text: String) {
         findViewById<TextView>(R.id.tvKey)?.text = text

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 更换背景弹窗：标题 + 三列宫格 RecyclerView -->
+<!-- 更换背景弹窗：标题 + 三列宫格 RecyclerView
+     背景不用 XML drawable（寄生环境资源引用不可靠），由代码 roundedWhite() 自绘 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_popup"
     android:orientation="vertical"
     android:paddingStart="20dp"
     android:paddingEnd="20dp"

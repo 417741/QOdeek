@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- DexKit 重建进度弹窗：标题 + 当前任务 key + 不确定进度条 -->
+<!-- DexKit 重建进度弹窗：标题 + 当前任务 key + 不确定进度条
+     背景不用 XML drawable（寄生环境资源引用不可靠），由代码 roundedWhite() 自绘 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_popup"
     android:orientation="vertical"
     android:padding="24dp">
 
@@ -24,10 +24,12 @@
         android:textColor="#8A8A8A"
         android:textSize="14sp" />
 
-    <ProgressBar
+    <!-- 不确定进度条：不用系统 ProgressBar（其 indeterminate 动画 drawable
+         在寄生环境可能被宿主资源污染渲染成灰块），改用一个空 View 占位，
+         由代码填充纯色圆角进度条，零系统资源依赖 -->
+    <FrameLayout
         android:id="@+id/progress"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:indeterminate="true" />
+        android:layout_height="6dp"
+        android:layout_marginTop="16dp" />
 </LinearLayout>
