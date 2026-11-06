@@ -21,6 +21,7 @@ local.properties
 *.apk
 *.aar
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 res_dump.txt
 setting_classes.txt
 

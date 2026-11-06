@@ -16,7 +16,7 @@ android {
         minSdk = 30
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -55,9 +55,9 @@ android {
     }
 }
 
-// 一键打包：gradlew packRelease
+// 一键打包：gradlew 一键打包
 // 构建 release APK 后，改名为应用名称 QOdeep.apk，直接放到项目根目录（不在子文件夹里）
-tasks.register("packRelease") {
+tasks.register("一键打包") {
     group = "build"
     description = "Build signed release APK and copy it to project root as QOdeep.apk"
     dependsOn("assembleRelease")
