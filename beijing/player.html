@@ -41,10 +41,11 @@
   }
 
   function start() {
-    if (!SPINE) return;
+    if (!SPINE) { document.title = 'err:no spine'; return; }
     var atlasUrl = './jieqi_' + key + '.atlas';
     var binUrl = './jieqi_' + key + '.bin';
     var texUrl = './jieqi_' + key + '.webp';
+    document.title = 'loading';
 
     Promise.all([loadImage(texUrl), fetchText(atlasUrl), fetchBuffer(binUrl)])
       .then(function (a) {
@@ -53,7 +54,7 @@
           alpha: true, premultipliedAlpha: false,
           antialias: true, preserveDrawingBuffer: true
         });
-        if (!gl) return;
+        if (!gl) { document.title = 'err:no webgl'; return; }
         cv.width = GAME_W; cv.height = GAME_H;
 
         var ctx = new SPINE.webgl.ManagedWebGLRenderingContext(gl);

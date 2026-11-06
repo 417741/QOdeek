@@ -1,0 +1,509 @@
+package me.lengyu.qedge.hook;
+
+import android.content.Context;
+import java.util.concurrent.atomic.AtomicBoolean;
+import me.lengyu.qedge.common.ModuleScope;
+import me.lengyu.qedge.hook.api.FromServiceMsgDispatcher;
+import me.lengyu.qedge.hook.item.DownloadEmotion;
+import me.lengyu.qedge.hook.item.FlashPicBypass;
+import me.lengyu.qedge.hook.item.TransparentAvatar;
+import me.lengyu.qedge.hook.item.VideoToBubble;
+import me.lengyu.qedge.hook.item.AntiPokeDelay;
+import me.lengyu.qedge.hook.item.AutoLikeBack;
+import me.lengyu.qedge.hook.item.KeepAliveHook;
+import me.lengyu.qedge.hook.item.LevelBoost;
+import me.lengyu.qedge.hook.item.TimArkCardBypass;
+import me.lengyu.qedge.hook.api.OnMenuBuild;
+import me.lengyu.qedge.hook.api.OnPaiYiPai;
+import me.lengyu.qedge.hook.api.OnQZonePush;
+import me.lengyu.qedge.hook.api.OnReceiveMsg;
+import me.lengyu.qedge.hook.api.OnSendMsg;
+import me.lengyu.qedge.hook.api.OnTroopJoin;
+import me.lengyu.qedge.hook.api.OnTroopQuit;
+import me.lengyu.qedge.hook.api.OnTroopShutUp;
+import me.lengyu.qedge.hook.api.OnGetRKey;
+import me.lengyu.qedge.hook.entry.QQPlusInject;
+import me.lengyu.qedge.hook.base.BaseApiHookItem;
+import me.lengyu.qedge.hook.base.BaseClickableHookItem;
+import me.lengyu.qedge.hook.base.BaseSwitchHookItem;
+import me.lengyu.qedge.hook.base.HookRegistry;
+import me.lengyu.qedge.plugin.bean.PluginInfo;
+import me.lengyu.qedge.plugin.PluginManager;
+import me.lengyu.qedge.plugin.view.ChatSettingLoader;
+import me.lengyu.qedge.plugin.view.MediaPanelLoader;
+import me.lengyu.qedge.hook.HeartbeatManager;
+import me.lengyu.qedge.utils.HostInfo;
+import me.lengyu.qedge.utils.HookUtils;
+import me.lengyu.qedge.utils.LogUtils;
+import me.lengyu.qedge.utils.ModuleConfig;
+import me.lengyu.qedge.utils.qq.QQCurrentEnv;
+import me.lengyu.qedge.utils.ReflectUtils;
+import me.lengyu.qedge.hook.entry.QQSettingInject;
+import me.lengyu.qedge.coldrain.ColdRainCore;
+import me.lengyu.qedge.hook.item.RemoveLinkInfo;
+import me.lengyu.qedge.hook.item.PreventRecall;
+import me.lengyu.qedge.hook.item.AntiQfixPatch;
+import me.lengyu.qedge.hook.item.AntiReport;
+import me.lengyu.qedge.hook.item.ForceVip;
+import me.lengyu.qedge.hook.item.DisableAIAvatar;
+import me.lengyu.qedge.hook.item.HideVirtualAvatar;
+import me.lengyu.qedge.hook.item.HideSuperEmotion;
+import me.lengyu.qedge.hook.item.HideQmateTitleIcon;
+import me.lengyu.qedge.hook.item.DisableAioLeftSwipe;
+import me.lengyu.qedge.hook.item.DisableHomePullDown;
+import me.lengyu.qedge.hook.item.CopyArkMessage;
+import me.lengyu.qedge.hook.item.LongClickSendCard;
+import me.lengyu.qedge.hook.item.RepeatMsg;
+import me.lengyu.qedge.hook.item.ImageSummary;
+import me.lengyu.qedge.hook.item.EmotionAiTag;
+import me.lengyu.qedge.hook.item.ImageRatioOverride;
+import me.lengyu.qedge.hook.item.RemoveRiskWebpageBlock;
+import me.lengyu.qedge.hook.item.RemoveAds;
+import me.lengyu.qedge.hook.item.VoiceSpeed;
+import me.lengyu.qedge.hook.item.QLogRedirect;
+import me.lengyu.qedge.hook.item.RemoveQrCodeCheck;
+import me.lengyu.qedge.hook.item.ForceSpeaker;
+import me.lengyu.qedge.hook.item.BypassProfileBan;
+import me.lengyu.qedge.hook.item.SkipScanWaitTime;
+import me.lengyu.qedge.hook.item.SplitScreenScan;
+import me.lengyu.qedge.hook.item.DisableWebSecurityCheck;
+import me.lengyu.qedge.hook.item.DisableSecCheck;
+import me.lengyu.qedge.hook.item.ForceModuleToast;
+import me.lengyu.qedge.hook.item.ForceInputNoLimit;
+import me.lengyu.qedge.hook.item.ForceFullScreenBtnShow;
+import me.lengyu.qedge.hook.item.WebJsBridgeAllowlist;
+import me.lengyu.qedge.hook.item.NativeEmotionDownload;
+import me.lengyu.qedge.hook.item.HideDressBeancurd;
+import me.lengyu.qedge.hook.item.HideAioPet;
+import me.lengyu.qedge.hook.item.Apk1AsApk;
+import me.lengyu.qedge.hook.item.GlassBottomTabBar;
+
+import java.util.List;
+/**
+ * @Author 冷雨
+ * @Description 主钩子类
+ */
+public class MainHook {
+
+    private static final AtomicBoolean initialized = new AtomicBoolean(false);
+
+    public static void registerHookItems() {
+        HookRegistry.register(OnGetRKey.INSTANCE);
+        HookRegistry.register(OnReceiveMsg.INSTANCE);
+        HookRegistry.register(OnSendMsg.INSTANCE);
+        HookRegistry.register(OnTroopJoin.INSTANCE);
+        HookRegistry.register(OnTroopQuit.INSTANCE);
+        HookRegistry.register(OnTroopShutUp.INSTANCE);
+        HookRegistry.register(OnPaiYiPai.INSTANCE);
+        HookRegistry.register(OnMenuBuild.INSTANCE);
+        HookRegistry.register(OnQZonePush.INSTANCE);
+        HookRegistry.register(FlashPicBypass.INSTANCE);
+        HookRegistry.register(DownloadEmotion.INSTANCE);
+        HookRegistry.register(AntiPokeDelay.INSTANCE);
+        HookRegistry.register(TransparentAvatar.INSTANCE);
+        HookRegistry.register(VideoToBubble.INSTANCE);
+        HookRegistry.register(TimArkCardBypass.INSTANCE);
+        HookRegistry.register(AutoLikeBack.INSTANCE);
+        HookRegistry.register(KeepAliveHook.INSTANCE);
+        HookRegistry.register(LevelBoost.INSTANCE);
+        HookRegistry.register(QQPlusInject.INSTANCE);
+        HookRegistry.register(RemoveLinkInfo.INSTANCE);
+        HookRegistry.register(QQSettingInject.INSTANCE);
+        HookRegistry.register(new PreventRecall());
+        HookRegistry.register(new CopyArkMessage());
+        HookRegistry.register(new LongClickSendCard());
+        HookRegistry.register(new RepeatMsg());
+        HookRegistry.register(ImageSummary.INSTANCE);
+        HookRegistry.register(EmotionAiTag.INSTANCE);
+        HookRegistry.register(ImageRatioOverride.INSTANCE);
+        HookRegistry.register(RemoveRiskWebpageBlock.INSTANCE);
+        HookRegistry.register(RemoveAds.INSTANCE);
+        HookRegistry.register(VoiceSpeed.INSTANCE);
+        HookRegistry.register(QLogRedirect.INSTANCE);
+        HookRegistry.register(RemoveQrCodeCheck.INSTANCE);
+        HookRegistry.register(SkipScanWaitTime.INSTANCE);
+        HookRegistry.register(SplitScreenScan.INSTANCE);
+        HookRegistry.register(AntiQfixPatch.INSTANCE);
+        HookRegistry.register(AntiReport.INSTANCE);
+        HookRegistry.register(ForceVip.INSTANCE);
+        HookRegistry.register(DisableAIAvatar.INSTANCE);
+        HookRegistry.register(HideVirtualAvatar.INSTANCE);
+        HookRegistry.register(HideSuperEmotion.INSTANCE);
+        HookRegistry.register(HideQmateTitleIcon.INSTANCE);
+        HookRegistry.register(DisableAioLeftSwipe.INSTANCE);
+        HookRegistry.register(DisableHomePullDown.INSTANCE);
+        HookRegistry.register(BypassProfileBan.INSTANCE);
+        HookRegistry.register(ForceSpeaker.INSTANCE);
+        HookRegistry.register(DisableWebSecurityCheck.INSTANCE);
+        HookRegistry.register(DisableSecCheck.INSTANCE);
+        HookRegistry.register(ForceModuleToast.INSTANCE);
+        HookRegistry.register(ForceInputNoLimit.INSTANCE);
+        HookRegistry.register(ForceFullScreenBtnShow.INSTANCE);
+        HookRegistry.register(WebJsBridgeAllowlist.INSTANCE);
+        HookRegistry.register(NativeEmotionDownload.INSTANCE);
+        HookRegistry.register(HideDressBeancurd.INSTANCE);
+        HookRegistry.register(HideAioPet.INSTANCE);
+        HookRegistry.register(Apk1AsApk.INSTANCE);
+        HookRegistry.register(GlassBottomTabBar.INSTANCE);
+    }
+
+    private static long lastPluginLoadTime = 0;
+    private static final long PLUGIN_LOAD_INTERVAL = 10000;
+    // 错峰延迟：配合受限并发调度器（最多 2 并发）+ 配置内存缓存后，单个 init 已很轻，
+    // 无需靠大延迟摊平，缩短到 20ms 只为避免瞬时全部提交。
+    private static final long HOOK_STAGGER_DELAY_MS = 20;
+
+    public static void loadHook() {
+        // 多路注入线程可能并发进入，用 CAS 保证只加载一次
+        if (!initialized.compareAndSet(false, true)) return;
+
+        // 早期预热：在 hook 加载阶段（后台线程）提前完成 JsonConfigUtils 类初始化与配置文件读取，
+        // 避免第二次进入页面时主线程/QLog hook 线程在热路径上争抢 <clinit> 类初始化锁导致卡死闪退
+        ModuleScope.launchIOJava("ConfigWarmup", () -> {
+            try {
+                ModuleConfig.getString("qlog_redirect_mode", "off");
+            } catch (Throwable ignored) {
+            }
+        });
+
+        try {
+            if (HeartbeatManager.isBanned()) {
+                LogUtils.e("MainHook", "Account is banned, skip loading hooks");
+                return;
+            }
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", "Check ban status failed: " + e.getMessage());
+        }
+
+        try {
+            registerHookItems();
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", "registerHookItems failed: " + e.getMessage());
+        }
+
+        try {
+            FromServiceMsgDispatcher.loadHook();
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", "FromServiceMsgDispatcher.loadHook failed: " + e.getMessage());
+        }
+
+        // 错峰加载：每个 Hook 在受限并发调度器上执行，避免集中阻塞主线程
+        loadApiHook();
+        initSwitchHookItem();
+
+        try {
+            hookAccountChange();
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", "hookAccountChange failed: " + e.getMessage());
+        }
+
+        // 兜底账号初始化：hookAccountChange() 依赖 QQAppInterface 的构造/onCreate 回调，而模块的 hook
+        // 是在 BaseApplicationImpl.onCreate 之后才装上的，此时 QQAppInterface 通常已创建完毕，回调不会
+        // 再触发 → onAccountChanged() 永不执行 → 心跳永不启动、点击类 Hook 的 initData 也不执行
+        //（表现为首页用户卡片一直"未登录"）。这里主动补一次；账号切换时仍由原 hook 触发，不冲突。
+        ModuleScope.launchDelayedIO("AccountFallback", 3000, () -> {
+            try {
+                onAccountChanged();
+            } catch (Throwable e) {
+                LogUtils.e("MainHook", "Fallback onAccountChanged failed: " + e.getMessage());
+            }
+            // onAccountChanged() 内部已尝试写 UIN 并启动心跳；只有当时还没登录（拿不到 UIN）才快速重试，
+            // 否则首个心跳要空转满 10 分钟，首页会一直显示"未登录"。
+            String uin = QQCurrentEnv.getCurrentUin();
+            if (uin == null || uin.isEmpty()) {
+                retryHeartbeatUntilLoggedIn(0);
+            }
+        });
+
+        // ChatSettingLoader 等基础 Hook 加载完后再执行
+        ModuleScope.launchDelayedIO("ChatSettingLoader", 3000, () -> {
+            try {
+                ChatSettingLoader.loadHook();
+            } catch (Throwable e) {
+                LogUtils.e("MainHook", "Failed to load ChatSettingLoader: " + e.getMessage());
+            }
+        });
+
+        // 表情/语音/视频综合面板入口（与脚本菜单独立的配置与入口点）
+        ModuleScope.launchDelayedIO("MediaPanelLoader", 3000, () -> {
+            try {
+                MediaPanelLoader.loadHook();
+            } catch (Throwable e) {
+                LogUtils.e("MainHook", "Failed to load MediaPanelLoader: " + e.getMessage());
+            }
+        });
+
+        // 插件和冷雨在所有 Hook 加载完成后执行
+        ModuleScope.launchDelayedIO("Plugin-AutoLoad", 5000, () -> {
+            try {
+                loadPluginsIfNeeded();
+            } catch (Throwable e) {
+                LogUtils.e("MainHook", "Failed to load plugins: " + e.getMessage());
+            }
+            try {
+                ColdRainCore.getInstance().init(HostInfo.getHostContext());
+            } catch (Throwable e) {
+                LogUtils.e("MainHook", "Failed to init ColdRainCore: " + e.getMessage());
+            }
+        });
+
+    }
+
+    private static void loadPluginsIfNeeded() {
+        long now = System.currentTimeMillis();
+        if (now - lastPluginLoadTime < PLUGIN_LOAD_INTERVAL) {
+            return;
+        }
+        lastPluginLoadTime = now;
+        PluginManager.initAllPluginForCurrent();
+    }
+
+    private static void loadApiHook() {
+        List<BaseApiHookItem> apiHookItemList = HookRegistry.getHookItemsByClass(BaseApiHookItem.class);
+        for (int i = 0; i < apiHookItemList.size(); i++) {
+            final BaseApiHookItem item = apiHookItemList.get(i);
+            final long delay = i * HOOK_STAGGER_DELAY_MS;
+            ModuleScope.launchDelayedHook("ApiHook", delay, () -> {
+                try {
+                    if (item.isInTargetProcess() && !item.isHookLoaded()) {
+                        item.loadHook();
+                        item.setHookLoaded(true);
+                    }
+                } catch (Throwable t) {
+                    LogUtils.e(item.getClass().getSimpleName(), t);
+                }
+            });
+        }
+    }
+
+    private static void initSwitchHookItem() {
+        List<BaseSwitchHookItem> switchHookItemList = HookRegistry.getHookItemsByClass(BaseSwitchHookItem.class);
+        for (int i = 0; i < switchHookItemList.size(); i++) {
+            final BaseSwitchHookItem item = switchHookItemList.get(i);
+            final long delay = i * HOOK_STAGGER_DELAY_MS;
+            ModuleScope.launchDelayedHook("SwitchHook", delay, () -> item.init());
+        }
+    }
+
+    private static void hookAccountChange() {
+        try {
+            Class<?> qqAppInterface = ReflectUtils.hostClassLoader != null 
+                ? Class.forName("com.tencent.mobileqq.app.QQAppInterface", false, ReflectUtils.hostClassLoader)
+                : Class.forName("com.tencent.mobileqq.app.QQAppInterface");
+            
+            java.lang.reflect.Method targetMethod = null;
+            String[] methodNames = {"onCreateQQMessageFacade", "initQQMessageFacade", "createQQMessageFacade", "onCreate"};
+            for (String methodName : methodNames) {
+                targetMethod = ReflectUtils.findMethod(qqAppInterface, methodName);
+                if (targetMethod != null) {
+                    break;
+                }
+            }
+            if (targetMethod == null) {
+                LogUtils.w("hookAccountChange", "Specific method not found, trying constructor hook");
+                HookUtils.hookAfter(qqAppInterface.getDeclaredConstructors()[0], (param) -> {
+                    ModuleScope.launchDelayedIO("AccountChange", 3000, () -> onAccountChanged());
+                });
+                return;
+            }
+            HookUtils.hookAfter(targetMethod, (param) -> {
+                ModuleScope.launchIOJava("AccountChange", () -> onAccountChanged());
+            });
+        } catch (Throwable e) {
+            LogUtils.e("hookAccountChange", e);
+        }
+    }
+
+    private static void onAccountChanged() {
+        try {
+            QQCurrentEnv.reset();
+            String currentUin = QQCurrentEnv.getCurrentUin();
+            if (currentUin != null && !currentUin.isEmpty()) {
+                ModuleConfig.INSTANCE.putString("currentUin", currentUin);
+                ModuleConfig.INSTANCE.putString("heartbeat_current_uin", currentUin);
+            } else if (HeartbeatManager.isMainProcess()) {
+                // 子进程（:tool / :MSF 等）本来就读不到账号，不再刷这条警告
+                LogUtils.w("onAccountChanged", "currentUin is null or empty, skip saving to config.");
+            }
+            processDataForCurrent("init");
+            loadPluginsIfNeeded();
+
+            try {
+                HeartbeatManager.getInstance().startHeartbeat();
+            } catch (Throwable e) {
+                LogUtils.e("onAccountChanged", "Failed to restart heartbeat: " + e.getMessage());
+            }
+        } catch (Throwable e) {
+            LogUtils.e("onAccountChanged", e);
+        }
+    }
+
+    // 登录未就绪时心跳的快速重试：每 15s 探一次，最多 8 次（约 2 分钟）
+    private static final int HEARTBEAT_FALLBACK_MAX_RETRY = 8;
+    private static final long HEARTBEAT_FALLBACK_INTERVAL_MS = 15000;
+
+    /**
+     * 登录还没完成（拿不到 UIN）时的兜底：定期探测，一旦 UIN 就绪就落盘并立即重启心跳，
+     * 避免首个心跳要空转满一整个 10 分钟周期。
+     */
+    private static void retryHeartbeatUntilLoggedIn(int attempt) {
+        // 子进程拿不到账号，重试只会白跑 8 轮并刷日志；心跳统一由主进程负责
+        if (!HeartbeatManager.isMainProcess()) {
+            return;
+        }
+        // getCurrentUin() 会把空结果也缓存下来，重试前必须先 reset，否则会一直读到旧的空值
+        QQCurrentEnv.reset();
+        String currentUin = QQCurrentEnv.getCurrentUin();
+        if (currentUin != null && !currentUin.isEmpty()) {
+            ModuleConfig.INSTANCE.putString("currentUin", currentUin);
+            ModuleConfig.INSTANCE.putString("heartbeat_current_uin", currentUin);
+            try {
+                HeartbeatManager.getInstance().startHeartbeat();
+            } catch (Throwable e) {
+                LogUtils.e("MainHook", "Failed to restart heartbeat: " + e.getMessage());
+            }
+            return;
+        }
+        if (attempt < HEARTBEAT_FALLBACK_MAX_RETRY) {
+            ModuleScope.launchDelayedIO("HeartbeatFallback", HEARTBEAT_FALLBACK_INTERVAL_MS,
+                    () -> retryHeartbeatUntilLoggedIn(attempt + 1));
+        } else {
+            LogUtils.w("MainHook", "UIN 仍未就绪，心跳交由周期任务自行重试");
+        }
+    }
+
+    public static void processDataForCurrent(String tag) {
+        List<BaseClickableHookItem> clickableHookItemList = HookRegistry.getHookItemsByClass(BaseClickableHookItem.class);
+        for (BaseClickableHookItem item : clickableHookItemList) {
+            if (item.isAvailable()) {
+                if ("init".equals(tag)) {
+                    try {
+                        java.lang.reflect.Method method = BaseClickableHookItem.class.getDeclaredMethod("initData");
+                        method.setAccessible(true);
+                        method.invoke(item);
+                    } catch (Throwable e) {
+                        LogUtils.e(e);
+                    }
+                } else if ("save".equals(tag)) {
+                    try {
+                        java.lang.reflect.Method method = BaseClickableHookItem.class.getDeclaredMethod("saveData");
+                        method.setAccessible(true);
+                        method.invoke(item);
+                    } catch (Throwable e) {
+                        LogUtils.e(e);
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<BaseSwitchHookItem> getSwitchHookItems() {
+        return (List<BaseSwitchHookItem>) (List<?>) HookRegistry.getHookItemsByClass(BaseSwitchHookItem.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<BaseClickableHookItem> getClickableHookItems() {
+        return (List<BaseClickableHookItem>) (List<?>) HookRegistry.getHookItemsByClass(BaseClickableHookItem.class);
+    }
+
+    @androidx.annotation.NonNull
+    public static java.util.List<me.lengyu.qedge.ui.pages.PluginData> getPluginList() {
+        me.lengyu.qedge.plugin.PluginManager.loadAll();
+        
+        java.util.List<me.lengyu.qedge.ui.pages.PluginData> list = new java.util.ArrayList<>();
+        try {
+            for (PluginInfo plugin : me.lengyu.qedge.plugin.PluginManager.plugins) {
+                list.add(new me.lengyu.qedge.ui.pages.PluginData(
+                    plugin.getId(),
+                    plugin.getName(),
+                    plugin.getVersion(),
+                    plugin.getAuthor(),
+                    plugin.getDesc(),
+                    plugin.isRunning(),
+                    me.lengyu.qedge.plugin.PluginManager.autoLoadList.contains(plugin.getId()),
+                    plugin.getDirPath(),
+                    plugin.getType()
+                ));
+            }
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", e);
+        }
+        return list;
+    }
+
+    public static void setPluginRunning(String pluginId, boolean running) {
+        try {
+            for (PluginInfo plugin : me.lengyu.qedge.plugin.PluginManager.plugins) {
+                if (plugin.getId().equals(pluginId)) {
+                    if (running) {
+                        me.lengyu.qedge.plugin.PluginManager.startPlugin(plugin);
+                    } else {
+                        me.lengyu.qedge.plugin.PluginManager.stopPlugin(plugin);
+                    }
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            LogUtils.e("[DEBUG-PLUGIN]", "DP-002 ERROR: " + e.getMessage());
+            LogUtils.e("[DEBUG-PLUGIN]", e);
+            LogUtils.e("MainHook", e);
+        }
+    }
+
+    public static void setPluginAutoLoad(String pluginId, boolean autoLoad) {
+        try {
+            for (PluginInfo plugin : me.lengyu.qedge.plugin.PluginManager.plugins) {
+                if (plugin.getId().equals(pluginId)) {
+                    me.lengyu.qedge.plugin.PluginManager.setAutoLoad(plugin, autoLoad);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", e);
+        }
+    }
+
+    public static void deletePlugin(String pluginId) {
+        try {
+            for (PluginInfo plugin : me.lengyu.qedge.plugin.PluginManager.plugins) {
+                if (plugin.getId().equals(pluginId)) {
+                    me.lengyu.qedge.plugin.PluginManager.deletePlugin(plugin);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", e);
+        }
+    }
+
+    public static void reloadPlugin(String pluginId) {
+        try {
+            for (PluginInfo plugin : me.lengyu.qedge.plugin.PluginManager.plugins) {
+                if (plugin.getId().equals(pluginId)) {
+                    me.lengyu.qedge.plugin.PluginManager.reloadPlugin(plugin);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", e);
+        }
+    }
+
+    public static void createPlugin() {
+        try {
+            me.lengyu.qedge.plugin.PluginManager.createExamplePlugin();
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", e);
+        }
+    }
+
+    /** 按新建弹窗填写的信息创建插件(type: java/js, 主脚本为空文件) */
+    public static void createPlugin(String type, String name, String desc, String author, String version) {
+        try {
+            me.lengyu.qedge.plugin.PluginManager.createPlugin(type, name, desc, author, version);
+        } catch (Throwable e) {
+            LogUtils.e("MainHook", e);
+        }
+    }
+}

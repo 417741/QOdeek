@@ -21,7 +21,7 @@ local.properties
 *.apk
 *.aar
 *.jar
-!gradle/wrapper/gradle-wrapper.jar
+!**/gradle/wrapper/gradle-wrapper.jar
 res_dump.txt
 setting_classes.txt
 
@@ -31,6 +31,5 @@ dec2/
 dec24/
 apk_extract/
 jadx/
-QEdge-main-master/
 _spine_tmp/
 .kotlin/

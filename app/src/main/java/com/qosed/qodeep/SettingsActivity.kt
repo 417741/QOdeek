@@ -90,6 +90,8 @@ private fun SettingsPage() {
     val prefs = remember { context.getSharedPreferences("qodeep_bg", Context.MODE_PRIVATE) }
     var bgKey by remember { mutableStateOf(prefs.getString("bg_key", null)) }
     var showPicker by remember { mutableStateOf(false) }
+    // 背景诊断信息（WebView 页面标题 + JS console 报错），排查后移除
+    var bgDebug by remember { mutableStateOf("bg: 解压中...") }
     // 寄生在 QQ 里时 file:///android_asset/ 指向 QQ 的 APK，必须先把模块 APK 里的背景资源解压到本地
     val bgDir by produceState<File?>(null) {
         value = withContext(Dispatchers.IO) { BgAssets.ensure(context) }
@@ -101,7 +103,21 @@ private fun SettingsPage() {
 
     Box(Modifier.fillMaxSize().background(Color(0xFFF2F4F8))) {
         // 动态 Spine 背景（资源解压完成后再加载），铺满全屏
-        JieqiBackground(activeKey, bgDir, Modifier.fillMaxSize())
+        JieqiBackground(
+            activeKey, bgDir,
+            onDebug = { msg -> bgDebug = "bg: $msg" },
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // 诊断浮层（排查背景不显示用，随后移除）
+        Text(
+            text = bgDebug,
+            color = Color(0xCCFF3B30),
+            fontSize = 10.sp,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(8.dp)
+        )
 
         // 内容：一列圆角半透明卡片叠在背景上，可滚动（FunBox 风格）
         Column(
@@ -279,7 +295,7 @@ private fun DexKitSection() {
 
 /** 全屏透明 WebView，从本地解压目录播放 Spine 骨骼动画背景。 */
 @Composable
-private fun JieqiBackground(key: String, dir: File?, modifier: Modifier = Modifier) {
+private fun JieqiBackground(key: String, dir: File?, onDebug: (String) -> Unit, modifier: Modifier = Modifier) {
     AndroidView(
         modifier = modifier,
         factory = { ctx ->
@@ -290,6 +306,7 @@ private fun JieqiBackground(key: String, dir: File?, modifier: Modifier = Modifi
                 settings.allowFileAccess = true
                 settings.allowFileAccessFromFileURLs = true
                 settings.allowUniversalAccessFromFileURLs = true
+                settings.domStorageEnabled = true
                 isHorizontalScrollBarEnabled = false
                 isVerticalScrollBarEnabled = false
                 // 背景层不拦截点击
@@ -297,6 +314,17 @@ private fun JieqiBackground(key: String, dir: File?, modifier: Modifier = Modifi
                 isFocusable = false
                 isLongClickable = false
                 setOnTouchListener { _, _ -> true }
+                webViewClient = object : android.webkit.WebViewClient() {
+                    override fun onPageFinished(view: WebView, url: String?) {
+                        view.evaluateJavascript("document.title || '(标题空)'") { onDebug("title=$it") }
+                    }
+                }
+                webChromeClient = object : android.webkit.WebChromeClient() {
+                    override fun onConsoleMessage(console: android.webkit.ConsoleMessage?): Boolean {
+                        onDebug("console: ${console?.message()}")
+                        return true
+                    }
+                }
             }
         },
         update = { wv ->
@@ -305,8 +333,11 @@ private fun JieqiBackground(key: String, dir: File?, modifier: Modifier = Modifi
                 val url = "file://${d.absolutePath}/player.html?key=$key"
                 if (wv.tag != url) {
                     wv.tag = url
+                    onDebug("加载: ${d.name}/player.html")
                     wv.loadUrl(url)
                 }
+            } else {
+                onDebug("bg: 解压失败(null)")
             }
         },
         onRelease = { it.destroy() }
