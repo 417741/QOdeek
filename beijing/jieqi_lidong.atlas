@@ -1,0 +1,279 @@
+
+jieqi_lidong.webp
+size: 2011,1175
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+lidong_0
+  rotate: true
+  xy: 1751, 264
+  size: 178, 45
+  orig: 178, 45
+  offset: 0, 0
+  index: -1
+lidong_1
+  rotate: false
+  xy: 1664, 640
+  size: 178, 285
+  orig: 178, 285
+  offset: 0, 0
+  index: -1
+lidong_10
+  rotate: false
+  xy: 1819, 935
+  size: 190, 238
+  orig: 192, 240
+  offset: 1, 1
+  index: -1
+lidong_11
+  rotate: false
+  xy: 1813, 395
+  size: 147, 89
+  orig: 147, 93
+  offset: 0, 0
+  index: -1
+lidong_12
+  rotate: false
+  xy: 1575, 707
+  size: 43, 39
+  orig: 47, 42
+  offset: 3, 1
+  index: -1
+lidong_13
+  rotate: false
+  xy: 1575, 667
+  size: 43, 38
+  orig: 47, 41
+  offset: 3, 1
+  index: -1
+lidong_14
+  rotate: false
+  xy: 1620, 668
+  size: 41, 37
+  orig: 43, 40
+  offset: 1, 1
+  index: -1
+lidong_15
+  rotate: false
+  xy: 1620, 707
+  size: 42, 39
+  orig: 44, 42
+  offset: 1, 1
+  index: -1
+lidong_16
+  rotate: false
+  xy: 1813, 486
+  size: 152, 152
+  orig: 152, 152
+  offset: 0, 0
+  index: -1
+lidong_17
+  rotate: true
+  xy: 1751, 182
+  size: 80, 114
+  orig: 80, 114
+  offset: 0, 0
+  index: -1
+lidong_18
+  rotate: false
+  xy: 410, 125
+  size: 570, 185
+  orig: 570, 185
+  offset: 0, 0
+  index: -1
+lidong_19
+  rotate: true
+  xy: 454, 312
+  size: 109, 868
+  orig: 109, 868
+  offset: 0, 0
+  index: -1
+lidong_2
+  rotate: true
+  xy: 1269, 927
+  size: 246, 548
+  orig: 249, 553
+  offset: 1, 2
+  index: -1
+lidong_20
+  rotate: false
+  xy: 650, 19
+  size: 217, 104
+  orig: 217, 104
+  offset: 0, 0
+  index: -1
+lidong_21
+  rotate: true
+  xy: 454, 857
+  size: 316, 813
+  orig: 316, 813
+  offset: 0, 0
+  index: -1
+lidong_22
+  rotate: false
+  xy: 1346, 21
+  size: 247, 125
+  orig: 247, 125
+  offset: 0, 0
+  index: -1
+lidong_23
+  rotate: true
+  xy: 869, 10
+  size: 113, 85
+  orig: 113, 85
+  offset: 0, 0
+  index: -1
+lidong_24
+  rotate: true
+  xy: 1720, 444
+  size: 194, 91
+  orig: 194, 91
+  offset: 0, 0
+  index: -1
+lidong_25
+  rotate: false
+  xy: 1269, 748
+  size: 393, 177
+  orig: 393, 177
+  offset: 0, 0
+  index: -1
+lidong_26
+  rotate: true
+  xy: 2, 96
+  size: 275, 406
+  orig: 275, 406
+  offset: 0, 0
+  index: -1
+lidong_27
+  rotate: false
+  xy: 2, 8
+  size: 342, 86
+  orig: 342, 86
+  offset: 0, 0
+  index: -1
+lidong_28
+  rotate: false
+  xy: 410, 16
+  size: 238, 107
+  orig: 238, 107
+  offset: 0, 0
+  index: -1
+lidong_29
+  rotate: false
+  xy: 1278, 428
+  size: 330, 147
+  orig: 330, 147
+  offset: 0, 0
+  index: -1
+lidong_3
+  rotate: false
+  xy: 1844, 645
+  size: 160, 288
+  orig: 160, 288
+  offset: 0, 0
+  index: -1
+lidong_30
+  rotate: false
+  xy: 1242, 577
+  size: 331, 169
+  orig: 331, 169
+  offset: 0, 0
+  index: -1
+lidong_31
+  rotate: false
+  xy: 1610, 429
+  size: 108, 209
+  orig: 108, 209
+  offset: 0, 0
+  index: -1
+lidong_32
+  rotate: true
+  xy: 454, 423
+  size: 132, 822
+  orig: 134, 825
+  offset: 1, 2
+  index: -1
+lidong_33
+  rotate: true
+  xy: 454, 557
+  size: 298, 786
+  orig: 298, 786
+  offset: 0, 0
+  index: -1
+lidong_34
+  rotate: false
+  xy: 1595, 2
+  size: 286, 159
+  orig: 286, 195
+  offset: 0, 0
+  index: -1
+lidong_35
+  rotate: true
+  xy: 956, 77
+  size: 46, 19
+  orig: 46, 19
+  offset: 0, 0
+  index: -1
+lidong_36
+  rotate: true
+  xy: 1324, 377
+  size: 49, 20
+  orig: 49, 20
+  offset: 0, 0
+  index: -1
+lidong_37
+  rotate: true
+  xy: 1242, 798
+  size: 57, 19
+  orig: 57, 19
+  offset: 0, 0
+  index: -1
+lidong_38
+  rotate: false
+  xy: 2, 373
+  size: 450, 800
+  orig: 452, 802
+  offset: 1, 1
+  index: -1
+lidong_4
+  rotate: true
+  xy: 1589, 163
+  size: 263, 160
+  orig: 263, 160
+  offset: 0, 0
+  index: -1
+lidong_5
+  rotate: true
+  xy: 1346, 148
+  size: 278, 241
+  orig: 278, 241
+  offset: 0, 0
+  index: -1
+lidong_6
+  rotate: false
+  xy: 982, 15
+  size: 362, 295
+  orig: 362, 295
+  offset: 0, 0
+  index: -1
+lidong_7
+  rotate: true
+  xy: 1798, 268
+  size: 125, 140
+  orig: 125, 140
+  offset: 0, 0
+  index: -1
+lidong_8
+  rotate: false
+  xy: 410, 326
+  size: 42, 45
+  orig: 42, 45
+  offset: 0, 0
+  index: -1
+lidong_9
+  rotate: false
+  xy: 346, 34
+  size: 36, 60
+  orig: 36, 60
+  offset: 0, 0
+  index: -1

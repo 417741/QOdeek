@@ -1,0 +1,260 @@
+{
+  "generatedFrom": "小程序解包(261031)",
+  "comparedWith": "小程序解包(261022)",
+  "count": 14,
+  "totalBytes": 8795635,
+  "items": [
+    {
+      "key": "duanwu",
+      "name": "端午",
+      "season": "夏",
+      "base": "jieqi_duanwu",
+      "bundle": "delayRes",
+      "bin": "duanwu/jieqi_duanwu.bin",
+      "atlas": "duanwu/jieqi_duanwu.atlas",
+      "texture": "duanwu/jieqi_duanwu.webp",
+      "textureSize": [
+        1905,
+        1095
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260611",
+      "bytes": 559107
+    },
+    {
+      "key": "xiaoshu",
+      "name": "小暑",
+      "season": "夏",
+      "base": "jieqi_xiaoshu",
+      "bundle": "delayRes",
+      "bin": "xiaoshu/jieqi_xiaoshu.bin",
+      "atlas": "xiaoshu/jieqi_xiaoshu.atlas",
+      "texture": "xiaoshu/jieqi_xiaoshu.webp",
+      "textureSize": [
+        1635,
+        1540
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260729",
+      "bytes": 609732
+    },
+    {
+      "key": "xiazhi",
+      "name": "夏至",
+      "season": "夏",
+      "base": "jieqi_xiazhi",
+      "bundle": "delayRes",
+      "bin": "xiazhi/jieqi_xiazhi.bin",
+      "atlas": "xiazhi/jieqi_xiazhi.atlas",
+      "texture": "xiazhi/jieqi_xiazhi.webp",
+      "textureSize": [
+        1730,
+        1540
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260729",
+      "bytes": 657053
+    },
+    {
+      "key": "dashu",
+      "name": "大暑",
+      "season": "夏",
+      "base": "jieqi_dashu",
+      "bundle": "delayRes",
+      "bin": "dashu/jieqi_dashu.bin",
+      "atlas": "dashu/jieqi_dashu.atlas",
+      "texture": "dashu/jieqi_dashu.webp",
+      "textureSize": [
+        1464,
+        1358
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260729",
+      "bytes": 434923
+    },
+    {
+      "key": "liqiu",
+      "name": "立秋",
+      "season": "秋",
+      "base": "jieqi_liqiu",
+      "bundle": "delayRes",
+      "bin": "liqiu/jieqi_liqiu.bin",
+      "atlas": "liqiu/jieqi_liqiu.atlas",
+      "texture": "liqiu/jieqi_liqiu.webp",
+      "textureSize": [
+        1985,
+        1127
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260729",
+      "bytes": 567088
+    },
+    {
+      "key": "chushu",
+      "name": "处暑",
+      "season": "秋",
+      "base": "jieqi_chushu",
+      "bundle": "delayRes",
+      "bin": "chushu/jieqi_chushu.bin",
+      "atlas": "chushu/jieqi_chushu.atlas",
+      "texture": "chushu/jieqi_chushu.webp",
+      "textureSize": [
+        2048,
+        2048
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260913",
+      "bytes": 856133
+    },
+    {
+      "key": "qixi",
+      "name": "七夕",
+      "season": "秋",
+      "base": "jieqi_qixi",
+      "bundle": "delayRes",
+      "bin": "qixi/jieqi_qixi.bin",
+      "atlas": "qixi/jieqi_qixi.atlas",
+      "texture": "qixi/jieqi_qixi.webp",
+      "textureSize": [
+        1899,
+        1291
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260913",
+      "bytes": 625976
+    },
+    {
+      "key": "bailu",
+      "name": "白露",
+      "season": "秋",
+      "base": "jieqi_bailu",
+      "bundle": "delayRes",
+      "bin": "bailu/jieqi_bailu.bin",
+      "atlas": "bailu/jieqi_bailu.atlas",
+      "texture": "bailu/jieqi_bailu.webp",
+      "textureSize": [
+        1277,
+        1684
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260913",
+      "bytes": 535129
+    },
+    {
+      "key": "qiufen",
+      "name": "秋分",
+      "season": "秋",
+      "base": "jieqi_qiufen",
+      "bundle": "delayRes",
+      "bin": "qiufen/jieqi_qiufen.bin",
+      "atlas": "qiufen/jieqi_qiufen.atlas",
+      "texture": "qiufen/jieqi_qiufen.webp",
+      "textureSize": [
+        1844,
+        1008
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260924",
+      "bytes": 522979
+    },
+    {
+      "key": "zhongqiu",
+      "name": "中秋",
+      "season": "秋",
+      "base": "jieqi_zhongqiu",
+      "bundle": "delayRes",
+      "bin": "zhongqiu/jieqi_zhongqiu.bin",
+      "atlas": "zhongqiu/jieqi_zhongqiu.atlas",
+      "texture": "zhongqiu/jieqi_zhongqiu.webp",
+      "textureSize": [
+        2020,
+        1604
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260924",
+      "bytes": 863018
+    },
+    {
+      "key": "hanlu",
+      "name": "寒露",
+      "season": "秋",
+      "base": "jieqi_hanlu",
+      "bundle": "delayRes",
+      "bin": "hanlu/jieqi_hanlu.bin",
+      "atlas": "hanlu/jieqi_hanlu.atlas",
+      "texture": "hanlu/jieqi_hanlu.webp",
+      "textureSize": [
+        1860,
+        1032
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "260924",
+      "bytes": 703857
+    },
+    {
+      "key": "shuangjiang",
+      "name": "霜降",
+      "season": "秋",
+      "base": "jieqi_shuangjiang",
+      "bundle": "delayRes",
+      "bin": "shuangjiang/jieqi_shuangjiang.bin",
+      "atlas": "shuangjiang/jieqi_shuangjiang.atlas",
+      "texture": "shuangjiang/jieqi_shuangjiang.webp",
+      "textureSize": [
+        1948,
+        1620
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "261022",
+      "bytes": 534807
+    },
+    {
+      "key": "lidong",
+      "name": "立冬",
+      "season": "冬",
+      "base": "jieqi_lidong",
+      "bundle": "delayRes",
+      "bin": "lidong/jieqi_lidong.bin",
+      "atlas": "lidong/jieqi_lidong.atlas",
+      "texture": "lidong/jieqi_lidong.webp",
+      "textureSize": [
+        2011,
+        1175
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": true,
+      "firstSeen": "261031",
+      "bytes": 843449
+    },
+    {
+      "key": "chongyang",
+      "name": "重阳",
+      "season": "秋",
+      "base": "jieqi_chongyang",
+      "bundle": "delayRes",
+      "bin": "chongyang/jieqi_chongyang.bin",
+      "atlas": "chongyang/jieqi_chongyang.atlas",
+      "texture": "chongyang/jieqi_chongyang.webp",
+      "textureSize": [
+        2004,
+        888
+      ],
+      "spineVersion": "3.8.99",
+      "isNew": false,
+      "firstSeen": "261022",
+      "bytes": 482384
+    }
+  ]
+}

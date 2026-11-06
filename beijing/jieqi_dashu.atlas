@@ -1,0 +1,83 @@
+
+jieqi_dashu.webp
+size: 1464,1358
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Bloom3
+  rotate: true
+  xy: 1282, 549
+  size: 400, 139
+  orig: 417, 139
+  offset: 2, 0
+  index: -1
+fx_glow_01
+  rotate: false
+  xy: 1282, 223
+  size: 103, 103
+  orig: 128, 128
+  offset: 12, 14
+  index: -1
+niao1
+  rotate: true
+  xy: 1189, 1216
+  size: 52, 21
+  orig: 52, 21
+  offset: 0, 0
+  index: -1
+ren
+  rotate: false
+  xy: 1282, 328
+  size: 119, 219
+  orig: 119, 220
+  offset: 0, 1
+  index: -1
+sky
+  rotate: true
+  xy: 1189, 951
+  size: 225, 258
+  orig: 225, 258
+  offset: 0, 0
+  index: -1
+taiyang1
+  rotate: false
+  xy: 1189, 1270
+  size: 87, 86
+  orig: 88, 88
+  offset: 1, 1
+  index: -1
+taiyangguang
+  rotate: false
+  xy: 1282, 1178
+  size: 180, 178
+  orig: 180, 180
+  offset: 0, 2
+  index: -1
+yun1
+  rotate: false
+  xy: 904, 2
+  size: 376, 452
+  orig: 376, 452
+  offset: 0, 0
+  index: -1
+yun2
+  rotate: true
+  xy: 2, 449
+  size: 907, 524
+  orig: 907, 524
+  offset: 0, 0
+  index: -1
+zhiwu
+  rotate: true
+  xy: 528, 456
+  size: 900, 659
+  orig: 900, 659
+  offset: 0, 0
+  index: -1
+zhongjing
+  rotate: false
+  xy: 2, 7
+  size: 900, 440
+  orig: 900, 440
+  offset: 0, 0
+  index: -1

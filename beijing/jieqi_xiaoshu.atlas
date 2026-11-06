@@ -1,0 +1,153 @@
+
+jieqi_xiaoshu.webp
+size: 1635,1540
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+ss1
+  rotate: false
+  xy: 1048, 87
+  size: 291, 277
+  orig: 291, 277
+  offset: 0, 0
+  index: -1
+ss2
+  rotate: false
+  xy: 700, 137
+  size: 346, 227
+  orig: 346, 227
+  offset: 0, 0
+  index: -1
+xss_0
+  rotate: true
+  xy: 62, 3
+  size: 16, 18
+  orig: 16, 18
+  offset: 0, 0
+  index: -1
+xss_1
+  rotate: false
+  xy: 980, 6
+  size: 39, 59
+  orig: 39, 59
+  offset: 0, 0
+  index: -1
+xss_10
+  rotate: false
+  xy: 2, 49
+  size: 696, 569
+  orig: 696, 569
+  offset: 0, 0
+  index: -1
+xss_11
+  rotate: false
+  xy: 1550, 399
+  size: 53, 52
+  orig: 55, 54
+  offset: 1, 1
+  index: -1
+xss_12
+  rotate: false
+  xy: 62, 21
+  size: 38, 26
+  orig: 38, 26
+  offset: 0, 0
+  index: -1
+xss_13
+  rotate: false
+  xy: 1550, 382
+  size: 21, 15
+  orig: 23, 17
+  offset: 1, 1
+  index: -1
+xss_14
+  rotate: false
+  xy: 1478, 382
+  size: 70, 69
+  orig: 70, 69
+  offset: 0, 0
+  index: -1
+xss_15
+  rotate: false
+  xy: 980, 67
+  size: 65, 68
+  orig: 65, 68
+  offset: 0, 0
+  index: -1
+xss_16
+  rotate: true
+  xy: 1021, 33
+  size: 32, 16
+  orig: 32, 16
+  offset: 0, 0
+  index: -1
+xss_17
+  rotate: true
+  xy: 2, 620
+  size: 918, 1604
+  orig: 918, 1608
+  offset: 0, 4
+  index: -1
+xss_2
+  rotate: false
+  xy: 1478, 453
+  size: 147, 165
+  orig: 147, 165
+  offset: 0, 0
+  index: -1
+xss_3
+  rotate: false
+  xy: 1341, 203
+  size: 292, 161
+  orig: 292, 161
+  offset: 0, 0
+  index: -1
+xss_4
+  rotate: true
+  xy: 1341, 40
+  size: 161, 292
+  orig: 161, 292
+  offset: 0, 0
+  index: -1
+xss_5
+  rotate: true
+  xy: 700, 4
+  size: 131, 278
+  orig: 131, 278
+  offset: 0, 0
+  index: -1
+xss_6
+  rotate: false
+  xy: 1608, 1498
+  size: 19, 40
+  orig: 19, 40
+  offset: 0, 0
+  index: -1
+xss_7
+  rotate: false
+  xy: 1605, 410
+  size: 16, 41
+  orig: 16, 41
+  offset: 0, 0
+  index: -1
+xss_8
+  rotate: false
+  xy: 31, 3
+  size: 29, 44
+  orig: 29, 44
+  offset: 0, 0
+  index: -1
+xss_99
+  rotate: true
+  xy: 700, 366
+  size: 252, 776
+  orig: 252, 776
+  offset: 0, 0
+  index: -1
+yezi
+  rotate: false
+  xy: 2, 2
+  size: 27, 45
+  orig: 27, 45
+  offset: 0, 0
+  index: -1

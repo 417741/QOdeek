@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">QOdeep</string>
+    <string name="app_desc">在 QQ 设置页插入自定义入口的 Xposed 模块</string>
+    <string name="xposed_description">在 QQ 设置页插入自定义入口</string>
+</resources>

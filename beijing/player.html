@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}
+  #cv{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<script src="./spine-webgl-3.8.js"></script>
+<script>
+(function () {
+  'use strict';
+  var SPINE = window.spine;
+  var GAME_W = 720, GAME_H = 1280;
+  var cv = document.getElementById('cv');
+  var key = new URLSearchParams(location.search).get('key') || 'duanwu';
+
+  function gameFrame(data) {
+    var dw = data && data.width, dh = data && data.height;
+    var dx = data && data.x, dy = data && data.y;
+    var sane = [dw, dh, dx, dy].every(Number.isFinite)
+      && dw > 600 && dw < 1400 && dh > 1100 && dh < 2000;
+    var cx = sane ? dx + dw / 2 : 0;
+    var cy = sane ? dy + dh / 2 : 0;
+    return { x: cx - GAME_W / 2, y: cy - GAME_H / 2, width: GAME_W, height: GAME_H };
+  }
+
+  function fetchText(url) { return fetch(url).then(function (r) { return r.text(); }); }
+  function fetchBuffer(url) { return fetch(url).then(function (r) { return r.arrayBuffer(); }); }
+  function loadImage(src) {
+    return new Promise(function (res, rej) {
+      var img = new Image();
+      img.onload = function () { res(img); };
+      img.onerror = function () { rej(new Error('img ' + src)); };
+      img.src = src;
+    });
+  }
+
+  function start() {
+    if (!SPINE) return;
+    var atlasUrl = './jieqi_' + key + '.atlas';
+    var binUrl = './jieqi_' + key + '.bin';
+    var texUrl = './jieqi_' + key + '.webp';
+
+    Promise.all([loadImage(texUrl), fetchText(atlasUrl), fetchBuffer(binUrl)])
+      .then(function (a) {
+        var img = a[0], atlasText = a[1], binBuf = a[2];
+        var gl = cv.getContext('webgl', {
+          alpha: true, premultipliedAlpha: false,
+          antialias: true, preserveDrawingBuffer: true
+        });
+        if (!gl) return;
+        cv.width = GAME_W; cv.height = GAME_H;
+
+        var ctx = new SPINE.webgl.ManagedWebGLRenderingContext(gl);
+        var tex = new SPINE.webgl.GLTexture(ctx, img);
+        var atlas = new SPINE.TextureAtlas(atlasText, function () { return tex; });
+        var data = new SPINE.SkeletonBinary(new SPINE.AtlasAttachmentLoader(atlas))
+          .readSkeletonData(new Uint8Array(binBuf));
+
+        var skeleton = new SPINE.Skeleton(data);
+        var stateData = new SPINE.AnimationStateData(data);
+        stateData.defaultMix = 0.2;
+        var state = new SPINE.AnimationState(stateData);
+
+        var anims = (data.animations || []).map(function (x) { return x.name; });
+        var anim = anims.indexOf('loop') >= 0 ? 'loop' : anims[0];
+        state.setAnimation(0, anim, true);
+
+        state.update(0.05);
+        state.apply(skeleton);
+        skeleton.updateWorldTransform();
+
+        var renderer = new SPINE.webgl.SceneRenderer(cv, ctx);
+        renderer.camera.setViewport(GAME_W, GAME_H);
+        var box = gameFrame(data);
+        var view = { zoom: box.width / GAME_W, cx: box.x + box.width / 2, cy: box.y + box.height / 2 };
+        gl.viewport(0, 0, GAME_W, GAME_H);
+
+        var last = 0;
+        function frame(now) {
+          requestAnimationFrame(frame);
+          var dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
+          last = now;
+          state.update(dt);
+          state.apply(skeleton);
+          skeleton.updateWorldTransform();
+          gl.clearColor(0, 0, 0, 0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          renderer.begin();
+          renderer.camera.position.x = view.cx;
+          renderer.camera.position.y = view.cy;
+          renderer.camera.zoom = view.zoom;
+          renderer.drawSkeleton(skeleton, false);
+          renderer.end();
+        }
+        requestAnimationFrame(frame);
+        document.title = 'ok';
+      })
+      .catch(function (e) { document.title = 'err:' + (e && e.message); });
+  }
+
+  if (document.readyState === 'complete') start();
+  else window.addEventListener('load', start);
+})();
+</script>
+</body>
+</html>

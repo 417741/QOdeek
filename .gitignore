@@ -1,0 +1,35 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# 敏感与大文件
+*.jks
+*.keystore
+*.zip
+*.apk
+*.aar
+*.jar
+res_dump.txt
+setting_classes.txt
+
+# 反编译产物与临时目录
+decompiled/
+dec2/
+dec24/
+apk_extract/
+jadx/
+QEdge-main-master/
+_spine_tmp/
+.kotlin/

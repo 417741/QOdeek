@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LSPosed 作用域：与 META-INF/xposed/scope.list 二选一即可，这里再声明一份作冗余 -->
+    <string-array name="xposedscope">
+        <item>com.tencent.mobileqq</item>
+    </string-array>
+</resources>
