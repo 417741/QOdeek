@@ -24,22 +24,10 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
-/**
- * Activity 寄生：让本模块的 SettingsActivity 在 QQ 进程内打开，而不是跳到独立 App
- * （避免「即将离开 QQ，打开其他应用」弹窗）。
- *
- * 原理（照 QEdge 移植）：
- * 1. startActivity 时，在 IActivityTaskManager 层把目标 Intent 换成 QQ 自己的壳 Activity，
- *    真正的 Intent 塞进 extra，骗过系统「跨应用启动」检查；
- * 2. ActivityThread 的消息队列里再把 Intent 还原；
- * 3. Instrumentation.newActivity 里把壳 Activity 实例替换成模块 Activity；
- * 4. IPackageManager 层伪造 ActivityInfo，让 QQ 自己的校验也以为是自己家的 Activity。
- */
 object Parasitics {
 
     private const val ACTIVITY_PROXY_INTENT = "ACTIVITY_PROXY_INTENT"
 
-    // 壳 Activity / 伪造模板候选：运行时用 PM 验证存在性，选第一个能解析到的
     private val ACTIVITY_CANDIDATES = arrayOf(
         "com.tencent.mobileqq.activity.photo.CameraPreviewActivity",
         "com.tencent.mobileqq.activity.QQSettingSettingActivity",
@@ -134,8 +122,6 @@ object Parasitics {
                 if (idx != -1) {
                     val raw = args[idx] as Intent
                     val component = raw.component
-                    // 组件包名保持为宿主包名（QQ 客户端「离开 QQ」检测看的是包名），
-                    // 类名才是我们要寄生的模块 Activity。
                     if (component != null && component.packageName == QQ_PACKAGE &&
                         isTargetActivity(component.className)
                     ) {

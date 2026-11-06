@@ -35,13 +35,11 @@ android {
             optimization {
                 enable = false
             }
-            // 正式签名，打包出来可直接安装
             signingConfig = signingConfigs.getByName("release")
         }
     }
     sourceSets {
         getByName("main") {
-            // 背景资源放在项目根目录 beijing/（便于在源码目录直接查看），打包时合并进 APK assets 根
             assets.srcDir(rootProject.file("beijing"))
         }
     }
@@ -55,13 +53,11 @@ android {
     }
 }
 
-// 一键打包：gradlew 一键打包
-// 构建 release APK 后，改名为应用名称 QOdeep.apk，直接放到项目根目录（不在子文件夹里）
+// gradlew 一键打包
 tasks.register("一键打包") {
     group = "build"
     description = "Build signed release APK and copy it to project root as QOdeep.apk"
     dependsOn("assembleRelease")
-    // 配置期先捕获路径，避免 doLast 引用 Project 对象破坏 configuration cache
     val apkDir = layout.buildDirectory.dir("outputs/apk/release").get().asFile
     val target = rootProject.projectDir.resolve("QOdeep.apk")
     doLast {
@@ -73,8 +69,6 @@ tasks.register("一键打包") {
 }
 
 dependencies {
-    // legacy Xposed API：编译期引用，运行时由 LSPosed 框架提供，不打进 APK
-    // 与 QEdge/吧唧/FunBox 等模块一致，LSPosed 2.x 对 legacy API 完全兼容
     compileOnly("de.robv.android.xposed:api:82")
 
     implementation(platform(libs.androidx.compose.bom))
@@ -86,7 +80,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // DexKit：运行时在宿主 dex 里动态查找混淆后的类，适配未知 QQ 版本
     implementation(libs.dexkit)
     implementation(libs.protobuf.javalite)
 

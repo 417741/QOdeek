@@ -16,25 +16,12 @@ import java.lang.reflect.Proxy
 import java.util.Collections
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * Xposed 入口（legacy API）。
- *
- * 启动分两层：
- * 1) QFix 双路抢真实 ClassLoader —— QQ 热补丁会把真正宿主类挂在补丁 loader 上，
- *    直接 hook lpparam.classLoader 会「装上了也永远不触发」。
- * 2) DexKit 动态查找 —— 设置页相关类名是随版本变化的混淆名，用 DexKit 扫描宿主 dex
- *    按特征（父类/字符串）找出来，配合硬编码兜底，做到不挑 QQ 版本。
- *
- * 拿到真实类后：hook 设置页列表构建方法，构造独立分组插到「账号与安全」上方，
- * 条目点击 -> 打开本模块 SettingsActivity。
- */
 class MainHook : IXposedHookLoadPackage, DexKitTask {
 
     override val tag: String = "SettingInject"
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         if (lpparam.packageName != QQ_PACKAGE) return
-        // 设置页只在主进程；子进程(:MSF/:tool)不需要注入，避免重复扫描 dex
         if (lpparam.processName != QQ_PACKAGE) {
             XposedBridge.log("[QOdeep] 跳过子进程: ${lpparam.processName}")
             return
@@ -51,23 +38,18 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
 
     override fun getQueryMap(): Map<String, BaseFinder> {
         val queries = linkedMapOf<String, BaseFinder>()
-        // 设置页 provider：setting.main 包下继承 SettingConfigProvider 的类（混淆名随版本变）
         queries["provider"] = FindClass().apply {
             searchPackages("com.tencent.mobileqq.setting.main")
             matcher { superClass("com.tencent.mobileqq.setting.processor.SettingConfigProvider") }
         }
-        // 通用条目处理器：常量池里有 "SimpleItemProcessor" 字符串的类
         queries["simpleItemProcessor"] = FindClass().apply {
             searchPackages("com.tencent.mobileqq.setting.processor")
             matcher { usingStrings("SimpleItemProcessor") }
         }
-        // 分组处理器：常量池里有 "itemProcessors" 字符串的类
         queries["settingSection"] = FindClass().apply {
             searchPackages("com.tencent.mobileqq.setting.processor")
             matcher { usingStrings("itemProcessors") }
         }
-        // 占位任务：先把查找任务数对齐到 16 个（对应后续 16 个功能），
-        // 每个槽位用当前必然不存在的字符串占位，后续加功能时逐个替换成真实查询。
         for (i in 4..16) {
             queries["slot$i"] = FindClass().apply {
                 searchPackages("com.tencent.mobileqq.setting")
@@ -77,7 +59,7 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         return queries
     }
 
-    // ---------------- 启动双路：QFix 补丁 loader + BaseApplicationImpl 兜底 ----------------
+    // ---------------- 启动 ----------------
 
     private fun hookStartup(cl: ClassLoader) {
         try {
@@ -143,7 +125,6 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         })
     }
 
-    /** 拿到真实宿主 ClassLoader 后只执行一次：挂 Application.onCreate */
     private fun doRealStartup(realLoader: ClassLoader) {
         if (!startupHooked.compareAndSet(false, true)) return
         unhookTemporary()
@@ -175,7 +156,6 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         }
     }
 
-    /** Application 创建完毕：准备环境，走 DexKit 缓存/扫描分支，最后装设置页 hook。 */
     private fun onHostReady(hostContext: Context) {
         initEnv(hostContext)
         runCatching { Parasitics.init(hostContext) }
@@ -250,7 +230,6 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         XposedBridge.log("[QOdeep] 设置页列表方法 hook 已安装: ${providerClass.name}.${buildMethod.name}")
     }
 
-    /** 优先 DexKit 查找结果，失败回退到本版本反编译确认的硬编码类名。 */
     private fun resolveProviderClass(): Class<*>? =
         runCatching { DexKitCache.getClass("$tag->provider") }.getOrNull()
             ?: runCatching { Env.hostClassLoader.loadClass("com.tencent.mobileqq.setting.main.b") }.getOrNull()
@@ -276,15 +255,12 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         val processor = createProcessor(itemClass, context, clickLambda)
         val newSection = createSection(sectionClass, processor)
 
-        // index 0 是 QQ 原生搜索框分组（setting.main.processor.t，与账号与安全条目同包名，
-        // findAccountIndex 会误命中），因此插入位置至少为 1，保证搜索框保持在页面顶部。
         val index = findAccountIndex(groups, sectionClass).takeIf { it > 0 } ?: 1
         val insertAt = if (index <= groups.size) index else groups.size
         groups.add(insertAt, newSection)
         XposedBridge.log("[QOdeep] 入口已插入 (index=$insertAt, section=${sectionClass.name}, item=${itemClass.name})")
     }
 
-    /** 「账号与安全」分组：条目类位于 setting.main.processor 包的第一组。 */
     private fun findAccountIndex(groups: List<Any?>, sectionClass: Class<*>): Int {
         val itemsMethod = runCatching {
             (sectionClass.methods + sectionClass.declaredMethods).distinct().firstOrNull {
@@ -325,7 +301,6 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         }
         val instance = ctor.newInstance(*args.toTypedArray())
 
-        // 设置点击回调：优先 Function0 单参方法，其次 Function1
         val methods = (processorClass.methods + processorClass.declaredMethods).distinct()
         var set = false
         for (m in methods) {
@@ -371,7 +346,6 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         return ctor.newInstance(*args.toTypedArray())
     }
 
-    /** 从分组列表现有条目里推断 SimpleItemProcessor 类（DexKit 未命中时兜底）。 */
     private fun findSimpleItemProcessorFromList(groups: List<Any?>): Class<*>? {
         for (group in groups) {
             if (group == null) continue
@@ -413,7 +387,6 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
         }
     }.getOrDefault(false)
 
-    /** 列表里可能是基类，尝试同包下常见混淆名找具体子类。 */
     private fun findConcreteItemProcessorClass(baseClass: Class<*>): Class<*>? = runCatching {
         val pkg = baseClass.`package`?.name
         if (pkg == null) {
@@ -464,13 +437,10 @@ class MainHook : IXposedHookLoadPackage, DexKitTask {
     private fun openSettings(context: Context) {
         try {
             Parasitics.ensureInitialized(context)
-            // 用 QQ 进程内的 context 构造 Intent，组件包名会保持为宿主包名，
-            // 从而避开 QQ 客户端「离开 QQ」检测；真正类名由 Parasitics 在 binder 层换壳。
             val intent = Intent(context, SettingsActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-                // 寄生页面与 MainHook 不同 ClassLoader，Env 字段不通，把环境随 Intent 带过去
                 putExtra(SettingsActivity.ENV_DATA_DIR, Env.moduleDataDir)
                 putExtra(SettingsActivity.ENV_NATIVE_LIB_DIR, Env.moduleNativeLibDir)
                 putExtra(SettingsActivity.ENV_HOST_APK, Env.hostApkPath)

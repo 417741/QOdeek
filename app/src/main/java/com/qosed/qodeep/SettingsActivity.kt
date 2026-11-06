@@ -58,17 +58,14 @@ import org.json.JSONObject
 import java.io.File
 import java.util.zip.ZipFile
 
-/** FunBox 风格卡片：圆角 + 半透明白底。 */
 private fun Modifier.cardStyle(): Modifier = this
     .clip(RoundedCornerShape(16.dp))
     .background(Color(0xCCFFFFFF))
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 寄生打开时窗口主题继承自 QQ 壳 Activity（深色/黑底），强制换成系统亮色主题
         runCatching { setTheme(android.R.style.Theme_Material_Light_NoActionBar) }
         super.onCreate(savedInstanceState)
-        // 寄生页面与 MainHook 不同 ClassLoader，Env 是空副本，从 Intent 恢复宿主环境
         intent?.let { i ->
             i.getStringExtra(ENV_DATA_DIR)?.let { Env.moduleDataDir = it }
             i.getStringExtra(ENV_NATIVE_LIB_DIR)?.let { Env.moduleNativeLibDir = it }
@@ -90,26 +87,21 @@ private fun SettingsPage() {
     val prefs = remember { context.getSharedPreferences("qodeep_bg", Context.MODE_PRIVATE) }
     var bgKey by remember { mutableStateOf(prefs.getString("bg_key", null)) }
     var showPicker by remember { mutableStateOf(false) }
-    // 背景诊断信息（WebView 页面标题 + JS console 报错），排查后移除
     var bgDebug by remember { mutableStateOf("bg: 解压中...") }
-    // 寄生在 QQ 里时 file:///android_asset/ 指向 QQ 的 APK，必须先把模块 APK 里的背景资源解压到本地
     val bgDir by produceState<File?>(null) {
         value = withContext(Dispatchers.IO) { BgAssets.ensure(context) }
     }
     val items = remember(bgDir) { bgDir?.let { JieqiCatalog.load(it) } ?: emptyList() }
     val current = items.firstOrNull { it.key == bgKey } ?: items.firstOrNull()
-    // 未选择过时跟随清单第一张（默认端午）；已选择过则用保存值
     val activeKey = bgKey ?: current?.key ?: "duanwu"
 
     Box(Modifier.fillMaxSize().background(Color(0xFFF2F4F8))) {
-        // 动态 Spine 背景（资源解压完成后再加载），铺满全屏
         JieqiBackground(
             activeKey, bgDir,
             onDebug = { msg -> bgDebug = "bg: $msg" },
             modifier = Modifier.fillMaxSize()
         )
 
-        // 诊断浮层（排查背景不显示用，随后移除）
         Text(
             text = bgDebug,
             color = Color(0xCCFF3B30),
@@ -119,7 +111,6 @@ private fun SettingsPage() {
                 .padding(8.dp)
         )
 
-        // 内容：一列圆角半透明卡片叠在背景上，可滚动（FunBox 风格）
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -127,7 +118,6 @@ private fun SettingsPage() {
                 .padding(horizontal = 16.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 标题卡
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -140,7 +130,6 @@ private fun SettingsPage() {
                 Text(text = "QQ 功能增强模块", color = Color(0xFF8A8A8A), fontSize = 13.sp)
             }
 
-            // 更换背景卡
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -168,7 +157,6 @@ private fun SettingsPage() {
                 Text(text = "›", color = Color(0xFFB0B0B0), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
 
-            // DexKit 缓存卡
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -242,7 +230,6 @@ private fun DexKitSection() {
                     DexKitFinder.toastContext = context.applicationContext
                     Thread {
                         runCatching {
-                            // 删缓存 → 当场重新扫描（期间弹「查找方法中」Toast）→ 写新缓存
                             DexKitPageState.clearCache()
                             DexKitFinder.doFind {
                                 Handler(Looper.getMainLooper()).post {
@@ -275,8 +262,6 @@ private fun DexKitSection() {
         Text(text = "清除缓存并重新扫描，完成后重启 QQ 生效", color = Color(0xFFFF9500), fontSize = 12.sp)
     }
 
-    // 重建期间的模态进度框（仿 QEdge）：无按钮、点外部关闭无效，
-    // 遮罩挡住整页操作，查找完成后 rebuilding 置 false 自动消失
     if (rebuilding) {
         AlertDialog(
             onDismissRequest = {},
@@ -293,9 +278,12 @@ private fun DexKitSection() {
     }
 }
 
-/** 全屏透明 WebView，从本地解压目录播放 Spine 骨骼动画背景。 */
 @Composable
 private fun JieqiBackground(key: String, dir: File?, onDebug: (String) -> Unit, modifier: Modifier = Modifier) {
+    // 让 WebViewClient 闭包始终能读到最新的解压目录（factory 只执行一次，不能直接捕获 dir 参数）
+    val dirRef = remember { mutableStateOf<File?>(null) }
+    dirRef.value = dir
+
     AndroidView(
         modifier = modifier,
         factory = { ctx ->
@@ -303,18 +291,41 @@ private fun JieqiBackground(key: String, dir: File?, onDebug: (String) -> Unit, 
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
                 setLayerType(View.LAYER_TYPE_HARDWARE, null)
                 settings.javaScriptEnabled = true
-                settings.allowFileAccess = true
-                settings.allowFileAccessFromFileURLs = true
-                settings.allowUniversalAccessFromFileURLs = true
                 settings.domStorageEnabled = true
                 isHorizontalScrollBarEnabled = false
                 isVerticalScrollBarEnabled = false
-                // 背景层不拦截点击
                 isClickable = false
                 isFocusable = false
                 isLongClickable = false
                 setOnTouchListener { _, _ -> true }
                 webViewClient = object : android.webkit.WebViewClient() {
+                    // 把 https://appassets.qodeep.local/* 拦截为解压目录里的本地文件。
+                    // 页面因此是正常 https 源，fetch/XHR 不再被 file:// 协议禁掉。
+                    override fun shouldInterceptRequest(
+                        view: WebView,
+                        request: android.webkit.WebResourceRequest
+                    ): android.webkit.WebResourceResponse? {
+                        val u = request.url
+                        if (u.host != "appassets.qodeep.local") return null
+                        val d = dirRef.value ?: return null
+                        val rel = u.path?.trimStart('/') ?: return null
+                        if (rel.isEmpty() || rel.contains("..")) return null
+                        val f = File(d, rel)
+                        if (!f.exists() || !f.isFile) return null
+                        val mime = when (f.extension.lowercase()) {
+                            "html" -> "text/html"
+                            "js" -> "application/javascript"
+                            "json" -> "application/json"
+                            "webp" -> "image/webp"
+                            "jpg", "jpeg" -> "image/jpeg"
+                            "png" -> "image/png"
+                            else -> "application/octet-stream"
+                        }
+                        return runCatching {
+                            android.webkit.WebResourceResponse(mime, null, java.io.FileInputStream(f))
+                        }.getOrNull()
+                    }
+
                     override fun onPageFinished(view: WebView, url: String?) {
                         view.evaluateJavascript("document.title || '(标题空)'") { onDebug("title=$it") }
                     }
@@ -328,12 +339,12 @@ private fun JieqiBackground(key: String, dir: File?, onDebug: (String) -> Unit, 
             }
         },
         update = { wv ->
-            val d = dir
+            val d = dirRef.value
             if (d != null) {
-                val url = "file://${d.absolutePath}/player.html?key=$key"
+                val url = "https://appassets.qodeep.local/player.html?key=$key"
                 if (wv.tag != url) {
                     wv.tag = url
-                    onDebug("加载: ${d.name}/player.html")
+                    onDebug("加载: 拦截域名 player.html")
                     wv.loadUrl(url)
                 }
             } else {
@@ -344,7 +355,6 @@ private fun JieqiBackground(key: String, dir: File?, onDebug: (String) -> Unit, 
     )
 }
 
-/** 更换背景弹窗：三列宫格显示各节令静态封面，点选立即生效并持久化。 */
 @Composable
 private fun BgPickerDialog(
     items: List<JieqiCatalog.Item>,
@@ -393,7 +403,6 @@ private fun BgPickerDialog(
     )
 }
 
-/** 从解压目录加载节令封面缩略图。 */
 @Composable
 private fun CoverThumb(key: String, dir: File?, modifier: Modifier = Modifier) {
     val bmp by produceState<ImageBitmap?>(null, key, dir) {
@@ -417,7 +426,6 @@ private fun CoverThumb(key: String, dir: File?, modifier: Modifier = Modifier) {
     }
 }
 
-/** 节令海报清单（解压目录里的 jieqi.json）。 */
 object JieqiCatalog {
     data class Item(val key: String, val name: String, val season: String)
 
@@ -431,13 +439,6 @@ object JieqiCatalog {
     }.getOrDefault(emptyList())
 }
 
-/**
- * 背景资源解压器。
- *
- * 模块页寄生在 QQ 进程里，WebView 的 file:///android_asset/ 指向 QQ 的 APK，
- * 读不到模块 APK 里的背景资源；所以首次打开时把模块 APK 内 assets/ 下的
- * 背景文件解压到 QQ 自己的 cacheDir（模块更新后按 APK 指纹自动重解压）。
- */
 object BgAssets {
     private const val MODULE_PKG = "com.qosed.qodeep"
     private const val MARKER = ".ver"
@@ -447,7 +448,6 @@ object BgAssets {
     @Volatile
     private var cachedFingerprint: String? = null
 
-    /** 返回解压完成的资源目录；失败返回 null。 */
     fun ensure(context: Context): File? {
         val fingerprint = runCatching {
             val info = context.packageManager.getApplicationInfo(MODULE_PKG, 0)
@@ -470,7 +470,6 @@ object BgAssets {
                         while (entries.hasMoreElements()) {
                             val e = entries.nextElement()
                             if (!e.name.startsWith("assets/") || e.isDirectory) continue
-                            // assets/player.html → <dir>/player.html（拍平）
                             val rel = e.name.removePrefix("assets/")
                             if (rel.isEmpty() || rel.contains('/')) continue
                             zip.getInputStream(e).use { input ->
@@ -491,14 +490,12 @@ object BgAssets {
     }
 }
 
-/** DexKit 缓存状态读取与重建（QQ 进程内才有宿主目录权限）。 */
 object DexKitPageState {
     const val TOTAL = 16
     private const val FINGERPRINT_KEY = "__host_apk__"
 
     private fun cacheFile(): File = File(File(Env.moduleDataDir, "dexkit"), "CacheMap.json")
 
-    /** 返回 (已就绪任务数, 描述)；n < 0 表示无法读取。 */
     fun readStatus(): Pair<Int, String> {
         if (Env.moduleDataDir.isEmpty()) return -1 to "请从 QQ 设置页进入本页面"
         val f = cacheFile()
@@ -511,13 +508,8 @@ object DexKitPageState {
         }.getOrElse { -1 to "缓存读取失败" }
     }
 
-    /** 清空缓存（内存 + 磁盘）；随后的 doFind 会全量重扫并写回。 */
     fun clearCache() {
-        // 页面侧 DexKitCache 是独立 ClassLoader 的副本，必须先 init 设置缓存文件路径，
-        // 否则扫描完成后 saveCache 因 cacheFile 为 null 而不落盘。
         DexKitCache.init()
-        // 关键：必须同时清内存 map。只删磁盘文件的话，cacheMap 里还留着上次扫描结果，
-        // scanBridge 的 contains(key) 全为 true → 全部跳过 → 变成「增量补查」而非全量重扫。
         DexKitCache.clearAll()
     }
 }
