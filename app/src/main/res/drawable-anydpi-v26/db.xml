@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QQ 设置页入口图标：用 adaptive-icon 让 QQ 按大圆头像样式渲染（与 QEdge 一致）。
+     foreground 用整幅圆形头像，mask 后头像中心被放大裁切，视觉上比普通位图更大更圆。 -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@android:color/white" />
+    <foreground android:drawable="@drawable/db_fg" />
+</adaptive-icon>
