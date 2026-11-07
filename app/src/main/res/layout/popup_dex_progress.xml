@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="正在查找方法"
-        android:textColor="#222222"
+        android:textColor="#111111"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="准备开始..."
-        android:textColor="#8A8A8A"
+        android:textColor="#5A6068"
         android:textSize="14sp" />
 
     <!-- 不确定进度条：不用系统 ProgressBar（其 indeterminate 动画 drawable

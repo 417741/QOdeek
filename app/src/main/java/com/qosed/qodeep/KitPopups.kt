@@ -98,16 +98,18 @@ class KitPopupHost(val activity: Activity) {
     private fun dp(v: Int): Int = (v * activity.resources.displayMetrics.density).toInt()
 }
 
-/** 白色 16dp 圆角卡片容器，弹窗内容统一用这个，杜绝库资源圆角失效。 */
+/** 液态玻璃弹窗卡片容器，统一 LiquidGlass 设计系统（与主页卡片一致）。 */
 fun popupCard(context: Context, paddingDp: Int = 20): LinearLayout =
     LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
-        background = roundedWhite(context)
+        background = LiquidGlass.card(context)
+        clipToOutline = true
+        outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
         setPadding(dp(context, paddingDp), dp(context, paddingDp), dp(context, paddingDp), dp(context, paddingDp))
     }
 
 /** 纯代码白底圆角背景：不依赖任何 XML drawable，寄生环境必然正确。 */
-fun roundedWhite(context: Context, radiusDp: Int = 16): GradientDrawable =
+fun roundedWhite(context: Context, radiusDp: Int = 30): GradientDrawable =
     GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
         cornerRadius = radiusDp * context.resources.displayMetrics.density
@@ -133,7 +135,7 @@ fun KitPopupHost.confirm(
     }
     val tvMsg = TextView(ctx).apply {
         text = message
-        setTextColor(0xFF666666.toInt())
+        setTextColor(0xFF44484D.toInt())
         textSize = 14f
         setPadding(0, dp(ctx, 10), 0, 0)
     }
@@ -144,7 +146,7 @@ fun KitPopupHost.confirm(
     }
     val tvCancel = TextView(ctx).apply {
         text = cancelText
-        setTextColor(0xFF8A8A8A.toInt())
+        setTextColor(0xFF6B7280.toInt())
         textSize = 15f
         setPadding(dp(ctx, 16), dp(ctx, 8), dp(ctx, 16), dp(ctx, 8))
         setOnClickListener { dismiss() }

@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -182,22 +181,10 @@ class SettingsActivity : ComponentActivity() {
         val cardBg = findViewById<FrameLayout>(R.id.cardBg)
         val cardDexkit = findViewById<FrameLayout>(R.id.cardDexkit)
 
-        // 卡片毛玻璃底：纯代码自绘（半透明白渐变 + 22dp 圆角 + 白描边）。
-        // 不用 XML drawable —— 寄生环境资源引用不可靠，而且圆角还决定玻璃层的裁剪轮廓。
-        fun frostedCardBg(): GradientDrawable {
-            val radius = 22f * resources.displayMetrics.density
-            return GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = radius
-                colors = intArrayOf(0xE6FFFFFF.toInt(), 0xB3FFFFFF.toInt())
-                orientation = GradientDrawable.Orientation.TOP_BOTTOM
-                setStroke((1f * resources.displayMetrics.density).toInt(), 0x59FFFFFF)
-            }
-        }
+        // 卡片液态玻璃：统一走 LiquidGlass 设计系统（浅冷灰透明玻璃 + 细白描边 + 大圆角）。
+        // 不用 XML drawable —— 寄生环境资源引用不可靠，圆角还决定玻璃层的裁剪轮廓。
         for (c in listOf(cardTitle, cardBg, cardDexkit)) {
-            c.background = frostedCardBg()
-            c.clipToOutline = true
-            c.outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
+            LiquidGlass.apply(c)
         }
         val tvCurrentBg = findViewById<TextView>(R.id.tvCurrentBg)
         val tvDexReady = findViewById<TextView>(R.id.tvDexReady)
@@ -205,100 +192,10 @@ class SettingsActivity : ComponentActivity() {
         val dexRebuildRow = findViewById<LinearLayout>(R.id.dexRebuildRow)
         val tvRebuild = findViewById<TextView>(R.id.tvRebuild)
 
-        // ---- 卡片毛玻璃（确定性实现，不用 BlurView）----
-        // BlurView 的实时快照模糊依赖离屏 GPU 渲染，在 QQ 寄生环境会输出灰色
-        // 错位图（卡片上方矩形灰块、弹窗后椭圆灰晕），独立 App 正常——环境不可控。
-        // 替代：把封面解码成 ~64px 小图（放大插值天然呈高斯模糊质感），铺到卡片
-        // 底层并用 Matrix 与全屏背景按位置对齐。零渲染依赖，两端画面必然一致。
-        val glassViews = listOf(
-            findViewById<ImageView>(R.id.glassTitle),
-            findViewById<ImageView>(R.id.glassBg),
-            findViewById<ImageView>(R.id.glassDex)
-        )
-        val glassCards = listOf(cardTitle, cardBg, cardDexkit)
-        var glassBitmap: android.graphics.Bitmap? = null
-        var glassJob = 0
-
-        fun refreshGlass() {
-            val bmp = glassBitmap ?: return
-            val rw = root.width
-            val rh = root.height
-            if (rw <= 0 || rh <= 0) return
-            val bw = bmp.width.toFloat()
-            val bh = bmp.height.toFloat()
-            if (bw <= 0f || bh <= 0f) return
-            // 与 bgCover 相同的 centerCrop 几何，把小图放大到全屏坐标系
-            val s = maxOf(rw / bw, rh / bh)
-            val dx = (rw - bw * s) / 2f
-            val dy = (rh - bh * s) / 2f
-            val rootLoc = IntArray(2)
-            root.getLocationOnScreen(rootLoc)
-            for (i in glassViews.indices) {
-                val g = glassViews[i]
-                if (g.width <= 0) continue
-                val loc = IntArray(2)
-                glassCards[i].getLocationOnScreen(loc)
-                val m = android.graphics.Matrix()
-                m.setScale(s, s)
-                m.postTranslate(dx - (loc[0] - rootLoc[0]), dy - (loc[1] - rootLoc[1]))
-                g.imageMatrix = m
-            }
-        }
-
-        fun setGlassCover(f: File?) {
-            if (f == null) return
-            val job = ++glassJob
-            Thread {
-                // 采样步长：把封面缩到宽 ~64px，放大后自然模糊
-                val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                runCatching { android.graphics.BitmapFactory.decodeFile(f.absolutePath, bounds) }
-                var sample = 1
-                while (bounds.outWidth / (sample * 2) >= 64) sample *= 2
-                val bmp = runCatching {
-                    android.graphics.BitmapFactory.decodeFile(
-                        f.absolutePath,
-                        android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
-                    )
-                }.getOrNull()
-                main.post {
-                    if (job != glassJob || bmp == null) return@post
-                    glassBitmap = bmp
-                    for (g in glassViews) g.setImageBitmap(bmp)
-                    refreshGlass()
-                }
-            }.start()
-        }
-        root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> refreshGlass() }
-        findViewById<View>(R.id.scroll).viewTreeObserver.addOnScrollChangedListener { refreshGlass() }
-
-        // 彩色圆角图标块（FunBox 风格）：14% 透明度底 + 前景色字符
-        fun chip(host: FrameLayout, glyph: String, argb: Int) {
-            host.removeAllViews()
-            val bg = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = 12f * resources.displayMetrics.density
-                setColor((argb and 0x00FFFFFF) or 0x24000000)
-            }
-            val tv = TextView(this).apply {
-                text = glyph
-                setTextColor(argb)
-                textSize = 17f
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
-                gravity = Gravity.CENTER
-            }
-            host.background = bg
-            host.addView(tv, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-        }
-        val logo = findViewById<FrameLayout>(R.id.logoChip)
-        val logoBg = GradientDrawable().apply {
-            orientation = GradientDrawable.Orientation.TL_BR
-            colors = intArrayOf(0xFF3D7FFF.toInt(), 0xFF66A1FF.toInt())
-            cornerRadius = 18f * resources.displayMetrics.density
-        }
-        logo.background = logoBg
-        chip(findViewById(R.id.chipBg), "景", 0xFF3D7FFF.toInt())
-        chip(findViewById(R.id.chipDex), "缓", 0xFFFF9500.toInt())
-
+        // ---- 卡片玻璃：去掉静态封面磨砂底图，改用「半透明薄白蒙层」直接透出底层 Spine 动画 ----
+        // 之前气泡里铺的是静态 _cover.jpg 小图（Matrix 对齐），导致气泡背景静止、
+        // 与底层会动的花草对不上。现改为：卡片只保留 LiquidGlass 的半透明薄白玻璃，
+        // 底下的 WebView Spine 动画（花草树木会动）直接透过玻璃显示，气泡画面跟着动。
         val prefs = getSharedPreferences("qodeep_bg", Context.MODE_PRIVATE)
         var bgKey: String? = prefs.getString("bg_key", null)
         var bgDir: File? = null
@@ -313,8 +210,6 @@ class SettingsActivity : ComponentActivity() {
             val cover = bgDir?.let { File(it, "${active}_cover.jpg") }
             if (cover != null && cover.exists()) {
                 Glide.with(this).load(cover).centerCrop().into(bgCover)
-                // 卡片毛玻璃底图同步换成新封面（换背景时毛玻璃跟着变）
-                setGlassCover(cover)
             }
             // 动态 Spine 背景：WebView 加载（资源就绪后只 load 一次）
             if (bgDir != null && animLoadedKey != active) {
@@ -556,8 +451,8 @@ class BgPickerSheet(
     init {
         // 寄生环境必须用模块 ClassLoader + 模块资源 inflate
         android.view.LayoutInflater.from(context).inflate(R.layout.popup_bg_picker, this, true)
-        // 圆角白底用纯代码自绘，覆盖 XML 里的 drawable 引用（寄生环境资源引用不可靠）
-        background = roundedWhite(context)
+        // 液态玻璃弹窗卡片：统一 LiquidGlass 设计系统（与主页卡片一致的半透明磨砂 + 描边 + 圆角）
+        LiquidGlass.apply(this)
         val grid = findViewById<RecyclerView>(R.id.bgGrid)
         grid.layoutManager = GridLayoutManager(context, 3)
         grid.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -586,7 +481,7 @@ class BgPickerSheet(
                 iv.background = bg
                 iv.clipToOutline = true
                 tv.text = item.name
-                tv.setTextColor(if (selected) 0xFF0A7AFF.toInt() else 0xFF8A8A8A.toInt())
+                tv.setTextColor(if (selected) 0xFF0A7AFF.toInt() else 0xFF5A6068.toInt())
                 // 缩略图不用 Glide（寄生环境图片加载不可靠，失败时留灰块）：
                 // 直接用 BitmapFactory 同步读本地封面，读不到就保持白底，绝不出现灰块。
                 val cover = dir?.let { File(it, "${item.key}_cover.jpg") }
@@ -617,8 +512,8 @@ class DexProgressSheet(context: Context) : FrameLayout(context) {
 
     init {
         android.view.LayoutInflater.from(context).inflate(R.layout.popup_dex_progress, this, true)
-        // 圆角白底纯代码自绘，覆盖 XML 里的 drawable 引用（寄生环境资源引用不可靠）
-        background = roundedWhite(context)
+        // 液态玻璃弹窗卡片：统一 LiquidGlass 设计系统
+        LiquidGlass.apply(this)
         // 进度条：纯代码不确定动画（一个来回扫动的蓝色圆角条），
         // 不用系统 ProgressBar（其 indeterminate 动画资源在寄生环境会渲染成灰块）
         bar = View(context).apply {
