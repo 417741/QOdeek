@@ -1,0 +1,6 @@
+id=com.qosed.qodeep
+name=豆包
+version=0.0.48
+versionCode=48
+author=QOdeep
+description=在 QQ 设置页插入自定义入口的 Xposed 模块

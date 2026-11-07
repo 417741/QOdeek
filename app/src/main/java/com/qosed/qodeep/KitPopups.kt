@@ -28,9 +28,17 @@ class KitPopupHost(val activity: Activity) {
 
     private val main = Handler(Looper.getMainLooper())
     private var overlay: FrameLayout? = null
+    private var cancelable = true
 
-    /** 居中弹出内容（内容自备圆角卡片背景）；cancelable=false 时点遮罩不关闭。 */
+    /** 当前是否有弹窗在显示（供返回键拦截判断）。 */
+    val isShowing: Boolean get() = overlay != null
+
+    /** 当前弹窗是否允许用户关闭（cancelable=false 的进度弹窗返回键不关闭）。 */
+    fun dismissable(): Boolean = cancelable
+
+    /** 居中弹出内容（内容自备圆角卡片背景）；cancelable=false 时点遮罩/返回键不关闭。 */
     fun showCenter(content: View, cancelable: Boolean = true) {
+        this.cancelable = cancelable
         main.post {
             val fl = overlay
             if (fl == null) {
@@ -43,11 +51,12 @@ class KitPopupHost(val activity: Activity) {
                     // 遮罩用半透明黑：既能遮住底下宿主背景（QQ 主题可能带灰），又不至于全黑。
                     // 关键：不要让它透明到透出宿主 windowBackground 的灰色。
                     background = GradientDrawable().apply { setColor(0x99000000.toInt()) }
-                    setOnClickListener { if (cancelable) dismiss() }
+                    setOnClickListener { if (this@KitPopupHost.cancelable) dismiss() }
                 }
                 decor.addView(ov)
                 ov.startAnimation(alpha(0f, 1f))
                 overlay = ov
+                // 内容点击默认吞掉，避免事件穿透到遮罩导致误关（自绘弹窗不是独立 Window）
                 content.setOnClickListener {}
                 ov.addView(
                     content,
@@ -61,8 +70,9 @@ class KitPopupHost(val activity: Activity) {
                 (content.layoutParams as FrameLayout.LayoutParams).setMargins(dp(24), 0, dp(24), 0)
                 content.startAnimation(alpha(0f, 1f, 1.05f))
             } else {
-                // 已有弹窗时替换内容（如进度→完成确认）
+                // 已有弹窗时替换内容（如进度→完成确认）：同样要吞掉点击，防止穿透到遮罩
                 fl.removeAllViews()
+                content.setOnClickListener {}
                 fl.addView(
                     content,
                     FrameLayout.LayoutParams(

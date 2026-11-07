@@ -15,6 +15,8 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import android.widget.TextView
+import com.qosed.qodeep.R
+import com.qosed.qodeep.levelboost.MoodScheduler
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import org.luckypray.dexkit.query.FindClass
 import org.luckypray.dexkit.query.base.BaseFinder
@@ -201,6 +203,8 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
     /** Application 创建完毕：准备环境，走 DexKit 缓存/扫描分支，最后装设置页 hook。 */
     private fun onHostReady(hostContext: Context) {
         initEnv(hostContext)
+        runCatching { MoodScheduler.start(hostContext) }
+            .onFailure { XposedBridge.log("[QOdeep] 定时说说调度启动失败: $it") }
         runCatching { Parasitics.init(hostContext) }
             .onFailure { XposedBridge.log("[QOdeep] 活动寄生初始化失败: $it") }
         runCatching { hookEmbeddingRules(Env.hostClassLoader) }
@@ -515,6 +519,12 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
             return
         }
 
+        // 注入模块资源到宿主 Resources：条目渲染时 QQ 会用自己的 Resources 解析
+        // 图标资源 ID（R.drawable.db），不注入的话同一 ID 在 QQ 资源表里对应别的图，
+        // 入口图标会显示成错误的图（实测为一张蓝色方块图）。
+        runCatching { Parasitics.injectModuleResourcesNow(context.resources, Env.moduleApkPath) }
+            .onFailure { XposedBridge.log("[QOdeep] 注入模块资源失败: $it") }
+
         val sectionClass = runCatching { DexKitCache.getClass("$tag->settingSection") }.getOrNull()
             ?: groups.firstOrNull { it != null }?.javaClass
         val itemClass = runCatching { DexKitCache.getClass("$tag->simpleItemProcessor") }.getOrNull()
@@ -570,9 +580,14 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
         args.add(context)
         args.add(ENTRY_TYPE)
         args.add(ENTRY_TITLE)
+        // 第一个 Int 参数是图标资源 ID（与 QEdge 一致），其余 Int 填 0
+        var intCount = 0
         for (i in 3 until params.size) {
             when {
-                params[i] == Int::class.javaPrimitiveType -> args.add(0)
+                params[i] == Int::class.javaPrimitiveType -> {
+                    if (intCount == 0) args.add(R.drawable.db) else args.add(0)
+                    intCount++
+                }
                 params[i] == String::class.java -> args.add("")
                 else -> args.add(null)
             }
@@ -742,6 +757,13 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
                     .apply()
             }
             context.startActivity(intent, buildFullscreenOptions(context))
+            // 双保险：部分 ROM 上 makeCustomAnimation(0,0) 不覆盖旧 Activity 的退出动画，
+            // 若点击源是 Activity，则对其再显式去一次转场，确保「点一下画面直接变、无跳转感」
+            runCatching {
+                if (context is Activity) {
+                    context.overridePendingTransition(0, 0)
+                }
+            }
             XposedBridge.log("[QOdeep] 已在 QQ 内打开设置页（寄生）")
         } catch (t: Throwable) {
             XposedBridge.log("[QOdeep] 打开设置页失败: $t")
@@ -769,8 +791,8 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
         private val temporaryUnhooks = mutableListOf<XC_MethodHook.Unhook>()
         private const val QQ_PACKAGE = "com.tencent.mobileqq"
         private const val MODULE_PACKAGE = "com.qosed.qodeep"
-        private const val ENTRY_TITLE = "QOdeep"
-        private const val BOTTOM_TITLE = ""
+        private const val ENTRY_TITLE = "豆包"
+        private const val BOTTOM_TITLE = "豆包"
         private const val ENTRY_TYPE = 100
         // 进度卡片里"当前查找 key"文本的 view id（自绘 AlertDialog 内容用）
         private const val MSG_ID = 0x60de0001

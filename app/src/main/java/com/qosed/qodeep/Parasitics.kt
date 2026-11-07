@@ -275,9 +275,14 @@ object Parasitics {
     // ---------------- 模块资源注入 ----------------
 
     fun injectModuleResources(res: Resources?) {
+        injectModuleResources(res, ModulePathHolder.path)
+    }
+
+    /** 可显式传模块 APK 路径的版本：QQ 设置页插入口时 ModulePathHolder 还没赋值，需要用 Env.moduleApkPath。 */
+    fun injectModuleResources(res: Resources?, apkPath: String?) {
         if (res == null) return
         if (runCatching { res.getString(R.string.app_name) }.isSuccess) return
-        val path = ModulePathHolder.path ?: return
+        val path = apkPath ?: ModulePathHolder.path ?: return
 
         if (Build.VERSION.SDK_INT >= 30) {
             runCatching {
@@ -297,6 +302,34 @@ object Parasitics {
             }
         } else {
             addAssetPathFallback(res, path)
+        }
+    }
+
+    /**
+     * 同步版注入：不做线程切换，调用返回后资源立即可用。
+     * QQ 设置页插入口条目时必须用这个——QQ 拿到分组列表后会同步渲染条目，
+     * 若走异步 post，首次渲染发生在注入生效前，图标资源 ID 会被 QQ 资源表
+     * 解析成错误图片（实测为蓝方块），且列表不会重绘。
+     */
+    fun injectModuleResourcesNow(res: Resources?, apkPath: String?) {
+        if (res == null) return
+        if (runCatching { res.getString(R.string.app_name) }.isSuccess) return
+        val path = apkPath ?: ModulePathHolder.path ?: return
+        runCatching {
+            if (Build.VERSION.SDK_INT >= 30) {
+                val loader = ResLoaderHolder.loader ?: run {
+                    val pfd = ParcelFileDescriptor.open(File(path), ParcelFileDescriptor.MODE_READ_ONLY)
+                    val provider = ResourcesProvider.loadFromApk(pfd)
+                    ResourcesLoader().apply { addProvider(provider) }.also { ResLoaderHolder.loader = it }
+                }
+                try {
+                    res.addLoaders(loader)
+                } catch (_: IllegalArgumentException) {
+                    addAssetPathFallback(res, path)
+                }
+            } else {
+                addAssetPathFallback(res, path)
+            }
         }
     }
 

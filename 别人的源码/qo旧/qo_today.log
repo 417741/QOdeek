@@ -1,0 +1,1429 @@
+2026-11-05 00:00:27.860 D [QO]:LevelBoost: deleteAfterPublish tid=b26415009656eb6a01d20b00 ok=true
+2026-11-05 00:03:46.407 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 00:03:49.042 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 00:08:13.933 E [QO]:OnTroopJoin: memberUin resolve failed: u_XHdQwOEuOFGvppQ8LGghRw
+2026-11-05 00:09:57.890 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 00:10:00.913 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 00:14:02.376 E [QO]:OnTroopJoin: memberUin resolve failed: u_ch1WcqLsHBu7kIBS8OmYEQ
+2026-11-05 00:19:17.471 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 00:19:20.655 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 00:32:34.689 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 00:32:37.388 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 00:39:09.091 E [QO]:OnTroopJoin: memberUin resolve failed: u_FMq_DaEhb6ae9F7Lheb9uQ
+2026-11-05 00:41:28.445 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 00:41:30.885 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 00:46:43.664 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 00:46:46.483 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 00:49:07.812 E [QO]:OnTroopJoin: memberUin resolve failed: {"11":108,"13":1699824489,"14":1280920671}
+2026-11-05 00:55:46.324 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 00:55:48.966 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 00:56:41.490 E [QO]:OnTroopJoin: memberUin resolve failed: u_vTUn8amSfdKMn-NtmzKBAg
+2026-11-05 01:15:34.683 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 01:15:37.045 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 01:44:56.884 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 01:45:28.579 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 02:21:11.299 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 02:21:14.490 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 02:22:09.928 E [QO]:OnTroopJoin: memberUin resolve failed: u_tbYLmdxWk7eO6_a0lhpfZw
+2026-11-05 02:44:54.912 E [QO]:OnTroopJoin: memberUin resolve failed: u_vS8ouoJaH6F53WXY4mtsUw
+2026-11-05 02:44:55.779 E [QO]:OnTroopJoin: memberUin resolve failed: u_jFwo5Dxlrd1s0FqvQxforQ
+2026-11-05 02:44:56.714 E [QO]:OnTroopJoin: memberUin resolve failed: u_tCyKKASgKO0L0uh705k-qA
+2026-11-05 02:44:57.377 E [QO]:OnTroopJoin: memberUin resolve failed: u_wbasPNQMnZe1OTm1U6gkhA
+2026-11-05 02:45:00.101 E [QO]:OnTroopJoin: memberUin resolve failed: u_6c1dSXyo4pDWv1vUtzcbqA
+2026-11-05 02:45:01.072 E [QO]:OnTroopJoin: memberUin resolve failed: u_CmU4PMoBzj0RyPfvafUfWg
+2026-11-05 02:49:56.195 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 02:49:59.283 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 02:55:55.954 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 02:56:00.527 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:00:00.821 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:00:01.497 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:00:02.087 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 03:02:27.435 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:27.485 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:27.525 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:27.558 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:27.608 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:27.819 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:27.829 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:27.836 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:27.843 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:28.347 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:28.378 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:28.654 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:28.756 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.159 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.170 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.180 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.191 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.503 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.506 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.508 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.510 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.681 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.687 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.693 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:30.697 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:35.730 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:02:36.107 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:36.334 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:02:36.745 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:03:16.007 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:03:17.810 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:07:30.773 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:30.784 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:30.789 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:33.737 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:07:34.353 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.379 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:07:34.366 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.383 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.407 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.420 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.455 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.460 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.465 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.468 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.471 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.672 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.675 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.677 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.679 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:34.681 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:35.775 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:35.790 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:35.904 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:35.908 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:36.065 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:40.308 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:07:40.354 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:41.265 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:07:42.103 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:07:42.882 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:07:46.635 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.646 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.655 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.690 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.701 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.949 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.954 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.957 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.960 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:46.963 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:47.286 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:07:49.133 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:49.233 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:07:49.595 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:49.672 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:49.716 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:49.750 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:50.361 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:50.407 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:07:50.478 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 03:08:34.046 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:08:36.026 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:09:22.617 E [QO]:OnTroopJoin: memberUin resolve failed: {"6":109,"14":1853113951,"15":71}
+2026-11-05 03:10:17.842 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:10:18.495 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:11:00.541 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:11:02.513 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:31:32.810 E [QO]:OnTroopJoin: memberUin resolve failed: u_dEBLJmlUe8sztfF4BMoq7g
+2026-11-05 03:35:02.204 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:35:05.742 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:45:08.088 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:45:13.195 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 03:55:19.591 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 03:55:25.325 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 04:04:51.934 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 04:04:57.140 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 04:10:15.453 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 04:10:17.927 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 04:19:29.607 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:29.668 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:29.693 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:29.701 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:29.720 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.113 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.121 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.127 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.133 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.139 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.235 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.241 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.245 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.249 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.252 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.559 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.563 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.566 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.570 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:30.574 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:33.231 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:33.236 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:33.241 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:33.254 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:33.449 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:33.454 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:33.459 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:33.463 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 04:19:36.197 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 04:19:38.122 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 04:19:38.594 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 04:19:39.721 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 04:20:14.918 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 04:20:17.903 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 04:35:48.302 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 04:35:51.329 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 04:49:49.170 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 04:49:49.812 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 04:50:23.494 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 04:50:24.908 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 05:12:30.136 E [QO]:OnTroopJoin: memberUin resolve failed: u_BOOhBNZobR8whhinHrse8g
+2026-11-05 05:44:27.447 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 05:44:29.944 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:31:58.672 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:58.702 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:58.712 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:58.721 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:58.730 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:58.738 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:58.754 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:59.010 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:59.015 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:59.021 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:59.026 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:59.030 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:59.035 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:31:59.040 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:00.154 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:32:00.661 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:00.806 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:32:01.639 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:02.983 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:32:03.591 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:32:04.090 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:04.101 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:04.502 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:04.507 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:06.184 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:07.924 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:07.957 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:08.039 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:08.098 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:08.232 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:08.255 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:08.340 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:10.343 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:10.490 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:10.751 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:10.771 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:10.793 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:11.879 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:11.941 I [QO]:ForceSpeaker: setMode blocked, keep NORMAL (was 3)
+2026-11-05 06:32:12.000 I [QO]:ForceSpeaker: player streamType forced to MUSIC via f
+2026-11-05 06:32:12.805 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.323 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.334 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.343 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.348 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.354 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.590 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.594 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.596 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.757 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.760 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.762 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.764 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:16.767 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:17.679 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:17.691 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:17.699 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:17.706 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:17.711 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:17.717 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:17.729 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.033 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.049 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.058 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.066 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.071 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.315 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.321 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.325 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.327 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:19.328 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:24.791 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:25.371 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:26.554 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:28.513 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:28.527 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:28.540 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:28.597 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:28.876 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:28.881 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:28.885 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:28.889 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:29.690 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.108 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.114 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.120 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.140 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.155 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.169 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.414 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.418 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.432 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.435 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.438 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.441 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:30.587 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:31.276 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:31.689 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:36.578 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:36.585 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:36.591 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:36.598 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:36.865 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:36.870 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:36.873 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:36.874 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:37.107 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.012 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.020 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.025 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.031 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.038 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.048 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.158 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.174 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.242 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:38.266 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:39.513 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:40.862 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:43.648 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:32:43.839 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:44.299 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:32:56.365 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:57.263 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:57.384 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:57.421 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:57.476 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:57.906 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:57.922 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:57.951 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:58.133 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:32:58.403 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:02.570 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:03.112 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:03.418 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:03.470 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:03.578 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:03.649 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:08.108 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:12.342 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:12.491 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:15.268 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:15.292 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:15.357 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:15.722 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.702 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.714 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.721 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.726 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.733 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.872 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.877 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.887 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.889 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:18.891 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:19.454 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:19.499 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:19.559 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:19.712 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:20.224 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.024 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.050 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.072 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.100 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.162 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.165 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.287 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.741 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.768 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.799 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.841 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.908 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:37.965 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:38.004 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:38.060 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:38.082 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:38.112 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:39.199 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:39.224 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:39.274 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:39.541 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:39.672 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:40.003 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:40.202 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:40.222 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:40.241 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:40.296 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:40.314 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:40.400 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:40.473 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.104 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.124 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.150 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.155 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.196 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.221 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.233 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.245 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.273 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.291 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.317 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.331 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.357 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.377 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.558 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.566 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.620 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.635 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.906 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:42.923 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:44.444 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:44.458 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:44.465 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:44.474 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.162 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.172 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.181 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.188 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.427 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.432 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.435 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.438 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:46.520 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:49.865 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:51.345 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:51.347 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:53.944 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:54.293 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:54.302 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:54.379 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:54.419 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:54.569 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:54.661 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.427 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.436 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.444 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.454 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.461 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.466 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.487 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.711 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.714 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.717 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.721 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.723 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.725 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:33:59.815 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:34:00.155 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:34:00.167 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:34:00.172 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:34:00.178 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:34:00.185 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:34:00.189 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:34:00.207 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:34:09.097 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:34:09.602 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:34:14.737 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:34:15.244 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:34:15.659 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:34:16.388 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:35:45.651 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.659 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.673 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.681 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.919 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.921 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.923 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.926 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.936 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:45.944 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.027 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.068 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.076 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.084 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.093 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.096 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.098 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.100 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.109 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.676 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.717 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.763 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:46.922 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.005 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.038 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.046 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.289 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.304 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.826 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.836 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.865 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:47.909 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.083 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.116 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.590 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.617 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.635 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.672 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.687 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.706 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.775 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.799 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.800 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.807 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.926 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:48.949 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:49.080 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:49.553 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:49.583 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:49.634 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:49.899 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:50.091 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:50.116 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:50.148 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:50.256 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:50.330 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:35:52.365 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 06:36:47.189 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:36:48.206 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:36:50.445 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:36:50.900 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:50.930 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:50.952 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:50.973 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:50.986 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:50.999 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.086 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:36:51.229 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.234 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.238 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.246 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.254 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.257 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.533 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.537 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.541 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.544 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.547 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:51.550 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.798 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.802 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.805 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.808 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.822 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.918 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.922 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.924 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.927 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:53.930 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:56.671 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:36:57.714 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:36:57.896 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:36:58.548 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 06:36:59.260 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:36:59.348 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 06:36:59.699 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:59.701 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:59.704 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:59.706 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 06:36:59.708 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:17:20.603 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:17:21.687 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:17:23.204 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:17:23.728 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:17:27.400 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:17:28.058 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:17:29.184 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 07:17:38.354 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:17:38.880 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:17:45.317 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:17:47.348 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:17:49.918 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:17:51.409 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:17:53.254 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:17:53.274 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:17:55.961 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:17:56.276 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:17:56.397 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:17:57.187 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:00.278 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:18:00.890 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:18:20.714 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:20.772 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:20.805 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:20.824 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:21.190 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:21.195 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:21.201 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:41.875 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:41.889 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:41.898 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:41.905 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:41.925 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:42.189 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:42.196 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:42.200 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:42.205 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:42.210 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:42.258 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:42.986 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.078 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.110 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.174 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.229 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.262 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.282 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.306 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.343 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.377 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.380 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.436 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.478 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.843 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.912 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.955 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:43.992 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.038 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.075 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.110 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.112 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.114 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.116 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.145 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.175 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.180 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.245 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.373 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.609 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.682 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.726 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.807 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:44.951 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.226 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.310 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.373 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.409 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.436 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.564 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.574 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:18:45.657 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.781 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.812 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.906 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.961 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:45.980 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.001 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.017 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.043 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.090 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:18:46.077 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.104 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.135 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.338 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.902 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.909 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.915 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.920 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.926 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.933 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.939 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:46.995 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:47.030 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:47.032 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:47.033 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:47.094 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:47.516 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:47.595 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:47.654 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.387 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.417 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.464 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.494 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.523 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.622 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.678 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.693 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.719 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.759 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.820 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:49.951 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.039 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.166 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.221 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.255 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.277 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.318 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.456 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.501 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.514 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.540 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.571 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.688 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.754 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.820 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.884 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.937 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:50.981 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.021 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.042 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.070 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.269 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.315 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.376 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.480 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.492 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.514 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:51.826 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.078 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.093 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.130 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.161 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.172 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.194 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.377 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.417 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.508 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.522 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.637 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.703 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.724 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:52.960 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:53.273 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:53.365 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:53.583 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:53.618 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:53.697 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:53.809 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:53.835 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:54.440 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:54.492 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:54.519 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:54.541 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:54.648 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:54.726 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:54.743 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:54.885 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:55.020 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:18:58.968 I [QO]:ForceSpeaker: setMode blocked, keep NORMAL (was 3)
+2026-11-05 07:18:59.013 I [QO]:ForceSpeaker: player streamType forced to MUSIC via f
+2026-11-05 07:19:05.713 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.724 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.741 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.758 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.776 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.786 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.846 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.872 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.874 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.876 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.878 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.880 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:05.882 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:06.003 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:06.178 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:06.479 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:06.555 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:06.648 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:06.804 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:06.867 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:06.922 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.054 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.116 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.170 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.306 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.386 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.453 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.530 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.603 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:07.843 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:08.866 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:08.932 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:08.955 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:09.002 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:09.066 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:09.124 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:09.306 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:09.902 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:09.964 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:10.025 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:10.093 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:10.245 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:10.285 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:10.358 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:10.473 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:10.593 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:10.739 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:11.255 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:11.313 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:11.426 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:11.600 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:11.668 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:11.733 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:11.858 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.074 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.147 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.245 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.332 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.449 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.514 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.698 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.785 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.813 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.874 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:16.996 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.114 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.189 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.234 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.327 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.455 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.476 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.501 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.533 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.600 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.642 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.692 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.844 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.925 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:17.985 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.102 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.148 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.203 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.257 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.280 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.346 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.397 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.537 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.630 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.722 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.763 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.798 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.819 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.863 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:18.893 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.050 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.086 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.179 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.370 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.407 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.516 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.552 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.594 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:19.979 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:20.045 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:20.124 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:20.380 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:21.519 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:21.587 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:21.739 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:21.896 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:21.926 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:21.936 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:21.970 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.046 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.061 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.090 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.134 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.163 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.221 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.299 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.555 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.648 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:22.916 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:23.634 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:23.787 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:24.139 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:26.054 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:26.148 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:26.321 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:26.758 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:26.828 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:26.908 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:19:59.616 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 07:20:20.942 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:20.949 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:20.954 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:20.962 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:21.235 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:21.238 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:21.241 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:21.243 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:26.687 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:20:27.838 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:20:31.343 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:31.346 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:31.406 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:31.408 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:31.422 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:31.424 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:49.130 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:49.133 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:49.146 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:50.200 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:50.203 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:50.274 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:50.277 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:50.302 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:50.307 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:50.464 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:20:50.468 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:16.043 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:21.080 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:21.083 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:21.091 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:21.303 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:21.306 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:21.308 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:39.361 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:39.447 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:21:41.166 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 07:22:11.667 E [QO]:HostRestarter: runRoot 失败：Cannot run program "su": error=13, Permission denied
+2026-11-05 07:22:14.461 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:22:15.665 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:22:20.313 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:20.365 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:20.380 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:20.392 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:20.401 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:20.723 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:20.728 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:20.732 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:20.736 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:21.363 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:21.367 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:21.369 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:21.372 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:22.797 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:23.119 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:23.410 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:23.457 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:23.495 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:23.518 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:23.744 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:23.757 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:29.459 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:29.464 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:29.467 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:29.471 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:29.475 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:29.479 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.817 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.820 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.822 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.824 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.827 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.829 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.851 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.855 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.857 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.859 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.861 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:32.863 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:34.306 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 07:22:43.550 E [QO]:HostRestarter: runRoot 失败：Cannot run program "su": error=13, Permission denied
+2026-11-05 07:22:43.550 W [QO]:HostRestarter: 无 root（component=true），走闹钟兜底重启：pkg=com.tencent.mobileqq
+2026-11-05 07:22:46.524 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:22:47.326 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:22:51.994 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:52.067 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:52.080 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:52.091 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:52.100 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:52.425 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:52.431 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:52.437 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:52.443 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:54.577 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:54.599 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:54.601 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:54.602 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:54.604 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:54.742 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:55.240 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:55.280 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:55.322 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:55.342 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:55.503 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:55.551 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.312 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.314 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.316 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.318 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.321 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.322 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.329 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.331 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.332 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.333 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.335 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:22:59.336 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.775 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.779 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.781 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.785 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.787 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.790 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.814 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.816 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.818 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.820 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.822 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:01.824 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.810 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.812 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.814 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.815 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.817 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.819 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.851 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.854 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.856 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.858 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.859 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:05.860 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.856 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.858 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.860 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.862 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.864 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.866 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.888 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.890 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.891 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.893 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.897 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:09.898 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:10.295 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:10.345 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:10.416 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:10.473 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:10.582 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:15.667 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:15.692 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:15.707 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:15.720 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:15.732 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:15.745 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:15.769 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:16.090 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:16.096 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:16.103 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:16.109 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:16.114 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:16.119 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:16.877 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:16.881 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:19.525 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:19.547 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:19.558 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:19.570 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:19.875 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:19.880 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:19.886 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:19.891 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.289 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.292 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.294 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.310 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.589 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.835 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.884 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.925 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:21.976 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:22.086 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.927 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.929 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.932 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.934 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.936 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.938 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.950 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.952 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.953 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.954 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.955 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:26.956 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:38.942 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:38.944 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:38.946 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:38.949 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:38.963 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.001 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.097 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.105 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.113 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.119 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.129 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.842 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.846 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.848 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.851 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.853 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.883 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.886 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.889 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.891 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:39.892 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:40.041 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:40.044 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:40.046 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:40.047 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:23:40.049 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:09.706 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 07:24:19.482 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.489 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.504 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.513 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.526 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.806 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.810 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.813 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.816 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.819 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.970 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.973 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.977 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.979 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:19.981 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:20.924 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:20.926 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:20.928 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:20.929 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:20.956 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.075 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.409 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.600 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.666 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.717 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.781 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.834 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.837 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.839 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.840 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.842 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:21.843 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.049 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.052 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.054 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.061 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.064 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.067 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.104 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.106 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.108 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.109 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.110 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:24.111 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:24:25.410 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 07:24:46.678 E [QO]:HostRestarter: runRoot 失败：Cannot run program "su": error=13, Permission denied
+2026-11-05 07:24:46.679 W [QO]:HostRestarter: 无 root（component=true），走闹钟兜底重启：pkg=com.tencent.mobileqq
+2026-11-05 07:24:50.000 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:24:50.918 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:25:04.609 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:25:05.232 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:25:05.610 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:25:06.294 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:26:07.513 E [QO]:HostRestarter: runRoot 失败：Cannot run program "su": error=13, Permission denied
+2026-11-05 07:26:07.513 W [QO]:HostRestarter: 无 root（component=true），走闹钟兜底重启：pkg=com.tencent.mobileqq
+2026-11-05 07:26:10.370 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:26:11.116 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:26:28.871 D [QO]:QQSettingInject: QQSettingInject icon dump [com.tencent.mobileqq.setting.processor.i]
+  field g: java.lang.CharSequence
+  field h: int
+  field i: java.lang.String
+  field j: kotlin.jvm.functions.Function0
+  field k: kotlin.jvm.functions.Function1
+  field l: boolean
+  field m: boolean
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  field a: int
+  field b: com.tencent.mobileqq.setting.processor.f
+  field c: com.tencent.mobileqq.setting.processor.e
+  field d: com.tencent.mobileqq.widget.listitem.a
+  field e: boolean
+  field f: java.lang.ref.WeakReference
+  field $redirector_: com.tencent.mobileqq.qfix.redirect.IPatchRedirector
+  method j(): int
+
+2026-11-05 07:26:32.922 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:32.948 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:32.953 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:32.962 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:33.264 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:33.269 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:33.273 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:33.276 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:56.159 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:56.163 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:56.177 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:56.334 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:56.339 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:56.530 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:26:56.532 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:24.224 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:24.493 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:24.570 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:24.572 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:24.575 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:24.577 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:26.667 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:27.356 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:27.761 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:28.453 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.184 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.218 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.244 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.265 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.280 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.292 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.558 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.563 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.570 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.574 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.577 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:33.582 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:34.250 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:34.256 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:48.161 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:48.866 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:49.319 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:55.413 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:27:55.697 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:04.596 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:04.693 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:04.991 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:07.418 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:41.478 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:41.488 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:41.498 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:41.785 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:41.789 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:41.792 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:47.209 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:28:48.032 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:28:59.254 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:59.261 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:59.273 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:59.283 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:59.463 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:28:59.466 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:29:02.647 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:29:49.920 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:29:52.217 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:36:09.626 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.637 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.646 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.655 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.664 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.691 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.694 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.698 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.700 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:09.706 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:15.136 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:36:15.844 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:36:17.294 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:17.302 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:17.310 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:17.585 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:17.589 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:17.591 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:27.317 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:27.320 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:27.331 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:27.340 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:27.491 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:27.494 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:27.495 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:41.330 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:54.434 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:54.441 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:54.455 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:54.468 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:54.836 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:54.841 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:54.845 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:54.847 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.005 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.012 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.015 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.018 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.712 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.714 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.716 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.749 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.761 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:55.806 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:56.526 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:56.601 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:56.716 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:57.504 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:57.848 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.057 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.105 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.138 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.215 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.242 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.244 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.245 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.246 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.252 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.253 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:36:58.950 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:36:59.574 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:37:01.241 I [QO]:QQDeepLink: 直达广播已注册
+2026-11-05 07:37:01.857 D [QO]:WebJsBridgeAllowlist: 开关未开启，跳过 Hook
+2026-11-05 07:37:04.046 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:37:04.049 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:37:04.051 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:37:04.053 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:37:04.055 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.
+2026-11-05 07:37:04.057 E [QO]:RepeatMsg: onHandleIntent: The key must be an application-specific resource id.

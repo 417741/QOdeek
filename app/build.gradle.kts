@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -15,8 +14,8 @@ android {
         applicationId = "com.qosed.qodeep"
         minSdk = 30
         targetSdk = 36
-        versionCode = 48
-        versionName = "0.0.48"
+        versionCode = 94
+        versionName = "0.0.94"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -51,12 +50,17 @@ android {
         }
     }
 
+    // 关键：把模块资源包 ID 从默认 0x7f 强制改成 0x69，与 QQ 宿主的 0x7f 段完全隔离。
+    // 否则 R.drawable.db 这类资源 ID 在 QQ 进程里会被 QQ 自己的资源表解析成错误图片，
+    // 且 injectModuleResources 的「已注入」检查（res.getString(R.string.app_name)）也会
+    // 因 0x7f 段 ID 命中 QQ 字符串而误判，导致入口图标永远显示成 QQ 的蓝方块。
+    androidResources {
+        additionalParameters += listOf("--allow-reserved-package-id", "--package-id", "0x69")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    buildFeatures {
-        compose = true
     }
 }
 
@@ -80,12 +84,6 @@ dependencies {
     // legacy Xposed API：编译期引用，运行时由 LSPosed 提供，不打进 APK
     compileOnly("de.robv.android.xposed:api:82")
 
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
@@ -93,20 +91,12 @@ dependencies {
     implementation(libs.dexkit)
     implementation(libs.protobuf.javalite)
 
-    // 传统 View 栈 UI（对齐 FunBox）：毛玻璃卡片 + 弹窗 + 图片加载 + 动画
+    // 传统 View 栈 UI：RecyclerView 宫格选择 + Glide 图片加载
     implementation(libs.androidx.appcompat)
-    implementation(libs.google.material)
     implementation(libs.androidx.recyclerview)
     implementation(libs.glide)
-    implementation(libs.lottie)
-    implementation(libs.xpopup)
-    implementation(libs.blurview)
 
     testImplementation(libs.junit)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-    debugImplementation(libs.androidx.compose.ui.tooling)
 }

@@ -2,14 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 定时发说说走 HTTPS；寄生进程复用 QQ 权限，但保留独立 App 场景下的网络能力 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/db"
         android:label="@string/app_name"
         android:description="@string/app_desc"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/db"
         android:supportsRtl="true"
         android:theme="@style/Theme.QOdeep">
         <!-- 模块设置页：既是桌面启动入口，也是 QQ 设置页入口点击后打开的页面。

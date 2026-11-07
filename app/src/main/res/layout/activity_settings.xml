@@ -60,12 +60,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingStart="22dp"
+            android:paddingEnd="22dp"
             android:paddingTop="8dp"
-            android:paddingBottom="28dp">
+            android:paddingBottom="22dp">
 
-            <!-- 标题卡：logo + 名称 -->
+            <!-- 标题卡：名称居中，切换二级内容时原地不动，仅文字变化 + 左侧出现返回箭头 -->
             <FrameLayout
                 android:id="@+id/cardTitle"
                 android:layout_width="match_parent"
@@ -73,28 +73,45 @@
                 android:clipToOutline="true"
                 android:outlineProvider="background">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tvTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:gravity="center"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:paddingTop="19dp"
+                    android:paddingBottom="19dp"
+                    android:text="豆包"
+                    android:textColor="#111111"
+                    android:textSize="34sp"
+                    android:fontFamily="sans-serif-black"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="QOdeep"
-                        android:textColor="#111111"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                <!-- 圆形返回按钮：QQ 原生式纯白底 + 短款 Material 向左箭头（代码绘制矢量），
+                     标题栏内部左侧，距左内边距 10dp，箭头紧凑短小居中 -->
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="39dp"
+                    android:layout_height="39dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="10dp"
+                    android:contentDescription="@null"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
             </FrameLayout>
 
-            <!-- 更换背景卡：chip + 标题/副标题 + 当前值 + 箭头 -->
+            <!-- 主页卡片组：切换二级内容时整组隐藏，标题卡原地不动 -->
+            <LinearLayout
+                android:id="@+id/mainCards"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <!-- 聊天功能 -->
             <FrameLayout
-                android:id="@+id/cardBg"
+                android:id="@+id/cardChat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -102,48 +119,27 @@
                 android:outlineProvider="background">
 
                 <LinearLayout
-                    android:id="@+id/bgRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:paddingTop="17dp"
+                    android:paddingBottom="17dp">
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="更换背景"
-                            android:textColor="#111111"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="节令动态海报（骨骼动画），点击选择"
-                            android:textColor="#5A6068"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/tvCurrentBg"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#5A6068"
-                        android:textSize="13sp" />
+                        android:text="聊天功能"
+                        android:textColor="#111111"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
                         android:text="›"
                         android:textColor="#8A8F96"
                         android:textSize="18sp"
@@ -151,9 +147,9 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- DexKit 缓存卡：状态行 + 重建入口 + 说明 -->
+            <!-- 等级加速 -->
             <FrameLayout
-                android:id="@+id/cardDexkit"
+                android:id="@+id/cardLevel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -163,17 +159,136 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:paddingTop="17dp"
+                    android:paddingBottom="17dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="等级加速"
+                        android:textColor="#111111"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="#8A8F96"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- DIY 布局（空壳入口，功能待实现） -->
+            <FrameLayout
+                android:id="@+id/cardDiy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToOutline="true"
+                android:outlineProvider="background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="17dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="DIY 布局"
+                        android:textColor="#111111"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="#8A8F96"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- 设置 -->
+            <FrameLayout
+                android:id="@+id/cardSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToOutline="true"
+                android:outlineProvider="background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="17dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="设置"
+                        android:textColor="#111111"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="#8A8F96"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </FrameLayout>
+            </LinearLayout>
+
+            <!-- DIY 布局二级内容：更换节令背景入口（从主页移入）+ 切换 UI 风格开关 -->
+            <LinearLayout
+                android:id="@+id/diyContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- 更换背景卡：chip + 标题/副标题 + 当前值 + 箭头 -->
+                <FrameLayout
+                    android:id="@+id/cardBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background">
 
                     <LinearLayout
+                        android:id="@+id/bgRow"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="17dp">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -184,60 +299,423 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="DexKit 缓存"
+                                android:text="更换节令背景"
                                 android:textColor="#111111"
-                                android:textSize="16sp" />
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/tvDexDesc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:text="点击选择"
                                 android:textColor="#5A6068"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
                         <TextView
-                            android:id="@+id/tvDexReady"
+                            android:id="@+id/tvCurrentBg"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="读取中..."
-                            android:textColor="#34C759"
+                            android:textColor="#5A6068"
                             android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/dexRebuildRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="8dp">
-
-                        <TextView
-                            android:id="@+id/tvRebuild"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="重建 DexKit 缓存"
-                            android:textColor="#111111"
-                            android:textSize="16sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
                             android:text="›"
                             android:textColor="#8A8F96"
                             android:textSize="18sp"
                             android:textStyle="bold" />
                     </LinearLayout>
+                </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                <!-- 切换 UI 卡：标题 + 开关（两套玻璃 UI 切换） -->
+                <FrameLayout
+                    android:id="@+id/cardUiStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background">
+
+                    <LinearLayout
+                        android:id="@+id/uiStyleRow"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="切换 UI"
+                            android:textColor="#111111"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <FrameLayout
+                            android:id="@+id/uiStyleSwitchSlot"
+                            android:layout_width="52dp"
+                            android:layout_height="32dp" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <!-- 流光卡：标题 + 开关（边框扫光开关，默认开启） -->
+                <FrameLayout
+                    android:id="@+id/cardShimmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background">
+
+                    <LinearLayout
+                        android:id="@+id/shimmerRow"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="流光"
+                            android:textColor="#111111"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <FrameLayout
+                            android:id="@+id/shimmerSwitchSlot"
+                            android:layout_width="52dp"
+                            android:layout_height="32dp" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- 二级内容区域：设置页显示 DexKit 缓存卡；聊天功能/等级加速只保留标题，内容区留空 -->
+            <FrameLayout
+                android:id="@+id/detailContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone">
+
+                <!-- DexKit 缓存卡：状态行 + 重建入口 + 说明（从主页移入「设置」，功能保持不变） -->
+                <FrameLayout
+                    android:id="@+id/cardDexkit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="清除缓存并重新扫描，完成后重启 QQ 生效"
-                        android:textColor="#FF9500"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="17dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="DexKit 缓存"
+                                    android:textColor="#111111"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvDexDesc"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="#5A6068"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tvDexReady"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="读取中..."
+                                android:textColor="#34C759"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/dexRebuildRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/tvRebuild"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="重建 DexKit 缓存"
+                                android:textColor="#111111"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="›"
+                                android:textColor="#8A8F96"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="清除缓存并重新扫描，完成后重启 QQ 生效"
+                            android:textColor="#FF9500"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- 等级加速二级内容：定时发说说（开关卡 + 配置卡） -->
+            <FrameLayout
+                android:id="@+id/levelContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- 定时发说说：一张卡内两行（发说说 + 发布后删除），中间一条分割线 -->
+                    <FrameLayout
+                        android:id="@+id/cardMoodSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <!-- 行1：定时发说说 +0.5天（固定行高，两行等分，分割线居中） -->
+                            <LinearLayout
+                                android:id="@+id/moodRow"
+                                android:layout_width="match_parent"
+                                android:layout_height="72dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="定时发说说"
+                                        android:textColor="#111111"
+                                        android:textSize="17sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvMoodSubtitle"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="点击修改内容"
+                                        android:textColor="#5A6068"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/moodSwitchSlot"
+                                    android:layout_width="52dp"
+                                    android:layout_height="32dp" />
+                            </LinearLayout>
+
+                            <!-- 分割线 -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginEnd="16dp"
+                                android:background="#1A000000" />
+
+                            <!-- 行2：发布后删除说说（与行1同高，分割线居中） -->
+                            <LinearLayout
+                                android:id="@+id/moodDeleteRow"
+                                android:layout_width="match_parent"
+                                android:layout_height="72dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="发布后删除说说"
+                                        android:textColor="#111111"
+                                        android:textSize="17sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="发布成功 5 秒后自动删除该条说说，默认关闭"
+                                        android:textColor="#5A6068"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/moodDeleteSwitchSlot"
+                                    android:layout_width="52dp"
+                                    android:layout_height="32dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <!-- 空间等级签到：一张卡内两行（签到 + 签到后删除），中间一条分割线 -->
+                    <FrameLayout
+                        android:id="@+id/cardCheckin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <!-- 行1：空间等级签到（点击配置时间/内容） -->
+                            <LinearLayout
+                                android:id="@+id/checkinRow"
+                                android:layout_width="match_parent"
+                                android:layout_height="72dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="空间等级签到"
+                                        android:textColor="#111111"
+                                        android:textSize="17sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvCheckinSubtitle"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="点击修改内容"
+                                        android:textColor="#5A6068"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/checkinSwitchSlot"
+                                    android:layout_width="52dp"
+                                    android:layout_height="32dp" />
+                            </LinearLayout>
+
+                            <!-- 分割线 -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginEnd="16dp"
+                                android:background="#1A000000" />
+
+                            <!-- 行2：签到后删除说说 -->
+                            <LinearLayout
+                                android:id="@+id/checkinDeleteRow"
+                                android:layout_width="match_parent"
+                                android:layout_height="72dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="签到后删除说说"
+                                        android:textColor="#111111"
+                                        android:textSize="17sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="发布成功 5 秒后自动删除该条说说，默认关闭"
+                                        android:textColor="#5A6068"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/checkinDeleteSwitchSlot"
+                                    android:layout_width="52dp"
+                                    android:layout_height="32dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </FrameLayout>
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>
