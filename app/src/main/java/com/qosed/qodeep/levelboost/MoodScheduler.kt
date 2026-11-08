@@ -16,13 +16,13 @@ import java.util.TimerTask
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * 定时发说说调度器（对齐 QEdge LevelBoost 的定时说说部分）。
+ * 定时发说说调度器。
  *
  * 仅在 QQ 主进程启动一次 Timer，每分钟 tick 一次；到点且今日未发过才发布，
  * 用 MoodConfig 做跨会话幂等标记。发说说依赖 QQEnv / CookieTool 反射取
  * uin、skey、p_skey，再请求 QZone 的 emotion_cgi_publish_v6 接口。
  *
- * 配置存储：{Env.moduleDataDir}/data/config.dat（与设置页寄生 Activity 共用同一份文件，
+ * 配置存储：{Env.moduleDataDir}/settings/mood.json（与设置页寄生 Activity 共用同一份文件，
  * 用户无需 root 即可查看/删除配置）。
  */
 object MoodScheduler {
@@ -32,9 +32,9 @@ object MoodScheduler {
     const val KEY_TEXT = "mood_text"
     const val KEY_DELETE_AFTER = "mood_delete_after"
     const val DEFAULT_TIME = "08:30"
-    const val DEFAULT_TEXT = "今天也要加油哦~"
+    const val DEFAULT_TEXT = "天天开心~"
 
-    // 空间等级签到（每日签到模板说说，对齐 QEdge qzoneClockIn）
+    // 空间等级签到（每日签到模板说说）
     const val KEY_CHECKIN_ENABLED = "checkin_enabled"
     const val KEY_CHECKIN_TIME = "checkin_time"
     const val KEY_CHECKIN_TEXT = "checkin_text"
@@ -53,7 +53,7 @@ object MoodScheduler {
     private const val PREFIX_CHECKIN_DONE = "checkin_done_"
     private const val DELETE_DELAY_MS = 5000L
 
-    // 记录上次开关状态，用于检测「关 → 开」变化时立即触发一次（对齐 QEdge last_switch 机制）
+    // 记录上次开关状态，用于检测「关 → 开」变化时立即触发一次
     private const val KEY_LAST_SWITCH = "mood_last_switch"
     private const val KEY_CHECKIN_LAST_SWITCH = "checkin_last_switch"
 
@@ -73,29 +73,33 @@ object MoodScheduler {
         }, 5000L, 60L * 1000L)
         FileLog.i("调度器已启动，配置文件：${MoodConfig.configPath()}")
 
-        // 启动时补执行：记录开关状态；若开启且今日未做则立即触发（覆盖 0 点/改配置后不在线场景）
+        // 启动时补执行：记录开关状态；若开启、今日未做且「已过设定时间」才补触发。
+        // 只补「错过的时间点」（如设定 08:30、QQ 12 点才启动）；
+        // 还没到点的（凌晨启动）绝不提前发，等 tick 到点再执行。
         Thread {
             runCatching {
-                val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
+                val now = Date()
+                val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(now)
+                val hm = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
 
                 val moodOn = isEnabled()
                 MoodConfig.putBoolean(KEY_LAST_SWITCH, moodOn)
-                if (moodOn && getText().isNotEmpty() && !isDoneToday(today)) {
-                    FileLog.i("启动补执行：定时说说开关已开且今日未发，立即触发")
+                if (moodOn && getText().isNotEmpty() && !isDoneToday(today) && hm >= getTime()) {
+                    FileLog.i("启动补执行：定时说说已过设定点且今日未发，立即触发")
                     doPublishMood(today)
                 }
 
                 val ckOn = isCheckinEnabled()
                 MoodConfig.putBoolean(KEY_CHECKIN_LAST_SWITCH, ckOn)
-                if (ckOn && !isCheckinDoneToday(today)) {
-                    FileLog.i("启动补执行：空间签到开关已开且今日未签，立即触发")
+                if (ckOn && !isCheckinDoneToday(today) && hm >= getCheckinTime()) {
+                    FileLog.i("启动补执行：空间签到已过设定点且今日未签，立即触发")
                     doCheckin(today)
                 }
             }.onFailure { FileLog.e("启动补执行异常", it) }
         }.start()
     }
 
-    // ---- 配置读取（供 tick 使用；设置页通过 MoodConfig 操作同一份 data/config.dat）----
+    // ---- 配置读取（供 tick 使用；设置页通过 MoodConfig 操作同一份 settings/mood.json）----
 
     fun isEnabled(): Boolean = MoodConfig.getBoolean(KEY_ENABLED, false)
 
@@ -300,7 +304,6 @@ object MoodScheduler {
      * 空间等级签到：走 h5.qzone.qq.com publishDiyMood/publishmood，
      * 发一条「每日签到」模板说说（miniprogram randomsignin 模板 + 模板图），
      * 观感就是 QQ 空间里常见的打卡/签到卡片，文字内容可自定义。
-     * 接口与请求体对齐 QEdge QZoneLikeTool.qzoneClockIn。
      * @return (是否成功, 签到说说 tid)
      */
     fun qzoneClockIn(content: String): Pair<Boolean, String> {

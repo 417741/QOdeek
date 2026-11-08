@@ -7,4 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- 头像圆底色（取自 db_fg 边缘，用作启动器图标的补边背景） -->
+    <color name="icon_avatar_bg">#D3EDF2</color>
 </resources>

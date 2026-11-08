@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- QQ 设置页入口图标：用 adaptive-icon 让 QQ 按大圆头像样式渲染（与 QEdge 一致）。
-     foreground 用整幅圆形头像，mask 后头像中心被放大裁切，视觉上比普通位图更大更圆。 -->
+<!-- 启动器图标（桌面/设置里显示的应用图标）。
+     前景是整幅圆形头像（db_fg），加 inset 缩到遮罩范围内，保证完整样貌不被
+     启动器遮罩裁切放大；背景层用头像同款底色补边，圆外区域视觉无缝。 -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@android:color/white" />
-    <foreground android:drawable="@drawable/db_fg" />
+    <background android:drawable="@color/icon_avatar_bg" />
+    <foreground>
+        <inset
+            android:drawable="@drawable/db_fg"
+            android:insetLeft="18%"
+            android:insetTop="18%"
+            android:insetRight="18%"
+            android:insetBottom="18%" />
+    </foreground>
 </adaptive-icon>

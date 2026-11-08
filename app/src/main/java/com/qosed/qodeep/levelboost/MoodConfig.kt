@@ -5,17 +5,16 @@ import org.json.JSONObject
 import java.io.File
 
 /**
- * 定时说说/空间签到的配置存储（对齐 QEdge 把配置存模块目录的做法）。
+ * 定时说说/空间签到的配置存储。
  *
- * 持久化到 {Env.moduleDataDir}/data/config.dat，主进程调度器与寄生设置页共用同一份文件，
+ * 持久化到 {Env.moduleDataDir}/settings/mood.json，主进程调度器与寄生设置页共用同一份文件，
  * 用户无需 root 即可在文件管理器里查看/删除配置（删掉后所有开关/内容/幂等标记复位）。
- * 路径对齐 QEdge 的 QEdge/data/config.dat。
  *
  * 读写线程安全：内存里持有一份 JSONObject 缓存，读直接返回内存值；写先改内存再落盘。
  */
 object MoodConfig {
 
-    private const val FILE_NAME = "data/config.dat"
+    private const val FILE_NAME = "settings/mood.json"
 
     private val lock = Any()
 
@@ -63,7 +62,7 @@ object MoodConfig {
 
     /**
      * 丢弃内存缓存并重新从磁盘读取。
-     * 用户手动删除 config.dat 后调用可立即复位（配合「删文件重新打卡」场景）。
+     * 用户手动删除 mood.json 后调用可立即复位（配合「删文件重新打卡」场景）。
      */
     fun reload() {
         synchronized(lock) {

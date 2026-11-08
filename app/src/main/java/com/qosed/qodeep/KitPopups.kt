@@ -36,11 +36,19 @@ class KitPopupHost(val activity: Activity) {
     /** 当前弹窗是否允许用户关闭（cancelable=false 的进度弹窗返回键不关闭）。 */
     fun dismissable(): Boolean = cancelable
 
-    /** 居中弹出内容（内容自备圆角卡片背景）；cancelable=false 时点遮罩/返回键不关闭。 */
-    fun showCenter(content: View, cancelable: Boolean = true) {
+    /**
+     * 居中弹出内容（内容自备圆角卡片背景）；cancelable=false 时点遮罩/返回键不关闭。
+     * matchWidth=false 时内容按自身宽度包裹（如 confirm 小卡片），四周留出的遮罩可点关闭。
+     */
+    fun showCenter(content: View, cancelable: Boolean = true, matchWidth: Boolean = true) {
         this.cancelable = cancelable
         main.post {
             val fl = overlay
+            val lp = FrameLayout.LayoutParams(
+                if (matchWidth) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER
+            )
             if (fl == null) {
                 val decor = activity.window.decorView as ViewGroup
                 val ov = FrameLayout(activity).apply {
@@ -58,30 +66,16 @@ class KitPopupHost(val activity: Activity) {
                 overlay = ov
                 // 内容点击默认吞掉，避免事件穿透到遮罩导致误关（自绘弹窗不是独立 Window）
                 content.setOnClickListener {}
-                ov.addView(
-                    content,
-                    FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        Gravity.CENTER
-                    )
-                )
+                ov.addView(content, lp)
                 // 内容横向留出 24dp 边距
-                (content.layoutParams as FrameLayout.LayoutParams).setMargins(dp(24), 0, dp(24), 0)
+                lp.setMargins(dp(24), 0, dp(24), 0)
                 content.startAnimation(alpha(0f, 1f, 1.05f))
             } else {
                 // 已有弹窗时替换内容（如进度→完成确认）：同样要吞掉点击，防止穿透到遮罩
                 fl.removeAllViews()
                 content.setOnClickListener {}
-                fl.addView(
-                    content,
-                    FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        Gravity.CENTER
-                    )
-                )
-                (content.layoutParams as FrameLayout.LayoutParams).setMargins(dp(24), 0, dp(24), 0)
+                fl.addView(content, lp)
+                lp.setMargins(dp(24), 0, dp(24), 0)
             }
         }
     }
@@ -108,13 +102,11 @@ class KitPopupHost(val activity: Activity) {
     private fun dp(v: Int): Int = (v * activity.resources.displayMetrics.density).toInt()
 }
 
-/** 液态玻璃弹窗卡片容器，统一 LiquidGlass 设计系统（与主页卡片一致）。 */
+/** 液态玻璃弹窗卡片容器，跟随当前 UI 档位（与其它弹窗/主页卡片一致）。 */
 fun popupCard(context: Context, paddingDp: Int = 20): LinearLayout =
     LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
-        background = LiquidGlass.card(context)
-        clipToOutline = true
-        outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
+        LiquidGlass.applyThemed(this)
         setPadding(dp(context, paddingDp), dp(context, paddingDp), dp(context, paddingDp), dp(context, paddingDp))
     }
 
@@ -174,7 +166,8 @@ fun KitPopupHost.confirm(
     card.addView(tvTitle)
     card.addView(tvMsg)
     card.addView(row)
-    showCenter(card, cancelable)
+    // 小卡片按内容宽度包裹，四周遮罩可点关闭（不铺满整条，否则横向空白也被卡片吞掉点击）
+    showCenter(card, cancelable, matchWidth = false)
 }
 
 private fun dp(context: Context, v: Int): Int = (v * context.resources.displayMetrics.density).toInt()

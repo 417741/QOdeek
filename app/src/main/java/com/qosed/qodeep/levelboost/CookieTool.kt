@@ -3,7 +3,7 @@ package com.qosed.qodeep.levelboost
 import com.qosed.qodeep.Env
 
 /**
- * Cookie / bkn 工具类（纯反射实现，对齐 QEdge CookieTool）。
+ * Cookie / bkn 工具类（纯反射实现）。
  *
  * 通过 AppRuntime 拿 TicketManager，反射 getSkey / getPskey，再算 g_tk(bkn)。
  */

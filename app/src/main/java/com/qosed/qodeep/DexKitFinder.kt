@@ -125,7 +125,7 @@ object DexKitFinder {
 
     private fun queryOne(bridge: DexKitBridge, key: String, query: BaseFinder) {
         progressIndex++
-        // 对齐 QEdge 的进度文案：直接展示当前查找的 key + 序号
+        // 进度文案：直接展示当前查找的 key + 序号
         progressKey = "$key ($progressIndex/$progressTotal)"
         when (query) {
             is FindClass -> {

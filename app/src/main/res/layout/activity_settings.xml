@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  设置页主布局（传统 View 栈，对齐 FunBox）：
+  设置页主布局（传统 View 栈）：
   FrameLayout root
     ├─ FrameLayout bgLayer 独立背景层
     │    ├─ ImageView  静态封面（点开瞬间即有画面，Glide 加载）
     │    ├─ WebView    Spine 节令动画背景（透明，铺满，代码里加载）
     │    └─ TextView   资源准备中提示
     └─ ScrollView 卡片列
-       每张卡 = FrameLayout，内含一张「模糊底图」ImageView：
-       用封面的极小图（~72px）放大铺满卡片并按位置矩阵对齐背景，
-       放大插值天然呈高斯模糊质感 —— 不依赖 BlurView 的实时快照，
-       其离屏 GPU 渲染在 QQ 寄生环境会输出灰色错位图（灰块/灰晕），
-       此方案零渲染依赖，独立 App 与寄生环境画面必然一致。
+       每张卡 = FrameLayout，第一、二套的模糊来自封面极小图放大铺满后按位置对齐，
+       零渲染依赖，独立 App 与寄生环境画面必然一致；第三套在 Android 12+ 且硬件加速
+       可用时改录背景层的显示列表做真实模糊与边缘折射，不满足条件自动回退确定性绘制。
+       两者都不用 BlurView 的离屏快照 —— 它在 QQ 寄生环境会输出灰色错位图（灰块/灰晕）。
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
@@ -30,10 +29,15 @@
             android:scaleType="centerCrop"
             android:contentDescription="@null" />
 
+        <!-- 初始全透明：WebView 首次 attach 到窗口时合成器会有一帧未初始化内容，
+             表现为进入模块时背景「暗一下再正常回来」。等页面首帧真正绘制完
+             （setupWebView 的 onPageCommitVisible）再把 alpha 置 1，这一帧便不可见。
+             切换背景只重新 loadUrl、不重建 View，因此不受影响。 -->
         <WebView
             android:id="@+id/bgAnim"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:alpha="0" />
 
         <TextView
             android:id="@+id/tvHint"
@@ -88,14 +92,26 @@
                     android:fontFamily="sans-serif-black"
                     android:textStyle="bold" />
 
+                <!-- 首页模块图标：与下面返回按钮同一位置、互斥显示。
+                     首页显示圆形匀速转圈的模块图标，二级页换成返回箭头。
+                     图片与圆形裁剪由代码设置（寄生环境须走模块资源 Context）。 -->
+                <ImageView
+                    android:id="@+id/titleIcon"
+                    android:layout_width="49dp"
+                    android:layout_height="49dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="12dp"
+                    android:contentDescription="@null"
+                    android:scaleType="fitXY" />
+
                 <!-- 圆形返回按钮：QQ 原生式纯白底 + 短款 Material 向左箭头（代码绘制矢量），
-                     标题栏内部左侧，距左内边距 10dp，箭头紧凑短小居中 -->
+                     标题栏内部左侧，距左内边距 13dp，箭头紧凑短小居中 -->
                 <ImageView
                     android:id="@+id/btnBack"
-                    android:layout_width="39dp"
-                    android:layout_height="39dp"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
                     android:layout_gravity="start|center_vertical"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="13dp"
                     android:contentDescription="@null"
                     android:padding="8dp"
                     android:scaleType="fitCenter"
@@ -185,7 +201,45 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- DIY 布局（空壳入口，功能待实现） -->
+            <!-- 基础功能（入口）：内含 QQ保活等基础项 -->
+            <FrameLayout
+                android:id="@+id/cardBasic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToOutline="true"
+                android:outlineProvider="background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="17dp"
+                    android:paddingBottom="17dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="基础功能"
+                        android:textColor="#111111"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="#8A8F96"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- 布局：紧挨「设置」上方 -->
             <FrameLayout
                 android:id="@+id/cardDiy"
                 android:layout_width="match_parent"
@@ -208,7 +262,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="DIY 布局"
+                        android:text="布局"
                         android:textColor="#111111"
                         android:textSize="17sp"
                         android:textStyle="bold" />
@@ -262,7 +316,115 @@
             </FrameLayout>
             </LinearLayout>
 
-            <!-- DIY 布局二级内容：更换节令背景入口（从主页移入）+ 切换 UI 风格开关 -->
+            <!-- 基础功能二级内容：QQ保活 + 悬浮窗，两个列表项按 4+4 合并成一张卡。
+                 两行各 72dp 严格等分，分割线正好落在两段正中间。 -->
+            <FrameLayout
+                android:id="@+id/basicContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/cardKeepAlive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- 行1：QQ保活总开关（前台通知 + 后台通知） -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="72dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="QQ保活"
+                                    android:textColor="#111111"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="前台通知 + 后台通知，同时启用"
+                                    android:textColor="#5A6068"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <FrameLayout
+                                android:id="@+id/keepAliveSwitchSlot"
+                                android:layout_width="52dp"
+                                android:layout_height="32dp" />
+                        </LinearLayout>
+
+                        <!-- 分割线：严格居中，左右缩进与两行内容对齐 -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="#1A000000" />
+
+                        <!-- 行2：从保活里单独拆出的悬浮窗开关，与行1 等高 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="72dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="悬浮窗"
+                                    android:textColor="#111111"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="1x1 透明悬浮窗，保持进程可见"
+                                    android:textColor="#5A6068"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <FrameLayout
+                                android:id="@+id/pixelWindowSwitchSlot"
+                                android:layout_width="52dp"
+                                android:layout_height="32dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- 布局二级内容：单行功能卡统一 56dp、卡片间距 12dp、水平内边距 16dp；
+                 双功能 4+4 合并卡为 72dp + 1dp 居中分割线 + 72dp = 145dp。
+                 同类卡必须完全等高，新增卡片照抄本页固定值，不用 wrap_content + 不对称 padding。 -->
             <LinearLayout
                 android:id="@+id/diyContent"
                 android:layout_width="match_parent"
@@ -282,13 +444,11 @@
                     <LinearLayout
                         android:id="@+id/bgRow"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="56dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="17dp">
+                        android:paddingEnd="16dp">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -330,7 +490,7 @@
                     </LinearLayout>
                 </FrameLayout>
 
-                <!-- 切换 UI 卡：标题 + 开关（两套玻璃 UI 切换） -->
+                <!-- 切换 UI 卡：标题 + 当前档位文字 + 四档滑块 -->
                 <FrameLayout
                     android:id="@+id/cardUiStyle"
                     android:layout_width="match_parent"
@@ -357,9 +517,18 @@
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
+                        <TextView
+                            android:id="@+id/tvCurrentUi"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="浅冷灰玻璃"
+                            android:textColor="#5A6068"
+                            android:textSize="13sp" />
+
                         <FrameLayout
                             android:id="@+id/uiStyleSwitchSlot"
-                            android:layout_width="52dp"
+                            android:layout_width="104dp"
                             android:layout_height="32dp" />
                     </LinearLayout>
                 </FrameLayout>
@@ -397,6 +566,52 @@
                             android:layout_height="32dp" />
                     </LinearLayout>
                 </FrameLayout>
+
+                <!-- 液态玻璃底部导航栏：修改主页底栏，默认关闭 -->
+                <FrameLayout
+                    android:id="@+id/cardLiquidGlassBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="液态玻璃底部导航栏"
+                                android:textColor="#111111"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="修改主页底栏 · 重启 QQ 后生效"
+                                android:textColor="#5A6068"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:id="@+id/liquidGlassBarSwitchSlot"
+                            android:layout_width="52dp"
+                            android:layout_height="32dp" />
+                    </LinearLayout>
+                </FrameLayout>
             </LinearLayout>
 
             <!-- 二级内容区域：设置页显示 DexKit 缓存卡；聊天功能/等级加速只保留标题，内容区留空 -->
@@ -407,7 +622,9 @@
                 android:layout_marginTop="12dp"
                 android:visibility="gone">
 
-                <!-- DexKit 缓存卡：状态行 + 重建入口 + 说明（从主页移入「设置」，功能保持不变） -->
+                <!-- DexKit 缓存卡：与等级加速「定时发说说」卡片同构，保持原有卡片尺寸。
+                     两行严格等分、分割线正好落在两段正中间，合并关系按「两个原有列表项」
+                     计算，不引入新的标准尺寸，也不再用零碎 padding 把两段挤成不等高。 -->
                 <FrameLayout
                     android:id="@+id/cardDexkit"
                     android:layout_width="match_parent"
@@ -418,17 +635,16 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="17dp">
+                        android:orientation="vertical">
 
+                        <!-- 行1：缓存状态 -->
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="72dp"
                             android:gravity="center_vertical"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
 
                             <LinearLayout
                                 android:layout_width="0dp"
@@ -461,24 +677,46 @@
                                 android:textSize="13sp" />
                         </LinearLayout>
 
+                        <!-- 分割线：严格居中，左右缩进与两行内容对齐 -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="#1A000000" />
+
+                        <!-- 行2：重建入口（与行1 等高），橙色说明并入本行作副标题 -->
                         <LinearLayout
                             android:id="@+id/dexRebuildRow"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="72dp"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="8dp">
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
 
-                            <TextView
-                                android:id="@+id/tvRebuild"
+                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="重建 DexKit 缓存"
-                                android:textColor="#111111"
-                                android:textSize="17sp"
-                                android:textStyle="bold" />
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvRebuild"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="重建 DexKit 缓存"
+                                    android:textColor="#111111"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="清除缓存并重新扫描，完成后重启 QQ 生效"
+                                    android:textColor="#FF9500"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -488,13 +726,6 @@
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="清除缓存并重新扫描，完成后重启 QQ 生效"
-                            android:textColor="#FF9500"
-                            android:textSize="12sp" />
                     </LinearLayout>
                 </FrameLayout>
             </FrameLayout>

@@ -4,19 +4,25 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.view.View
+import android.view.ViewGroup
 import dalvik.system.BaseDexClassLoader
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.IXposedHookZygoteInit
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
+import android.widget.ImageView
 import android.widget.TextView
 import com.qosed.qodeep.R
+import com.qosed.qodeep.levelboost.MoodConfig
 import com.qosed.qodeep.levelboost.MoodScheduler
+import com.qosed.qodeep.liquidglass.LiquidGlassModule
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import org.luckypray.dexkit.query.FindClass
 import org.luckypray.dexkit.query.base.BaseFinder
@@ -205,10 +211,21 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
         initEnv(hostContext)
         runCatching { MoodScheduler.start(hostContext) }
             .onFailure { XposedBridge.log("[QOdeep] 定时说说调度启动失败: $it") }
+        // QQ 启动后按配置恢复保活（initEnv 已写好 moduleDataDir，MoodConfig 此时可读）
+        runCatching { KeepAlive.refresh(hostContext) }
+            .onFailure { XposedBridge.log("[QOdeep] QQ保活恢复失败: $it") }
         runCatching { Parasitics.init(hostContext) }
             .onFailure { XposedBridge.log("[QOdeep] 活动寄生初始化失败: $it") }
         runCatching { hookEmbeddingRules(Env.hostClassLoader) }
             .onFailure { XposedBridge.log("[QOdeep] 分屏规则过滤挂载失败: $it") }
+        runCatching { installEntryStyleHook() }
+            .onFailure { XposedBridge.log("[QOdeep] 入口样式 hook 安装失败: $it") }
+        // 主页底栏液态玻璃：只在 QQ 启动时按开关决定是否挂载整条 hook 链。
+        // 关闭后重启 QQ 即彻底恢复原生底栏；不做运行时卸载（reparent / padding 无法安全回滚）。
+        if (MoodConfig.getBoolean(KEY_LIQUID_GLASS_BAR, false)) {
+            runCatching { LiquidGlassModule.install(Env.hostClassLoader) }
+                .onFailure { XposedBridge.log("[QOdeep] 液态玻璃底栏挂载失败: $it") }
+        }
         DexKitCache.init()
         DexKitTaskRegistry.register(this)
 
@@ -262,7 +279,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
                 fired = true
                 mainHandler.post {
                     if (finished) return@post
-                    // QEdge 风格：白色圆角卡片 + 标题 + 当前查找 key。
+                    // 白色圆角卡片 + 标题 + 当前查找 key。
                     // 默认 AlertDialog 会被 QQ 深色主题渲染成黑底，观感突兀，改用自绘 view。
                     val d = buildProgressCard(activity)
                     dialog = d
@@ -293,7 +310,7 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
         })
     }
 
-    /** QEdge 风格进度卡片：白底圆角、黑色粗体标题、灰色当前查找 key，无默认对话框黑框。 */
+    /** 进度卡片：白底圆角、黑色粗体标题、灰色当前查找 key，无默认对话框黑框。 */
     private fun buildProgressCard(activity: Activity): android.app.AlertDialog {
         val dm = activity.resources.displayMetrics
         val dp = { v: Int -> (v * dm.density).toInt() }
@@ -485,6 +502,87 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
 
     // ---------------- 设置页注入 ----------------
 
+    /** 正在播放旋转动画的入口头像，复用绑定到其它头像时据此停掉旧动画。 */
+    private val rotatingIcons = java.util.WeakHashMap<ImageView, Boolean>()
+
+    /**
+     * 记录被放大过的 ImageView 的原尺寸，供 RecyclerView 复用该 View 绑定其它条目时还原，
+     * 避免放大后的尺寸残留到别的设置行上。
+     */
+    private val enlargedIconOriginalBounds = java.util.WeakHashMap<ImageView, IntArray>()
+
+    /**
+     * 入口保持 QQ 原生白卡，但头像放大到模块图标同档尺寸（36dp）并持续旋转。
+     * 旋转角度锚定系统时钟（IconSpin），与模块主页头像同步转、方向一致。
+     */
+    private fun installEntryStyleHook() {
+        // 通过 ImageView.setImageResource 精准命中入口头像（db_fg）：放大 + 挂无限旋转动画。
+        val iconHook = object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam) {
+                val iv = param.thisObject as? ImageView ?: return
+                val resId = param.args[0] as? Int ?: return
+                runCatching {
+                    val lp = iv.layoutParams ?: return@runCatching
+                    if (resId == R.drawable.db_fg) {
+                        val density = iv.resources.displayMetrics.density
+                        val target = (ENTRY_ICON_SIZE_DP * density + 0.5f).toInt()
+                        if (lp.width >= target && lp.height >= target) {
+                            startEntryIconRotation(iv)
+                            return@runCatching
+                        }
+                        enlargedIconOriginalBounds[iv] = intArrayOf(lp.width, lp.height)
+                        if (lp.width > 0) lp.width = target
+                        if (lp.height > 0) lp.height = target
+                        iv.layoutParams = lp
+                        startEntryIconRotation(iv)
+                    } else {
+                        // 条目被复用绑定其它图标：还原尺寸、停掉旋转，避免残留到别的设置行。
+                        if (rotatingIcons.remove(iv) == true) {
+                            iv.animate().cancel()
+                            iv.rotation = 0f
+                        }
+                        val saved = enlargedIconOriginalBounds.remove(iv) ?: return@runCatching
+                        if (saved[0] > 0) lp.width = saved[0]
+                        if (saved[1] > 0) lp.height = saved[1]
+                        iv.layoutParams = lp
+                    }
+                }.onFailure { XposedBridge.log("[QOdeep] 入口图标处理失败: $it") }
+            }
+        }
+        XposedBridge.hookMethod(
+            ImageView::class.java.getMethod("setImageResource", Int::class.javaPrimitiveType),
+            iconHook
+        )
+
+        XposedBridge.log("[QOdeep] 入口头像(放大+旋转) hook 已安装")
+    }
+
+    /**
+     * 给入口头像挂无限旋转动画。只在「尚无线程在驱动该头像」时启动；每帧用 Choreographer
+     * 依据系统时钟设置 rotation，角度锚定 IconSpin 绝对时钟，与模块主页头像严格同步。
+     */
+    private fun startEntryIconRotation(iv: ImageView) {
+        if (rotatingIcons[iv] == true) return
+        rotatingIcons[iv] = true
+        iv.post {
+            if (!iv.isAttachedToWindow) {
+                rotatingIcons.remove(iv)
+                return@post
+            }
+            val callback = object : android.view.Choreographer.FrameCallback {
+                override fun doFrame(frameTimeNanos: Long) {
+                    if (rotatingIcons[iv] != true || !iv.isAttachedToWindow) {
+                        rotatingIcons.remove(iv)
+                        return
+                    }
+                    iv.rotation = IconSpin.currentDegrees()
+                    android.view.Choreographer.getInstance().postFrameCallback(this)
+                }
+            }
+            android.view.Choreographer.getInstance().postFrameCallback(callback)
+        }
+    }
+
     private fun installSettingHook() {
         val providerClass = resolveProviderClass()
             ?: throw ClassNotFoundException("SettingConfigProvider")
@@ -513,11 +611,38 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
         runCatching { DexKitCache.getClass("$tag->provider") }.getOrNull()
             ?: runCatching { Env.hostClassLoader.loadClass("com.tencent.mobileqq.setting.main.b") }.getOrNull()
 
+    /** 列表里已有标题为入口名的条目就不再插，防止宿主复用同一份列表时叠加出多个入口。 */
+    private fun containsOurEntry(groups: List<Any?>): Boolean {
+        for (g in groups) {
+            if (g == null) continue
+            val itemsMethod = runCatching {
+                (g.javaClass.methods + g.javaClass.declaredMethods).distinct().firstOrNull {
+                    it.returnType == List::class.java && it.parameterTypes.isEmpty()
+                }
+            }.getOrNull() ?: continue
+            runCatching { itemsMethod.isAccessible = true }
+            val items = runCatching { itemsMethod.invoke(g) as? List<*> }.getOrNull() ?: continue
+            for (item in items) {
+                if (item == null) continue
+                val hit = item.javaClass.declaredFields.any { f ->
+                    runCatching {
+                        f.isAccessible = true
+                        val v = f.get(item)
+                        v is CharSequence && v.toString() == ENTRY_TITLE
+                    }.getOrDefault(false)
+                }
+                if (hit) return true
+            }
+        }
+        return false
+    }
+
     private fun insertEntry(groups: MutableList<Any?>, context: Context) {
         if (groups.isEmpty()) {
             XposedBridge.log("[QOdeep] 分组列表为空")
             return
         }
+        if (containsOurEntry(groups)) return
 
         // 注入模块资源到宿主 Resources：条目渲染时 QQ 会用自己的 Resources 解析
         // 图标资源 ID（R.drawable.db），不注入的话同一 ID 在 QQ 资源表里对应别的图，
@@ -580,12 +705,15 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
         args.add(context)
         args.add(ENTRY_TYPE)
         args.add(ENTRY_TITLE)
-        // 第一个 Int 参数是图标资源 ID（与 QEdge 一致），其余 Int 填 0
+        // 第一个 Int 参数是图标资源 ID，其余 Int 填 0
         var intCount = 0
         for (i in 3 until params.size) {
             when {
                 params[i] == Int::class.javaPrimitiveType -> {
-                    if (intCount == 0) args.add(R.drawable.db) else args.add(0)
+                    // 用完整圆形头像 PNG（db_fg）而非 adaptive-icon（db）：
+                    // adaptive-icon 渲染时套圆形 mask 只露中央约 2/3，头像会被放大裁切；
+                    // 直接给整幅 PNG 才能显示全部样貌。桌面启动器图标仍用 db 不变。
+                    if (intCount == 0) args.add(R.drawable.db_fg) else args.add(0)
                     intCount++
                 }
                 params[i] == String::class.java -> args.add("")
@@ -740,7 +868,12 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
             val intent = Intent(context, SettingsActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+                    Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED or
+                    // 系统级禁用转场：真正启动的是 QQ 的壳 Activity，它的主题是右侧滑入的
+                    // 半屏面板样式。Parasitics 换壳时会原样复制 flags，这个 flag 能传到
+                    // system_server，比起传 0 资源 ID 的 ActivityOptions 更可靠（部分 ROM
+                    // 会把 0 当无效值回退到壳主题默认动画，于是仍能看见从右边滑进来）。
+                    Intent.FLAG_ACTIVITY_NO_ANIMATION)
                 // 寄生页面与 MainHook 不同 ClassLoader，Env 字段不通，把环境随 Intent 带过去
                 putExtra(SettingsActivity.ENV_DATA_DIR, Env.moduleDataDir)
                 putExtra(SettingsActivity.ENV_NATIVE_LIB_DIR, Env.moduleNativeLibDir)
@@ -756,9 +889,8 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
                     .putString("moduleApk", Env.moduleApkPath)
                     .apply()
             }
-            context.startActivity(intent, buildFullscreenOptions(context))
-            // 双保险：部分 ROM 上 makeCustomAnimation(0,0) 不覆盖旧 Activity 的退出动画，
-            // 若点击源是 Activity，则对其再显式去一次转场，确保「点一下画面直接变、无跳转感」
+            context.startActivity(intent)
+            // 双保险：若点击源是 Activity，再显式去一次转场，确保「点一下画面直接变、无跳转感」
             runCatching {
                 if (context is Activity) {
                     context.overridePendingTransition(0, 0)
@@ -772,12 +904,15 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
 
     /**
      * 构造「瞬开」启动选项：仅 makeCustomAnimation(0, 0) 去掉转场动画，
-     * 点击后页面直接出现（对齐 FunBox 观感）。
+     * 点击后页面直接出现。
      *
      * 不再用 setLaunchWindowingMode(FULLSCREEN)/setLaunchAlwaysExpand 强制窗口模式：
      * 在 QQ 嵌入分屏环境下，这两个隐藏 API 会让系统先把 Activity 按半屏面板布局、
      * 再切换到全屏，造成「抖动一下再进入」。分屏问题已由 hookEmbeddingRules 在
      * 源头过滤（剔除会抓壳 Activity 的 SplitPairRule），无需在这里二次强制。
+     *
+     * 当前不启用：0 资源 ID 的自定义动画在部分 ROM 上会被判为无效、回退到壳主题的
+     * 右侧滑入。改用 Intent.FLAG_ACTIVITY_NO_ANIMATION（系统级），此函数保留作备用。
      */
     private fun buildFullscreenOptions(context: Context): android.os.Bundle? =
         runCatching {
@@ -785,6 +920,9 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
         }.getOrNull()
 
     companion object {
+        /** 主页底栏液态玻璃开关，默认关闭；开启并重启 QQ 后才挂载宿主 hook。 */
+        const val KEY_LIQUID_GLASS_BAR = "liquid_glass_tab_bar"
+
         private val initialized = AtomicBoolean(false)
         private val startupHooked = AtomicBoolean(false)
         private val patchLoaderCaptured = AtomicBoolean(false)
@@ -794,6 +932,8 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
         private const val ENTRY_TITLE = "豆包"
         private const val BOTTOM_TITLE = "豆包"
         private const val ENTRY_TYPE = 100
+        /** 入口头像的显示尺寸（dp），对齐其它模块图标的观感。 */
+        private const val ENTRY_ICON_SIZE_DP = 36
         // 进度卡片里"当前查找 key"文本的 view id（自绘 AlertDialog 内容用）
         private const val MSG_ID = 0x60de0001
     }

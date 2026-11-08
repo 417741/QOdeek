@@ -3,9 +3,12 @@ package com.qosed.qodeep
 import android.content.Context
 import android.content.res.AssetManager
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
@@ -16,6 +19,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
+import android.view.animation.LinearInterpolator
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -36,7 +40,36 @@ import java.io.File
 import java.util.zip.ZipFile
 
 /**
- * 模块设置页（传统 View 栈，对齐 FunBox）：
+ * 进程内封面位图缓存。
+ *
+ * 连续「返回 → 再点入口」时每次都是新 Activity，若每轮都要等后台解压线程把封面
+ * 解码到主线程再贴上，IO 稍慢就会露出窗口纯白底，表现为概率性「闪一下」。
+ * 缓存只保留最近一张（按背景 key），命中时首帧直接贴已解码位图，
+ * 顺带省掉每轮一次的整图解码；切背景时自动换掉，内存占用恒定。
+ */
+private object CoverCache {
+    @Volatile private var key: String? = null
+    @Volatile private var bmp: Bitmap? = null
+
+    /** 首帧用：此时还没加载背景清单，直接取最近显示过的一张。
+     *  未选过背景时清单第一张的 key 未必是默认值，按 key 查反而可能错配并造成跳变。 */
+    fun peek(): Bitmap? = synchronized(this) {
+        bmp?.takeIf { !it.isRecycled }
+    }
+
+    fun get(k: String): Bitmap? = synchronized(this) {
+        val b = bmp
+        if (key == k && b != null && !b.isRecycled) b else null
+    }
+
+    fun put(k: String, b: Bitmap) = synchronized(this) {
+        key = k
+        bmp = b
+    }
+}
+
+/**
+ * 模块设置页（传统 View 栈）：
  * 全屏节令海报背景 + 一摞 BlurView 真毛玻璃卡片，
  * 弹窗统一走 XPopup，图片加载统一走 Glide。
  */
@@ -44,6 +77,10 @@ class SettingsActivity : ComponentActivity() {
 
     private val main = Handler(Looper.getMainLooper())
     private var animLoadedKey: String? = null
+    /** 首页标题图标是否在自转（时钟驱动，与入口头像同步）；二级页/暂停时置 false。 */
+    @Volatile
+    private var titleSpinning = false
+    private var spinCallback: android.view.Choreographer.FrameCallback? = null
 
     /**
      * 寄生环境关键：布局 XML 里写了模块专属 View（eightbitlab.com.blurview.BlurView），
@@ -70,28 +107,48 @@ class SettingsActivity : ComponentActivity() {
 
     private fun moduleContext(): Context {
         moduleCtx?.let { return it }
-        val apkPath = Env.moduleApkPath
-        if (apkPath.isEmpty()) return this
-        val built = runCatching {
-            val base = resources
-            val res = buildModuleResources(apkPath, base)
-            object : android.content.ContextWrapper(this) {
-                override fun getResources(): Resources = res
-                override fun getSystemService(name: String): Any? {
-                    // 让 LayoutInflater.from(ctx) 拿到 clone 到本 Context 的 inflater，
-                    // 这样 inflate 时 getResources()/getClassLoader() 走的都是模块侧。
-                    if (name == Context.LAYOUT_INFLATER_SERVICE) {
-                        val raw = super.getSystemService(name)
-                        if (raw is android.view.LayoutInflater) return raw.cloneInContext(this)
-                    }
-                    return super.getSystemService(name)
-                }
+        // 首选：模块是正常安装的 APK，用 createPackageContext 拿模块自己的 Resources/ClassLoader。
+        // 全程系统封装，不反射 AssetManager、不手动 addAssetPath/addLoaders，
+        // 在 MIUI/Android 14 上不会出现空资源表或 hidden API 失败。
+        try {
+            createPackageContext(
+                MODULE_PACKAGE,
+                Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
+            ).let {
+                moduleCtx = it
+                return it
             }
-        }.getOrNull()
-        if (built != null) {
-            moduleCtx = built
-            return built
+        } catch (t: Throwable) {
+            android.util.Log.w("QOdeep", "createPackageContext 失败，回退 buildModuleResources: $t")
         }
+
+        // 兜底 1：从模块 APK 路径构造只含模块资源的 Resources（API 30+ 走 ResourcesLoader）。
+        val apkPath = Env.moduleApkPath
+        if (apkPath.isNotEmpty()) {
+            val built = runCatching {
+                val base = resources
+                val res = buildModuleResources(apkPath, base)
+                object : android.content.ContextWrapper(this) {
+                    override fun getResources(): Resources = res
+                    override fun getSystemService(name: String): Any? {
+                        // 让 LayoutInflater.from(ctx) 拿到 clone 到本 Context 的 inflater，
+                        // 这样 inflate 时 getResources()/getClassLoader() 走的都是模块侧。
+                        if (name == Context.LAYOUT_INFLATER_SERVICE) {
+                            val raw = super.getSystemService(name)
+                            if (raw is android.view.LayoutInflater) return raw.cloneInContext(this)
+                        }
+                        return super.getSystemService(name)
+                    }
+                }
+            }.onFailure {
+                android.util.Log.w("QOdeep", "buildModuleResources 失败: $it")
+            }.getOrNull()
+            if (built != null) {
+                moduleCtx = built
+                return built
+            }
+        }
+        android.util.Log.w("QOdeep", "moduleContext 全部失败，退回宿主 resources")
         return this
     }
 
@@ -139,6 +196,9 @@ class SettingsActivity : ComponentActivity() {
         // AppCompatActivity 会在 attach 阶段检测窗口主题非 Theme.AppCompat 而抛
         // IllegalStateException → 崩溃 → QQ 重启。ComponentActivity 无此约束（重铸前已验证）。
         super.onCreate(savedInstanceState)
+        // 壳 Activity 的主题自带「右侧滑入」的窗口动画样式，主题级动画不受
+        // overridePendingTransition 约束。窗口一创建就清掉，保证第一帧无位移。
+        runCatching { window.setWindowAnimations(0) }
         // 沉浸式：背景动画铺到状态栏/导航栏底下
         runCatching {
             androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -151,6 +211,10 @@ class SettingsActivity : ComponentActivity() {
         }
         // QQ 壳 Activity 的主题是半屏面板样式（右侧滑入、宽度受限），强制全屏不透明窗口
         runCatching {
+            // 壳主题带 backgroundDimEnabled：系统会在窗口首帧压一层暗色遮罩，
+            // 光清 FLAG_DIM_BEHIND 不够（部分 ROM 在 flag 生效前已画过一帧暗底，
+            // 表现就是「进入时背景暗一下再正常回来」）。把 dim 量一并归零。
+            window.setDimAmount(0f)
             window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND)
             // 关键：QQ 壳主题可能带 windowTranslucentStatus → 系统在状态栏下压一层
             // 半透明黑渐变（表现为「背景全屏了但状态栏还是大黑边」）。必须显式清掉
@@ -207,15 +271,26 @@ class SettingsActivity : ComponentActivity() {
             android.view.LayoutInflater.from(mctx)
                 .inflate(R.layout.activity_settings, null, false)
         } catch (t: Throwable) {
-            // 兜底：模块资源表构造失败时，退回宿主 resources 直接 inflate。
-            // 寄生环境下宿主 resources 已在 callActivityOnCreate 时注入模块资源表。
+            // 兜底：模块资源表构造失败时，先把模块资源同步注入宿主 Resources 再 inflate。
+            // 用宿主 resources 直接 inflate 才能保证后续主题/窗口背景解析不串包。
+            android.util.Log.w("QOdeep", "模块资源 inflate 失败，回退宿主注入: $t")
+            runCatching { Parasitics.injectModuleResourcesNow(resources, Env.moduleApkPath) }
             android.view.LayoutInflater.from(this)
                 .inflate(R.layout.activity_settings, null, false)
         }
         setContentView(content)
 
         val root = findViewById<FrameLayout>(R.id.root)
+        // 第三套真实液态玻璃要取样卡片背后的画面：背景层独立在卡片列之外，
+        // 录它的显示列表不会把卡片自身卷进来造成递归。宿主原生条目不设取样源，
+        // 自动走零渲染依赖的静态近似。
+        LiquidGlass.setBackdrop(findViewById(R.id.bgLayer))
         val bgCover = findViewById<ImageView>(R.id.bgCover)
+        // 首帧即有画面：背景封面原本要等后台解压线程 + 主线程解码才贴上，IO 稍慢
+        // 就会露出窗口纯白底（连续返回再进入时最明显）。进程内已有上次显示过的
+        // 封面时，在首帧绘制前直接复用，白底一帧都不露；首次冷启动缓存为空时
+        // 仍走原来的异步加载链路，行为不变。
+        CoverCache.peek()?.let { bgCover.setImageBitmap(it) }
         val bgAnim = findViewById<WebView>(R.id.bgAnim)
         val tvHint = findViewById<TextView>(R.id.tvHint)
         val cardTitle = findViewById<FrameLayout>(R.id.cardTitle)
@@ -227,12 +302,21 @@ class SettingsActivity : ComponentActivity() {
         val cardLevel = findViewById<FrameLayout>(R.id.cardLevel)
         val tvTitle = findViewById<TextView>(R.id.tvTitle)
         val btnBack = findViewById<ImageView>(R.id.btnBack)
+        val titleIcon = findViewById<ImageView>(R.id.titleIcon)
         val mainCards = findViewById<LinearLayout>(R.id.mainCards)
+        val cardBasic = findViewById<FrameLayout>(R.id.cardBasic)
+        val basicContent = findViewById<FrameLayout>(R.id.basicContent)
+        val cardKeepAlive = findViewById<FrameLayout>(R.id.cardKeepAlive)
+        val keepAliveSwitchSlot = findViewById<FrameLayout>(R.id.keepAliveSwitchSlot)
+        val pixelWindowSwitchSlot = findViewById<FrameLayout>(R.id.pixelWindowSwitchSlot)
         val diyContent = findViewById<LinearLayout>(R.id.diyContent)
         val cardUiStyle = findViewById<FrameLayout>(R.id.cardUiStyle)
         val uiStyleSwitchSlot = findViewById<FrameLayout>(R.id.uiStyleSwitchSlot)
+        val tvCurrentUi = findViewById<TextView>(R.id.tvCurrentUi)
         val cardShimmer = findViewById<FrameLayout>(R.id.cardShimmer)
         val shimmerSwitchSlot = findViewById<FrameLayout>(R.id.shimmerSwitchSlot)
+        val cardLiquidGlassBar = findViewById<FrameLayout>(R.id.cardLiquidGlassBar)
+        val liquidGlassBarSwitchSlot = findViewById<FrameLayout>(R.id.liquidGlassBarSwitchSlot)
         val detailContent = findViewById<FrameLayout>(R.id.detailContent)
         val levelContent = findViewById<FrameLayout>(R.id.levelContent)
         val cardMoodSwitch = findViewById<FrameLayout>(R.id.cardMoodSwitch)
@@ -249,24 +333,45 @@ class SettingsActivity : ComponentActivity() {
         // 卡片液态玻璃：统一走 LiquidGlass 设计系统（浅冷灰透明玻璃 + 细白描边 + 大圆角）。
         // 不用 XML drawable —— 寄生环境资源引用不可靠，圆角还决定玻璃层的裁剪轮廓。
         // detailContent 只作二级内容容器，本身不做玻璃卡；DexKit 卡已移入其中，单独保持玻璃质感
-        val glassCards = listOf(cardTitle, cardBg, cardDiy, cardDexkit, cardSettings, cardChat, cardLevel, cardMoodSwitch, cardCheckin, cardUiStyle, cardShimmer)
+        val glassCards = listOf(cardTitle, cardBg, cardDiy, cardDexkit, cardSettings, cardChat, cardLevel, cardMoodSwitch, cardCheckin, cardUiStyle, cardShimmer, cardLiquidGlassBar, cardBasic, cardKeepAlive)
 
-        // 两套 UI 风格（都带流光，仅玻璃材质不同）：
-        //  iceUi=false 第一套（默认）：所有卡片浅冷灰透明玻璃 + 灰色流光
-        //  iceUi=true  第二套（切换后）：所有卡片轻薄冰块玻璃（切面高光 + 反光）+ 亮银白流光
+        // 四档 UI 风格：
+        //  0 第一套（默认）：浅冷灰透明玻璃 + 蓝色流光
+        //  1 第二套：轻薄冰块玻璃 + 亮银白流光
+        //  2 第三套：真实液态玻璃（背后画面模糊 + 边缘折射）+ 粉色流光
+        //     Android 12+ 且硬件加速可用才启用，否则自动回退静态近似
+        //  3 第四套：液滴玻璃（拖动主页功能时弹出的那套）+ 色散彩虹流光
         val uiPrefs = getSharedPreferences("qodeep_ui", Context.MODE_PRIVATE)
-        var iceUi = uiPrefs.getBoolean("ui_new", false)
+        // 兼容旧版布尔配置 ui_new：开过第二套的迁移到档位 1
+        var uiMode = if (uiPrefs.contains("ui_mode")) {
+            uiPrefs.getInt("ui_mode", 0).coerceIn(0, 3)
+        } else if (uiPrefs.getBoolean("ui_new", false)) {
+            1
+        } else {
+            0
+        }
         // 流光开关：默认开启
         LiquidGlass.shimmerOn = uiPrefs.getBoolean("shimmer_on", true)
 
-        fun applyUiStyle(ice: Boolean) {
-            LiquidGlass.iceUi = ice
+        fun applyUiStyle(mode: Int) {
+            LiquidGlass.uiMode = mode
+            LiquidGlass.iceUi = mode == 1
             for (c in glassCards) {
-                if (ice) LiquidGlass.applyIceFrosted(c)
-                else LiquidGlass.applyFrosted(c)
+                when (mode) {
+                    1 -> LiquidGlass.applyIceFrosted(c)
+                    2 -> LiquidGlass.applyLiquidFrosted(c)
+                    3 -> LiquidGlass.applyDropletFrosted(c)
+                    else -> LiquidGlass.applyFrosted(c)
+                }
+            }
+            tvCurrentUi.text = when (mode) {
+                1 -> "冰块玻璃"
+                2 -> "液态玻璃"
+                3 -> "液滴玻璃"
+                else -> "浅冷灰玻璃"
             }
         }
-        applyUiStyle(iceUi)
+        applyUiStyle(uiMode)
 
         // 圆形返回按钮：QQ 原生式纯白底 + 短款 Material 向左箭头（全代码绘制，不依赖 XML drawable）
         btnBack.background = GradientDrawable().apply {
@@ -275,29 +380,52 @@ class SettingsActivity : ComponentActivity() {
         }
         btnBack.setImageDrawable(MaterialBackArrowDrawable(0xFF1A1A1A.toInt()))
 
+        // 首页标题左侧的模块头像：走模块资源 Context 取完整圆形头像，画成正圆后匀速自转。
+        // 不依赖 XML drawable / outline 裁剪（寄生环境资源 ID 在宿主资源表里不一定存在），
+        // 圆形由 Drawable 自己用 BitmapShader 绘制，View 旋转时轮廓始终是正圆。
+        // 图标只在首页出现：功能卡和所有二级界面都不加图标。
+        val iconBmp = loadModuleIcon(mctx)
+        if (iconBmp != null) {
+            titleIcon.setImageDrawable(CircleBitmapDrawable(iconBmp))
+            // 角度锚定 IconSpin 系统时钟，与 QQ 设置页入口头像严格同步、方向一致。
+            startTitleSpin()
+        } else {
+            titleIcon.visibility = View.GONE
+        }
+
         // ---- 同页切换（无跳转、无动画）：标题栏原地不动，仅替换标题栏下方内容区域 ----
         fun openDetail(title: String) {
             tvTitle.text = title            // 标题文字改为所选功能名
+            titleIcon.visibility = View.GONE  // 二级界面一律不显示首页头像
+            stopTitleSpin()                // 二级页停转，不空耗刷新
             btnBack.visibility = View.VISIBLE  // 标题栏内部左侧出现圆形返回箭头
             mainCards.visibility = View.GONE   // 隐藏主页卡片列表
-            // 设置页下方显示 DexKit 缓存卡；等级加速页显示定时发说说卡；DIY 布局页显示更换背景卡；聊天功能只保留标题
-            diyContent.visibility = if (title == "DIY 布局") View.VISIBLE else View.GONE
+            // 设置页下方显示 DexKit 缓存卡；等级加速页显示定时发说说卡；布局页显示更换背景卡；
+            // 基础功能页显示 QQ保活 + 悬浮窗合并卡；聊天功能只保留标题
+            diyContent.visibility = if (title == "布局") View.VISIBLE else View.GONE
             detailContent.visibility = if (title == "设置") View.VISIBLE else View.GONE
             levelContent.visibility = if (title == "等级加速") View.VISIBLE else View.GONE
+            basicContent.visibility = if (title == "基础功能") View.VISIBLE else View.GONE
         }
         fun backHome() {
             tvTitle.text = "豆包"
             btnBack.visibility = View.GONE
+            if (iconBmp != null) {
+                titleIcon.visibility = View.VISIBLE
+                startTitleSpin()           // 回首页接着转，角度由时钟推导、不重置
+            }
             diyContent.visibility = View.GONE
             detailContent.visibility = View.GONE
             levelContent.visibility = View.GONE
+            basicContent.visibility = View.GONE
             mainCards.visibility = View.VISIBLE
         }
         btnBack.setOnClickListener { backHome() }
         cardSettings.setOnClickListener { openDetail("设置") }
-        cardDiy.setOnClickListener { openDetail("DIY 布局") }
+        cardDiy.setOnClickListener { openDetail("布局") }
         cardChat.setOnClickListener { openDetail("聊天功能") }
         cardLevel.setOnClickListener { openDetail("等级加速") }
+        cardBasic.setOnClickListener { openDetail("基础功能") }
 
         // 自研弹窗宿主（弃用 XPopup 弹窗壳：库资源在寄生环境解析错乱出灰团/圆角失效）
         val popupHost = KitPopupHost(this)
@@ -309,7 +437,16 @@ class SettingsActivity : ComponentActivity() {
                     if (popupHost.dismissable()) popupHost.dismiss()
                     return
                 }
-                if (mainCards.visibility == View.GONE) backHome() else finish()
+                if (mainCards.visibility == View.GONE) {
+                    backHome()
+                } else {
+                    finish()
+                    // 退出同样要去掉转场：只处理「进入」的话，finish 时壳主题自带的
+                    // 退出动画仍会播，QQ 设置页露出几帧后新页面才起，连续「返回→再点」
+                    // 就会看到一次闪。finish 之后调用才对退出生效。
+                    @Suppress("DEPRECATION")
+                    runCatching { overridePendingTransition(0, 0) }
+                }
             }
         })
 
@@ -333,14 +470,16 @@ class SettingsActivity : ComponentActivity() {
             // 未选择过时跟随清单第一张（默认端午）；已选择过则用保存值
             val active = bgKey ?: current?.key ?: "duanwu"
             tvCurrentBg.text = current?.name ?: "端午"
-            // 静态封面：先用同步解码保证首帧即有完整画面（消除进入时的空白/闪暗「跳转感」），
-            // 再交给 Glide 后台预热写磁盘缓存；本地 jpg 体积小，同步解码开销可忽略。
+            // 静态封面：优先用进程内已解码的位图，命中即零 IO、零解码；
+            // 未命中才同步解码并存进缓存。失败时仍交给 Glide 兜底。
             val cover = bgDir?.let { File(it, "${active}_cover.jpg") }
             if (cover != null && cover.exists()) {
-                val bmp = runCatching {
+                val cached = CoverCache.get(active)
+                val bmp = cached ?: runCatching {
                     android.graphics.BitmapFactory.decodeFile(cover.absolutePath)
                 }.getOrNull()
                 if (bmp != null) {
+                    if (cached == null) CoverCache.put(active, bmp)
                     bgCover.setImageBitmap(bmp)   // 首帧同步显示，立即有画面
                 } else Glide.with(this).load(cover).centerCrop().into(bgCover)
             }
@@ -354,7 +493,7 @@ class SettingsActivity : ComponentActivity() {
 
         setupWebView(bgAnim) { bgDir }
 
-        // ---- 定时发说说：开关 + 发布后删除开关（与 MainHook 后台调度器共用 data/config.dat 配置）----
+        // ---- 定时发说说：开关 + 发布后删除开关（与 MainHook 后台调度器共用 settings/mood.json 配置）----
         fun refreshMood() {
             val time = MoodConfig.getString(MoodScheduler.KEY_TIME, MoodScheduler.DEFAULT_TIME)
                 .trim().takeIf { MoodScheduler.HH_MM_REGEX.matches(it) } ?: MoodScheduler.DEFAULT_TIME
@@ -365,17 +504,17 @@ class SettingsActivity : ComponentActivity() {
         }
         refreshMood()
 
-        // ---- 切换 UI 开关：两套玻璃 UI（浅冷灰 vs 冰块）----
-        val uiStyleSwitch = MoodSwitch(mctx).apply {
-            checked = iceUi
-            onChanged = { on ->
-                iceUi = on
-                uiPrefs.edit().putBoolean("ui_new", on).apply()
-                applyUiStyle(on)
+        // ---- 四档 UI 滑块：点击依次切到下一套，最右后再回到第一套 ----
+        val uiStyleSlider = UiStyleSlider(mctx).apply {
+            position = uiMode
+            onChanged = { mode ->
+                uiMode = mode
+                uiPrefs.edit().putInt("ui_mode", mode).apply()
+                applyUiStyle(mode)
             }
         }
         uiStyleSwitchSlot.addView(
-            uiStyleSwitch,
+            uiStyleSlider,
             FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -388,11 +527,88 @@ class SettingsActivity : ComponentActivity() {
             onChanged = { on ->
                 LiquidGlass.shimmerOn = on
                 uiPrefs.edit().putBoolean("shimmer_on", on).apply()
-                applyUiStyle(iceUi)   // 重新应用背景，让流光开关即时生效
+                applyUiStyle(uiMode)   // 重新应用背景，让流光开关即时生效
             }
         }
         shimmerSwitchSlot.addView(
             shimmerSwitch,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+
+        // ---- QQ保活总开关 + 从里面单独拆出的悬浮窗开关：同卡 4+4 合并 ----
+        // 配置与 MainHook/调度器共用 settings/mood.json（跨 ClassLoader 靠 mtime 热加载）。
+        // 桌面独立 App 只是 UI 预览壳，控件外观/可点状态与 QQ 内保持一致（预览才有意义），
+        // 但只有宿主进程才真正写配置、起保活；预览页的开关切换仅停留在视觉。
+        val parasitic = KeepAlive.isHostProcess()
+        val keepAliveSwitch = MoodSwitch(mctx).apply {
+            checked = MoodConfig.getBoolean(KeepAlive.KEY_ENABLED, false)
+            onChanged = { on ->
+                if (parasitic) {
+                    MoodConfig.putBoolean(KeepAlive.KEY_ENABLED, on)
+                    runCatching { KeepAlive.refresh(this@SettingsActivity.applicationContext) }
+                        .onFailure { android.util.Log.w("QOdeep", "QQ保活刷新失败: $it") }
+                }
+            }
+        }
+        // 页面打开时按配置对齐一次状态（例如 QQ 重启后配置仍为开，需重新挂起保活）
+        runCatching { KeepAlive.refresh(this@SettingsActivity.applicationContext) }
+            .onFailure { android.util.Log.w("QOdeep", "QQ保活初始化失败: $it") }
+        keepAliveSwitchSlot.addView(
+            keepAliveSwitch,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+
+        // 悬浮窗独立开关：默认开，旧配置里没有这个 key 时保持原来的三项全开行为
+        val pixelWindowSwitch = MoodSwitch(mctx).apply {
+            checked = MoodConfig.getBoolean(KeepAlive.KEY_PIXEL_WINDOW, true)
+            onChanged = { on ->
+                if (parasitic) {
+                    MoodConfig.putBoolean(KeepAlive.KEY_PIXEL_WINDOW, on)
+                    runCatching { KeepAlive.refresh(this@SettingsActivity.applicationContext) }
+                        .onFailure { android.util.Log.w("QOdeep", "悬浮窗刷新失败: $it") }
+                }
+            }
+        }
+        pixelWindowSwitchSlot.addView(
+            pixelWindowSwitch,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+
+        // ---- 液态玻璃底部导航栏：修改主页底栏，默认关闭 ----
+        // 只有宿主进程写配置；桌面预览页仅保留开关外观，不触碰功能。
+        val liquidGlassBarSwitch = MoodSwitch(mctx).apply {
+            checked = if (parasitic) {
+                MoodConfig.getBoolean(MainHook.KEY_LIQUID_GLASS_BAR, false)
+            } else {
+                uiPrefs.getBoolean("liquid_glass_bar", false)
+            }
+            onChanged = { on ->
+                uiPrefs.edit().putBoolean("liquid_glass_bar", on).apply()
+                if (parasitic) {
+                    MoodConfig.putBoolean(MainHook.KEY_LIQUID_GLASS_BAR, on)
+                }
+                // 底栏玻璃在 QQ 启动时一次性挂载，切换后必须重启 QQ 才生效，提示用户重启。
+                val verb = if (on) "开启" else "关闭"
+                popupHost.confirm(
+                    "需重启 QQ",
+                    "底部导航栏已$verb，重启 QQ 后生效。",
+                    cancelText = "稍后",
+                    okText = "立即重启",
+                    onOk = { restartQQ() }
+                )
+            }
+        }
+        liquidGlassBarSwitchSlot.addView(
+            liquidGlassBarSwitch,
             FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -436,7 +652,7 @@ class SettingsActivity : ComponentActivity() {
             sheet.onDismiss = { popupHost.dismiss() }
         }
 
-        // ---- 空间等级签到：开关 + 签到后删除开关（与 MoodScheduler 调度器共用 data/config.dat 配置）----
+        // ---- 空间等级签到：开关 + 签到后删除开关（与 MoodScheduler 调度器共用 settings/mood.json 配置）----
         fun refreshCheckin() {
             val time = MoodConfig.getString(MoodScheduler.KEY_CHECKIN_TIME, MoodScheduler.DEFAULT_CHECKIN_TIME)
                 .trim().takeIf { MoodScheduler.HH_MM_REGEX.matches(it) }
@@ -597,6 +813,91 @@ class SettingsActivity : ComponentActivity() {
         }.start()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // 二级页时动画保持暂停；只有首页才恢复自转
+        if (findViewById<View>(R.id.mainCards)?.visibility == View.VISIBLE) startTitleSpin()
+    }
+
+    override fun onPause() {
+        stopTitleSpin()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        stopTitleSpin()
+        super.onDestroy()
+    }
+
+    /** 启动首页头像自转：每帧从 IconSpin 系统时钟取角度，与入口头像严格同步。 */
+    private fun startTitleSpin() {
+        if (titleSpinning) return
+        titleSpinning = true
+        val cb = object : android.view.Choreographer.FrameCallback {
+            override fun doFrame(frameTimeNanos: Long) {
+                if (!titleSpinning) return
+                findViewById<ImageView>(R.id.titleIcon)?.rotation = IconSpin.currentDegrees()
+                android.view.Choreographer.getInstance().postFrameCallback(this)
+            }
+        }
+        spinCallback = cb
+        android.view.Choreographer.getInstance().postFrameCallback(cb)
+    }
+
+    /** 停止首页头像自转。 */
+    private fun stopTitleSpin() {
+        titleSpinning = false
+        spinCallback = null
+    }
+
+    /**
+     * 重启 QQ 使需要重启才生效的改动（如底部导航栏玻璃）落地。
+     *
+     * 寄生在 QQ 进程时 kill 自己即杀 QQ；独立桌面进程时 am force-stop 杀 QQ。
+     * 统一交给独立 shell 执行：先停掉 QQ，1 秒后 monkey 重新拉起，shell 不随
+     * 当前进程死亡而中断（与 DexKit 重建后的重启同一套路）。
+     */
+    private fun restartQQ() {
+        runCatching {
+            Runtime.getRuntime().exec(
+                arrayOf(
+                    "sh", "-c",
+                    "am force-stop com.tencent.mobileqq; " +
+                        "sleep 1; monkey -p com.tencent.mobileqq -c android.intent.category.LAUNCHER 1"
+                )
+            )
+        }.onFailure { android.util.Log.w("QOdeep", "重启 QQ 失败: $it") }
+        // 寄生进程：上面 force-stop 会杀掉本进程；独立进程：延迟结束自己，避免残留设置页。
+        main.postDelayed({
+            runCatching { android.os.Process.killProcess(android.os.Process.myPid()) }
+        }, 400)
+    }
+
+    /**
+     * 取模块图标位图。寄生页面 Activity 自身的 resources 是 QQ 的，模块资源 ID
+     * （0x69 段）在宿主资源表里不一定存在，优先用模块资源 Context；全失败时
+     * 直接从模块 APK 里按文件名找 PNG，完全绕开资源表。
+     */
+    private fun loadModuleIcon(ctx: Context): Bitmap? {
+        runCatching { android.graphics.BitmapFactory.decodeResource(ctx.resources, R.drawable.db_fg) }
+            .getOrNull()?.let { return it }
+        runCatching { android.graphics.BitmapFactory.decodeResource(resources, R.drawable.db_fg) }
+            .getOrNull()?.let { return it }
+        val apk = Env.moduleApkPath.ifEmpty {
+            runCatching { applicationInfo.sourceDir }.getOrDefault("")
+        }
+        if (apk.isEmpty()) return null
+        return runCatching {
+            ZipFile(File(apk)).use { zip ->
+                val e = zip.entries().asSequence()
+                    .firstOrNull { it.name.contains("db_fg") && it.name.endsWith(".png", true) }
+                if (e != null) {
+                    zip.getInputStream(e).use { android.graphics.BitmapFactory.decodeStream(it) }
+                } else null
+            }
+        }.getOrNull()
+    }
+
     /** 全屏透明 WebView：Spine 节令动画背景，铺到毛玻璃卡片底下供其采样。 */
     private fun setupWebView(
         wv: WebView,
@@ -614,7 +915,28 @@ class SettingsActivity : ComponentActivity() {
         wv.isFocusable = false
         wv.isLongClickable = false
         wv.setOnTouchListener { _, _ -> true }
+
+        // 动画层初始 alpha=0（见布局注释）：等页面首帧真正绘制出来再显示，
+        // 避开 WebView 首次 attach 时合成器输出的那帧「暗一下」。
+        // 用 AtomicBoolean 保证三层回调只生效一次；任何一层先到即可，
+        // 且不做淡入（淡入会引入新的过渡帧，反而又是一次可见变化）。
+        val revealed = java.util.concurrent.atomic.AtomicBoolean(false)
+        fun reveal() {
+            if (revealed.compareAndSet(false, true)) wv.alpha = 1f
+        }
+        // 最终兜底：某些 ROM 不上报 onPageCommitVisible / onPageFinished，
+        // 或页面加载失败时也必须把动画层显示出来，不能让背景永久空白。
+        wv.postDelayed({ reveal() }, 1200)
+
         wv.webViewClient = object : android.webkit.WebViewClient() {
+            override fun onPageCommitVisible(view: WebView, url: String) {
+                reveal()
+            }
+
+            override fun onPageFinished(view: WebView, url: String) {
+                reveal()
+            }
+
             // 把 https://appassets.qodeep.local/* 拦截为解压目录里的本地文件。
             // 页面因此是正常 https 源，fetch/XHR 不再被 file:// 协议禁掉。
             override fun shouldInterceptRequest(
@@ -669,7 +991,7 @@ class SettingsActivity : ComponentActivity() {
 
         // 三写：
         // 1) Env.moduleDataDir = QQ 的 /sdcard/Android/data/com.tencent.mobileqq/QOdeep/
-        //    （文件管理器可直接看到，dexkit 目录就在这，优先写这里）
+        //    （文件管理器可直接看到，findcache 目录就在这，优先写这里）
         // 2) cacheDir（QQ 内部 cache，兜底，文件管理器看不到但一定可写）
         // 3) /sdcard 根目录（旧系统可写，新系统分区存储会失败，尽力而为）
         val targets = mutableListOf<File>()
@@ -705,7 +1027,45 @@ class SettingsActivity : ComponentActivity() {
         const val ENV_NATIVE_LIB_DIR = "qodeep.env.nativeLibDir"
         const val ENV_HOST_APK = "qodeep.env.hostApk"
         const val ENV_MODULE_APK = "qodeep.env.moduleApk"
+        private const val MODULE_PACKAGE = "com.qosed.qodeep"
     }
+}
+
+/**
+ * 把位图 centerCrop 后裁成正圆绘制。
+ * 用 BitmapShader 而不是 View 的 outline 裁剪：outline 裁剪发生在 View 合成阶段，
+ * 与 View.rotation 叠加时部分 ROM 会出现方角/锯齿；shader 在 Drawable 内部画圆，
+ * 无论 View 怎么转，内容始终是正圆。
+ */
+private class CircleBitmapDrawable(private val bmp: Bitmap) : android.graphics.drawable.Drawable() {
+
+    private val shader = BitmapShader(bmp, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).also { it.shader = shader }
+    private val matrix = Matrix()
+
+    override fun draw(canvas: Canvas) {
+        val side = minOf(bounds.width(), bounds.height()).toFloat()
+        if (side <= 0f) return
+        val r = side / 2f
+        val cx = bounds.left + bounds.width() / 2f
+        val cy = bounds.top + bounds.height() / 2f
+        val scale = maxOf(side / bmp.width, side / bmp.height)
+        matrix.setScale(scale, scale)
+        matrix.postTranslate(cx - bmp.width * scale / 2f, cy - bmp.height * scale / 2f)
+        shader.setLocalMatrix(matrix)
+        canvas.drawCircle(cx, cy, r, paint)
+    }
+
+    override fun setAlpha(alpha: Int) {
+        paint.alpha = alpha
+    }
+
+    override fun setColorFilter(colorFilter: android.graphics.ColorFilter?) {
+        paint.colorFilter = colorFilter
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun getOpacity(): Int = android.graphics.PixelFormat.TRANSLUCENT
 }
 
 /**
@@ -994,7 +1354,7 @@ object DexKitPageState {
 
     private const val FINGERPRINT_KEY = "__host_apk__"
 
-    private fun cacheFile(): File = File(File(Env.moduleDataDir, "dexkit"), "CacheMap.json")
+    private fun cacheFile(): File = File(File(Env.moduleDataDir, "findcache"), "dex_map.json")
 
     /** 返回 (已命中的真实任务数, 描述)；n < 0 表示无法读取。 */
     fun readStatus(): Pair<Int, String> {
@@ -1101,7 +1461,81 @@ private class MoodSwitch(context: Context) : View(context) {
     private fun dpf(v: Float): Float = v * density
 }
 
-/** 定时说说/签到配置弹窗：发送时间 + 内容，保存时校验并持久化到 data/config.dat。 */
+/**
+ * 四档位 UI 滑块：沿用开关的圆角轨道 / 细白描边 / 冷白圆点风格，
+ * 圆点在四个等距位置停靠，点击依次前进（0→1→2→3→0）。
+ * 圆点直径与 MoodSwitch 完全一致（h * 0.78），轨道相应加宽以容纳四档。
+ */
+private class UiStyleSlider(context: Context) : View(context) {
+
+    var position = 0
+        set(value) {
+            field = value.coerceIn(0, 3)
+            invalidate()
+        }
+    var onChanged: ((Int) -> Unit)? = null
+
+    private val density = context.resources.displayMetrics.density
+    private val trackOnTop = 0xFF9AA1A9.toInt()
+    private val trackOnBottom = 0xFF7A828C.toInt()
+    private val borderColor = 0x8FFFFFFF.toInt()
+    private val thumbTop = 0xFFFFFFFF.toInt()
+    private val thumbBottom = 0xE6F2F3F5.toInt()
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val trackRect = RectF()
+
+    init {
+        setOnClickListener {
+            position = (position + 1) % 4
+            onChanged?.invoke(position)
+        }
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        val w = width.toFloat()
+        val h = height.toFloat()
+        if (w <= 0f || h <= 0f) return
+        val trackRadius = h / 2f
+        val strokeW = density * 1.1f
+        val inset = strokeW / 2f
+        trackRect.set(inset, inset, w - inset, h - inset)
+
+        paint.shader = LinearGradient(
+            0f, trackRect.top, 0f, trackRect.bottom,
+            intArrayOf(trackOnTop, trackOnBottom),
+            null,
+            Shader.TileMode.CLAMP
+        )
+        paint.style = Paint.Style.FILL
+        canvas.drawRoundRect(trackRect, trackRadius, trackRadius, paint)
+        paint.shader = null
+
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = strokeW
+        paint.color = borderColor
+        canvas.drawRoundRect(trackRect, trackRadius, trackRadius, paint)
+
+        // 与 MoodSwitch 同尺寸（h * 0.78）的冷白圆点，四个等距停靠点
+        paint.style = Paint.Style.FILL
+        val d = h * 0.78f
+        val dotInset = (h - d) / 2f
+        val r = d / 2f
+        val leftX = dotInset + r
+        val rightX = w - dotInset - r
+        val cx = leftX + (rightX - leftX) * position / 3f
+        val cy = h / 2f
+        paint.shader = LinearGradient(
+            0f, cy - r, 0f, cy + r,
+            intArrayOf(thumbTop, thumbBottom),
+            null,
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawCircle(cx, cy, r, paint)
+        paint.shader = null
+    }
+}
+
+/** 定时说说/签到配置弹窗：发送时间 + 内容，保存时校验并持久化到 settings/mood.json。 */
 class MoodConfigSheet(
     context: Context,
     private val keyTime: String = MoodScheduler.KEY_TIME,

@@ -11,10 +11,10 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 
 /**
- * 日志落盘工具：对齐 QEdge LogUtils 的做法，把运行日志写到模块目录 log/ 下，
+ * 日志落盘工具：把运行日志写到模块目录 logs/ 下，
  * 按日期分文件，后台单线程异步写，调用线程只入队不阻塞。
  *
- * 路径：{Env.moduleDataDir}/log/yyyy-MM-dd.log
+ * 路径：{Env.moduleDataDir}/logs/qodeep_yyyy-MM-dd.log
  */
 object FileLog {
 
@@ -52,9 +52,9 @@ object FileLog {
     private fun flush(batch: List<String>) {
         if (batch.isEmpty()) return
         runCatching {
-            val dir = File(Env.moduleDataDir, "log")
+            val dir = File(Env.moduleDataDir, "logs")
             if (!dir.exists()) dir.mkdirs()
-            val file = File(dir, "${dateFmt.get().format(Date())}.log")
+            val file = File(dir, "qodeep_${dateFmt.get().format(Date())}.log")
             FileWriter(file, true).use { w ->
                 for (line in batch) w.write(line)
             }

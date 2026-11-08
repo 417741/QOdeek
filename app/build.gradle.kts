@@ -14,8 +14,8 @@ android {
         applicationId = "com.qosed.qodeep"
         minSdk = 30
         targetSdk = 36
-        versionCode = 94
-        versionName = "0.0.94"
+        versionCode = 153
+        versionName = "0.0.153"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

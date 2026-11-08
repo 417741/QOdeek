@@ -5,8 +5,8 @@ import com.qosed.qodeep.Env
 /**
  * QQ 当前环境工具类（纯反射实现）。
  *
- * QOdeep 没有 QQ 的 stub 依赖，宿主类一律通过 [Env.hostClassLoader] 用字符串类名反射加载，
- * 与 QEdge 的 QQCurrentEnv 等价，但去掉了对 mqq.app / com.tencent.* 的编译期依赖。
+ * 没有 QQ 的 stub 依赖，宿主类一律通过 [Env.hostClassLoader] 用字符串类名反射加载，
+ * 去掉对 mqq.app / com.tencent.* 的编译期依赖。
  */
 object QQEnv {
 

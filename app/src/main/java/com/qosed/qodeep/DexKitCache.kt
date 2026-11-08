@@ -22,7 +22,7 @@ object DexKitCache {
     private var cacheFile: File? = null
 
     fun init() {
-        cacheFile = File(File(Env.moduleDataDir, "dexkit"), "CacheMap.json")
+        cacheFile = File(File(Env.moduleDataDir, "findcache"), "dex_map.json")
     }
 
     private fun hostFingerprint(): String {
