@@ -4,6 +4,7 @@ import dalvik.system.BaseDexClassLoader
 import de.robv.android.xposed.XposedBridge
 import org.luckypray.dexkit.DexKitBridge
 import org.luckypray.dexkit.query.FindClass
+import org.luckypray.dexkit.query.FindMethod
 import org.luckypray.dexkit.query.base.BaseFinder
 import java.io.File
 
@@ -135,6 +136,15 @@ object DexKitFinder {
                     DexKitCache.put(key, descriptor)
                 } else {
                     XposedBridge.log("[QOdeep] DexKit 未命中: $key")
+                }
+            }
+            is FindMethod -> {
+                val descriptor = bridge.findMethod(query).firstOrNull()?.descriptor
+                if (descriptor != null) {
+                    XposedBridge.log("[QOdeep] DexKit 命中方法: $key -> $descriptor")
+                    DexKitCache.put(key, descriptor)
+                } else {
+                    XposedBridge.log("[QOdeep] DexKit 未命中方法: $key")
                 }
             }
             else -> XposedBridge.log("[QOdeep] 不支持的查询类型: $key")

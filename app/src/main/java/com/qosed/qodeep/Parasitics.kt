@@ -274,6 +274,9 @@ object Parasitics {
 
     // ---------------- 模块资源注入 ----------------
 
+    /** 已做过模块资源注入的 Resources 对象（弱引用，随对象回收自动清理）。 */
+    private val injectedRes = java.util.WeakHashMap<Resources, Boolean>()
+
     fun injectModuleResources(res: Resources?) {
         injectModuleResources(res, ModulePathHolder.path)
     }
@@ -281,8 +284,9 @@ object Parasitics {
     /** 可显式传模块 APK 路径的版本：QQ 设置页插入口时 ModulePathHolder 还没赋值，需要用 Env.moduleApkPath。 */
     fun injectModuleResources(res: Resources?, apkPath: String?) {
         if (res == null) return
-        if (runCatching { res.getString(R.string.app_name) }.isSuccess) return
+        if (injectedRes.containsKey(res)) return
         val path = apkPath ?: ModulePathHolder.path ?: return
+        injectedRes[res] = true
 
         if (Build.VERSION.SDK_INT >= 30) {
             runCatching {
@@ -313,8 +317,9 @@ object Parasitics {
      */
     fun injectModuleResourcesNow(res: Resources?, apkPath: String?) {
         if (res == null) return
-        if (runCatching { res.getString(R.string.app_name) }.isSuccess) return
+        if (injectedRes.containsKey(res)) return
         val path = apkPath ?: ModulePathHolder.path ?: return
+        injectedRes[res] = true
         runCatching {
             if (Build.VERSION.SDK_INT >= 30) {
                 val loader = ResLoaderHolder.loader ?: run {

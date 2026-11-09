@@ -660,7 +660,6 @@ object LiquidGlass {
         private val radius = RADIUS_DP * density
         private val strokeW = STROKE_DP * density
         private val lensW = 3f * density
-        private val pad = (REFRACTION_DP * density).roundToInt()
 
         private val fallback = LiquidCardDrawable(density)
         private val rect = RectF()
@@ -750,11 +749,15 @@ object LiquidGlass {
         }
 
         private fun drawGlass(canvas: Canvas, view: View, backdrop: ViewGroup, w: Int, h: Int) {
-            val nw = w + pad * 2
-            val nh = h + pad * 2
+            // 不再外扩采样：录制区尺寸与卡片一致（w×h），采样原点即卡片屏幕位置。
+            // 这样 shader 的 size=(w,h) 与 content（node 的 w×h）尺寸完全对齐，
+            // 折射不会错位、不会放大；且采样区永在屏幕内，贴边也不会越界露灰底。
+            // 代价仅是边缘折射采不到「卡片外 24dp」的内容，透镜扭曲略减，但稳定性彻底解决。
+            val nw = w
+            val nh = h
             view.getLocationOnScreen(loc)
-            val x = loc[0] - pad
-            val y = loc[1] - pad
+            val x = loc[0]
+            val y = loc[1]
             // 流光开着时卡片本来就每帧重绘，顺带刷新折射内容；
             // 关掉流光后静止画面不重录，避免显示列表持续损坏引发无休止的重绘。
             val needCapture = !captured || x != lastX || y != lastY ||
@@ -781,7 +784,7 @@ object LiquidGlass {
                 val shader = lens
                 chain = if (shader != null) {
                     shader.setFloatUniform("size", w.toFloat(), h.toFloat())
-                    shader.setFloatUniform("offset", -pad.toFloat(), -pad.toFloat())
+                    shader.setFloatUniform("offset", 0f, 0f)
                     shader.setFloatUniform("cornerRadii", radius, radius, radius, radius)
                     shader.setFloatUniform("refractionHeight", REFRACTION_DP * density)
                     shader.setFloatUniform("refractionAmount", -REFRACTION_DP * density)
@@ -798,7 +801,6 @@ object LiquidGlass {
             node.setRenderEffect(chain!!)
             val save = canvas.save()
             canvas.clipPath(clip)
-            canvas.translate(-pad.toFloat(), -pad.toFloat())
             canvas.drawRenderNode(node)
             canvas.restoreToCount(save)
         }

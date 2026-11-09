@@ -24,7 +24,7 @@ import android.widget.TextView
  * 做法：直接往 Activity 自己的 decorView 加一层全屏遮罩 + 居中内容，
  * 全部用代码自绘（GradientDrawable 圆角），零库资源依赖，两端必然一致。
  */
-class KitPopupHost(val activity: Activity) {
+class KitPopupHost(val activity: Activity, val uiCtx: Context = activity) {
 
     private val main = Handler(Looper.getMainLooper())
     private var overlay: FrameLayout? = null
@@ -99,7 +99,7 @@ class KitPopupHost(val activity: Activity) {
     private fun alpha(from: Float, to: Float, scale: Float = 1f): AlphaAnimation =
         AlphaAnimation(from, to).apply { duration = (180 * scale).toLong() }
 
-    private fun dp(v: Int): Int = (v * activity.resources.displayMetrics.density).toInt()
+    private fun dp(v: Int): Int = UiScale.dp(v)
 }
 
 /** 液态玻璃弹窗卡片容器，跟随当前 UI 档位（与其它弹窗/主页卡片一致）。 */
@@ -114,7 +114,7 @@ fun popupCard(context: Context, paddingDp: Int = 20): LinearLayout =
 fun roundedWhite(context: Context, radiusDp: Int = 30): GradientDrawable =
     GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
-        cornerRadius = radiusDp * context.resources.displayMetrics.density
+        cornerRadius = UiScale.dp(radiusDp).toFloat()
         setColor(Color.WHITE)
     }
 
@@ -127,18 +127,18 @@ fun KitPopupHost.confirm(
     cancelable: Boolean = true,
     onOk: (() -> Unit)? = null
 ) {
-    val ctx = activity
+    val ctx = uiCtx
     val card = popupCard(ctx)
     val tvTitle = TextView(ctx).apply {
         text = title
         setTextColor(0xFF111111.toInt())
-        textSize = 18f
+        fixedTextSize(18f)
         typeface = Typeface.DEFAULT_BOLD
     }
     val tvMsg = TextView(ctx).apply {
         text = message
         setTextColor(0xFF44484D.toInt())
-        textSize = 14f
+        fixedTextSize(14f)
         setPadding(0, dp(ctx, 10), 0, 0)
     }
     val row = LinearLayout(ctx).apply {
@@ -149,14 +149,14 @@ fun KitPopupHost.confirm(
     val tvCancel = TextView(ctx).apply {
         text = cancelText
         setTextColor(0xFF6B7280.toInt())
-        textSize = 15f
+        fixedTextSize(15f)
         setPadding(dp(ctx, 16), dp(ctx, 8), dp(ctx, 16), dp(ctx, 8))
         setOnClickListener { dismiss() }
     }
     val tvOk = TextView(ctx).apply {
         text = okText
         setTextColor(0xFF0A7AFF.toInt())
-        textSize = 15f
+        fixedTextSize(15f)
         typeface = Typeface.DEFAULT_BOLD
         setPadding(dp(ctx, 16), dp(ctx, 8), dp(ctx, 8), dp(ctx, 8))
         setOnClickListener { dismiss(); onOk?.invoke() }
@@ -170,4 +170,4 @@ fun KitPopupHost.confirm(
     showCenter(card, cancelable, matchWidth = false)
 }
 
-private fun dp(context: Context, v: Int): Int = (v * context.resources.displayMetrics.density).toInt()
+private fun dp(context: Context, v: Int): Int = UiScale.dp(v)

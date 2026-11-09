@@ -20,12 +20,15 @@ import de.robv.android.xposed.XposedHelpers
 import android.widget.ImageView
 import android.widget.TextView
 import com.qosed.qodeep.R
+import com.qosed.qodeep.chat.ChatFeaturesInstaller
 import com.qosed.qodeep.levelboost.MoodConfig
 import com.qosed.qodeep.levelboost.MoodScheduler
 import com.qosed.qodeep.liquidglass.LiquidGlassModule
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import org.luckypray.dexkit.query.FindClass
+import org.luckypray.dexkit.query.FindMethod
 import org.luckypray.dexkit.query.base.BaseFinder
+import org.luckypray.dexkit.query.matchers.MethodMatcher
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.Collections
@@ -93,6 +96,19 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
             searchPackages("com.tencent.mobileqq.setting.processor")
             matcher { usingStrings("itemProcessors") }
         }
+        // 原生表情包下载判定方法：com.tencent.qqnt.msg 包下 (PicElement)->boolean、
+        // 方法体调用 IZplanOffLineApi.isZPlanMsgOffLine 的方法（类/方法名混淆，靠特征定位）
+        queries["pic_download_method"] = FindMethod().apply {
+            searchPackages("com.tencent.qqnt.msg")
+            matcher {
+                returnType("boolean")
+                paramTypes("com.tencent.qqnt.kernel.nativeinterface.PicElement")
+                addInvoke(MethodMatcher().apply {
+                    declaredClass("com.tencent.qqnt.msg.api.IZplanOffLineApi")
+                    name("isZPlanMsgOffLine")
+                })
+            }
+        }
         // 占位任务：把查找任务数对齐到 16 个（对应后续 16 个功能），
         // 每个槽位用当前必然不存在的字符串占位，后续加功能时逐个替换成真实查询。
         for (i in 4..16) {
@@ -106,7 +122,8 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
 
     // 真实查询只有 3 个（provider / simpleItemProcessor / settingSection）。
     // slot4~slot16 是占位，扫不到是正常的，不应计入「缓存完整」判断。
-    override fun realQueryKeys(): Set<String> = setOf("provider", "simpleItemProcessor", "settingSection")
+    override fun realQueryKeys(): Set<String> =
+        setOf("provider", "simpleItemProcessor", "settingSection", "pic_download_method")
 
     // ---------------- 启动双路：QFix 补丁 loader + BaseApplicationImpl 兜底 ----------------
 
@@ -240,6 +257,10 @@ class MainHook : IXposedHookLoadPackage, IXposedHookZygoteInit, DexKitTask {
                     .onFailure { XposedBridge.log("[QOdeep] 设置页 hook 安装失败: $it") }
             }
         }
+
+        // 聊天功能：后台线程逐项安装，单项失败不影响其余功能
+        runCatching { ChatFeaturesInstaller.install(hostContext.packageName) }
+            .onFailure { XposedBridge.log("[QOdeep] 聊天功能安装失败: $it") }
     }
 
     /**

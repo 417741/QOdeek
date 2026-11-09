@@ -87,7 +87,7 @@
                     android:paddingTop="19dp"
                     android:paddingBottom="19dp"
                     android:text="豆包"
-                    android:textColor="#111111"
+                    android:textColor="#000000"
                     android:textSize="34sp"
                     android:fontFamily="sans-serif-black"
                     android:textStyle="bold" />
@@ -116,7 +116,87 @@
                     android:padding="8dp"
                     android:scaleType="fitCenter"
                     android:visibility="gone" />
+
+                <!-- 一级标题右侧「启动」：只在等级加速页出现，无视开关与当日标记立即执行全部功能。
+                     圆角与配色由代码绘制（寄生环境不引用 XML drawable）。
+                     marginEnd 让出位置给右侧常驻的搜索图标（两按钮并排不重叠）。 -->
+                <TextView
+                    android:id="@+id/btnRunAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="60dp"
+                    android:gravity="center"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingStart="9dp"
+                    android:paddingEnd="9dp"
+                    android:text="启动"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <!-- 标题右侧搜索图标：黑色放大镜（代码绘制矢量），首页与所有二级界面常驻。
+                     点击在标题下方弹出搜索框，过滤全部功能项并定位。 -->
+                <ImageView
+                    android:id="@+id/btnSearch"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="@null"
+                    android:padding="9dp"
+                    android:scaleType="fitCenter" />
             </FrameLayout>
+
+            <!-- 搜索面板：点搜索图标弹出。圆角灰底输入框 + 实时过滤结果列表，
+                 背景配色全部代码绘制（寄生环境不引用 XML drawable）。 -->
+            <LinearLayout
+                android:id="@+id/searchPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/searchBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp">
+
+                    <ImageView
+                        android:id="@+id/ivSearchInBox"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:layout_marginStart="14dp"
+                        android:contentDescription="@null"
+                        android:padding="10dp"
+                        android:scaleType="fitCenter" />
+
+                    <EditText
+                        android:id="@+id/etSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="52dp"
+                        android:layout_marginEnd="14dp"
+                        android:background="@null"
+                        android:hint="搜索功能..."
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:textColor="#000000"
+                        android:textColorHint="#9E9E9E"
+                        android:textSize="15sp" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/searchResults"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
 
             <!-- 主页卡片组：切换二级内容时整组隐藏，标题卡原地不动 -->
             <LinearLayout
@@ -125,12 +205,21 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+            <!-- 账号卡：收起显示头像+昵称+QQ号，点击展开模块/QQ 版本；内容全部代码构建（寄生环境不引用 XML drawable） -->
+            <FrameLayout
+                android:id="@+id/cardAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/card_spacing"
+                android:clipToOutline="true"
+                android:outlineProvider="background" />
+
             <!-- 聊天功能 -->
             <FrameLayout
                 android:id="@+id/cardChat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:clipToOutline="true"
                 android:outlineProvider="background">
 
@@ -141,23 +230,23 @@
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:paddingTop="17dp"
-                    android:paddingBottom="17dp">
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="聊天功能"
-                        android:textColor="#111111"
-                        android:textSize="17sp"
+                        android:textColor="#000000"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="›"
-                        android:textColor="#8A8F96"
+                        android:textColor="#3A3F44"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -168,7 +257,7 @@
                 android:id="@+id/cardLevel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:clipToOutline="true"
                 android:outlineProvider="background">
 
@@ -179,23 +268,23 @@
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:paddingTop="17dp"
-                    android:paddingBottom="17dp">
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="等级加速"
-                        android:textColor="#111111"
-                        android:textSize="17sp"
+                        android:textColor="#000000"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="›"
-                        android:textColor="#8A8F96"
+                        android:textColor="#3A3F44"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -206,7 +295,7 @@
                 android:id="@+id/cardBasic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:clipToOutline="true"
                 android:outlineProvider="background">
 
@@ -217,23 +306,23 @@
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:paddingTop="17dp"
-                    android:paddingBottom="17dp">
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="基础功能"
-                        android:textColor="#111111"
-                        android:textSize="17sp"
+                        android:textColor="#000000"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="›"
-                        android:textColor="#8A8F96"
+                        android:textColor="#3A3F44"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -244,7 +333,7 @@
                 android:id="@+id/cardDiy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:clipToOutline="true"
                 android:outlineProvider="background">
 
@@ -255,23 +344,23 @@
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:paddingTop="17dp"
-                    android:paddingBottom="17dp">
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="布局"
-                        android:textColor="#111111"
-                        android:textSize="17sp"
+                        android:textColor="#000000"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="›"
-                        android:textColor="#8A8F96"
+                        android:textColor="#3A3F44"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -282,7 +371,7 @@
                 android:id="@+id/cardSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:clipToOutline="true"
                 android:outlineProvider="background">
 
@@ -293,23 +382,23 @@
                     android:orientation="horizontal"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:paddingTop="17dp"
-                    android:paddingBottom="17dp">
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="设置"
-                        android:textColor="#111111"
-                        android:textSize="17sp"
+                        android:textColor="#000000"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="›"
-                        android:textColor="#8A8F96"
+                        android:textColor="#3A3F44"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -317,12 +406,12 @@
             </LinearLayout>
 
             <!-- 基础功能二级内容：QQ保活 + 悬浮窗，两个列表项按 4+4 合并成一张卡。
-                 两行各 72dp 严格等分，分割线正好落在两段正中间。 -->
+                 两行各 @dimen/card_height 严格等分，分割线正好落在两段正中间。 -->
             <FrameLayout
                 android:id="@+id/basicContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:visibility="gone">
 
                 <FrameLayout
@@ -340,7 +429,7 @@
                         <!-- 行1：QQ保活总开关（前台通知 + 后台通知） -->
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="72dp"
+                            android:layout_height="@dimen/card_height"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingStart="16dp"
@@ -356,16 +445,18 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="QQ保活"
-                                    android:textColor="#111111"
-                                    android:textSize="17sp"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/card_title_size"
                                     android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="前台通知 + 后台通知，同时启用"
-                                    android:textColor="#5A6068"
-                                    android:textSize="12sp" />
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                             </LinearLayout>
 
                             <FrameLayout
@@ -377,7 +468,7 @@
                         <!-- 分割线：严格居中，左右缩进与两行内容对齐 -->
                         <View
                             android:layout_width="match_parent"
-                            android:layout_height="1dp"
+                            android:layout_height="1dp" android:layout_marginTop="-1dp"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="16dp"
                             android:background="#1A000000" />
@@ -385,7 +476,7 @@
                         <!-- 行2：从保活里单独拆出的悬浮窗开关，与行1 等高 -->
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="72dp"
+                            android:layout_height="@dimen/card_height"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingStart="16dp"
@@ -401,16 +492,18 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="悬浮窗"
-                                    android:textColor="#111111"
-                                    android:textSize="17sp"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/card_title_size"
                                     android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="1x1 透明悬浮窗，保持进程可见"
-                                    android:textColor="#5A6068"
-                                    android:textSize="12sp" />
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                             </LinearLayout>
 
                             <FrameLayout
@@ -422,14 +515,14 @@
                 </FrameLayout>
             </FrameLayout>
 
-            <!-- 布局二级内容：单行功能卡统一 56dp、卡片间距 12dp、水平内边距 16dp；
-                 双功能 4+4 合并卡为 72dp + 1dp 居中分割线 + 72dp = 145dp。
+            <!-- 布局二级内容：单行功能卡统一 @dimen/card_height、卡片间距 @dimen/card_spacing、水平内边距 16dp；
+                 双功能 4+4 合并卡为 card_height + card_height = 124dp，分割线叠绘不额外占高。
                  同类卡必须完全等高，新增卡片照抄本页固定值，不用 wrap_content + 不对称 padding。 -->
             <LinearLayout
                 android:id="@+id/diyContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:orientation="vertical"
                 android:visibility="gone">
 
@@ -444,7 +537,7 @@
                     <LinearLayout
                         android:id="@+id/bgRow"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/card_height"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
@@ -460,31 +553,31 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="更换节令背景"
-                                android:textColor="#111111"
-                                android:textSize="17sp"
+                                android:textColor="#000000"
+                                android:textSize="@dimen/card_title_size"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="点击选择"
-                                android:textColor="#5A6068"
-                                android:textSize="12sp" />
+                                android:textColor="#1A1A1A"
+                                android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                         </LinearLayout>
 
                         <TextView
                             android:id="@+id/tvCurrentBg"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="#5A6068"
-                            android:textSize="13sp" />
+                            android:textColor="#1A1A1A"
+                            android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:text="›"
-                            android:textColor="#8A8F96"
+                            android:textColor="#3A3F44"
                             android:textSize="18sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -495,14 +588,14 @@
                     android:id="@+id/cardUiStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/card_spacing"
                     android:clipToOutline="true"
                     android:outlineProvider="background">
 
                     <LinearLayout
                         android:id="@+id/uiStyleRow"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/card_height"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
@@ -513,8 +606,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="切换 UI"
-                            android:textColor="#111111"
-                            android:textSize="17sp"
+                            android:textColor="#000000"
+                            android:textSize="@dimen/card_title_size"
                             android:textStyle="bold" />
 
                         <TextView
@@ -523,8 +616,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:text="浅冷灰玻璃"
-                            android:textColor="#5A6068"
-                            android:textSize="13sp" />
+                            android:textColor="#1A1A1A"
+                            android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
 
                         <FrameLayout
                             android:id="@+id/uiStyleSwitchSlot"
@@ -538,14 +631,14 @@
                     android:id="@+id/cardShimmer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/card_spacing"
                     android:clipToOutline="true"
                     android:outlineProvider="background">
 
                     <LinearLayout
                         android:id="@+id/shimmerRow"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/card_height"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
@@ -556,8 +649,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="流光"
-                            android:textColor="#111111"
-                            android:textSize="17sp"
+                            android:textColor="#000000"
+                            android:textSize="@dimen/card_title_size"
                             android:textStyle="bold" />
 
                         <FrameLayout
@@ -572,13 +665,13 @@
                     android:id="@+id/cardLiquidGlassBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/card_spacing"
                     android:clipToOutline="true"
                     android:outlineProvider="background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="@dimen/card_height"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
@@ -594,16 +687,18 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="液态玻璃底部导航栏"
-                                android:textColor="#111111"
-                                android:textSize="17sp"
+                                android:textColor="#000000"
+                                android:textSize="@dimen/card_title_size"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="修改主页底栏 · 重启 QQ 后生效"
-                                android:textColor="#5A6068"
-                                android:textSize="12sp" />
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textColor="#1A1A1A"
+                                android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                         </LinearLayout>
 
                         <FrameLayout
@@ -619,7 +714,7 @@
                 android:id="@+id/detailContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:visibility="gone">
 
                 <!-- DexKit 缓存卡：与等级加速「定时发说说」卡片同构，保持原有卡片尺寸。
@@ -640,7 +735,7 @@
                         <!-- 行1：缓存状态 -->
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="72dp"
+                            android:layout_height="@dimen/card_height"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingStart="16dp"
@@ -656,16 +751,16 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="DexKit 缓存"
-                                    android:textColor="#111111"
-                                    android:textSize="17sp"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/card_title_size"
                                     android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/tvDexDesc"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textColor="#5A6068"
-                                    android:textSize="12sp" />
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                             </LinearLayout>
 
                             <TextView
@@ -674,13 +769,13 @@
                                 android:layout_height="wrap_content"
                                 android:text="读取中..."
                                 android:textColor="#34C759"
-                                android:textSize="13sp" />
+                                android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                         </LinearLayout>
 
                         <!-- 分割线：严格居中，左右缩进与两行内容对齐 -->
                         <View
                             android:layout_width="match_parent"
-                            android:layout_height="1dp"
+                            android:layout_height="1dp" android:layout_marginTop="-1dp"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="16dp"
                             android:background="#1A000000" />
@@ -689,7 +784,7 @@
                         <LinearLayout
                             android:id="@+id/dexRebuildRow"
                             android:layout_width="match_parent"
-                            android:layout_height="72dp"
+                            android:layout_height="@dimen/card_height"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingStart="16dp"
@@ -706,23 +801,25 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="重建 DexKit 缓存"
-                                    android:textColor="#111111"
-                                    android:textSize="17sp"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/card_title_size"
                                     android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="清除缓存并重新扫描，完成后重启 QQ 生效"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
                                     android:textColor="#FF9500"
-                                    android:textSize="12sp" />
+                                    android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                             </LinearLayout>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="›"
-                                android:textColor="#8A8F96"
+                                android:textColor="#3A3F44"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -730,12 +827,20 @@
                 </FrameLayout>
             </FrameLayout>
 
+            <!-- 聊天功能二级内容：卡片由 ChatPanelBuilder 代码生成（按功能清单驱动，避免逐项写 XML） -->
+            <FrameLayout
+                android:id="@+id/chatContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/card_spacing"
+                android:visibility="gone" />
+
             <!-- 等级加速二级内容：定时发说说（开关卡 + 配置卡） -->
             <FrameLayout
                 android:id="@+id/levelContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/card_spacing"
                 android:visibility="gone">
 
                 <LinearLayout
@@ -760,7 +865,7 @@
                             <LinearLayout
                                 android:id="@+id/moodRow"
                                 android:layout_width="match_parent"
-                                android:layout_height="72dp"
+                                android:layout_height="@dimen/card_height"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
                                 android:paddingStart="16dp"
@@ -776,8 +881,8 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="定时发说说"
-                                        android:textColor="#111111"
-                                        android:textSize="17sp"
+                                        android:textColor="#000000"
+                                        android:textSize="@dimen/card_title_size"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -787,8 +892,8 @@
                                         android:ellipsize="end"
                                         android:maxLines="1"
                                         android:text="点击修改内容"
-                                        android:textColor="#5A6068"
-                                        android:textSize="12sp" />
+                                        android:textColor="#1A1A1A"
+                                        android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                                 </LinearLayout>
 
                                 <FrameLayout
@@ -800,7 +905,7 @@
                             <!-- 分割线 -->
                             <View
                                 android:layout_width="match_parent"
-                                android:layout_height="1dp"
+                                android:layout_height="1dp" android:layout_marginTop="-1dp"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginEnd="16dp"
                                 android:background="#1A000000" />
@@ -809,7 +914,7 @@
                             <LinearLayout
                                 android:id="@+id/moodDeleteRow"
                                 android:layout_width="match_parent"
-                                android:layout_height="72dp"
+                                android:layout_height="@dimen/card_height"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
                                 android:paddingStart="16dp"
@@ -825,16 +930,18 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="发布后删除说说"
-                                        android:textColor="#111111"
-                                        android:textSize="17sp"
+                                        android:textColor="#000000"
+                                        android:textSize="@dimen/card_title_size"
                                         android:textStyle="bold" />
 
                                     <TextView
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="发布成功 5 秒后自动删除该条说说，默认关闭"
-                                        android:textColor="#5A6068"
-                                        android:textSize="12sp" />
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="发布成功 5 秒后自动删除该条说说"
+                                        android:textColor="#1A1A1A"
+                                        android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                                 </LinearLayout>
 
                                 <FrameLayout
@@ -850,7 +957,7 @@
                         android:id="@+id/cardCheckin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="@dimen/card_spacing"
                         android:clipToOutline="true"
                         android:outlineProvider="background">
 
@@ -863,7 +970,7 @@
                             <LinearLayout
                                 android:id="@+id/checkinRow"
                                 android:layout_width="match_parent"
-                                android:layout_height="72dp"
+                                android:layout_height="@dimen/card_height"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
                                 android:paddingStart="16dp"
@@ -879,8 +986,8 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="空间等级签到"
-                                        android:textColor="#111111"
-                                        android:textSize="17sp"
+                                        android:textColor="#000000"
+                                        android:textSize="@dimen/card_title_size"
                                         android:textStyle="bold" />
 
                                     <TextView
@@ -890,8 +997,8 @@
                                         android:ellipsize="end"
                                         android:maxLines="1"
                                         android:text="点击修改内容"
-                                        android:textColor="#5A6068"
-                                        android:textSize="12sp" />
+                                        android:textColor="#1A1A1A"
+                                        android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                                 </LinearLayout>
 
                                 <FrameLayout
@@ -903,7 +1010,7 @@
                             <!-- 分割线 -->
                             <View
                                 android:layout_width="match_parent"
-                                android:layout_height="1dp"
+                                android:layout_height="1dp" android:layout_marginTop="-1dp"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginEnd="16dp"
                                 android:background="#1A000000" />
@@ -912,7 +1019,7 @@
                             <LinearLayout
                                 android:id="@+id/checkinDeleteRow"
                                 android:layout_width="match_parent"
-                                android:layout_height="72dp"
+                                android:layout_height="@dimen/card_height"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
                                 android:paddingStart="16dp"
@@ -928,16 +1035,18 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="签到后删除说说"
-                                        android:textColor="#111111"
-                                        android:textSize="17sp"
+                                        android:textColor="#000000"
+                                        android:textSize="@dimen/card_title_size"
                                         android:textStyle="bold" />
 
                                     <TextView
-                                        android:layout_width="wrap_content"
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="发布成功 5 秒后自动删除该条说说，默认关闭"
-                                        android:textColor="#5A6068"
-                                        android:textSize="12sp" />
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="发布成功 5 秒后自动删除该条说说"
+                                        android:textColor="#1A1A1A"
+                                        android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
                                 </LinearLayout>
 
                                 <FrameLayout
@@ -945,6 +1054,252 @@
                                     android:layout_width="52dp"
                                     android:layout_height="32dp" />
                             </LinearLayout>
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <!-- QQ 日签打卡（等级加速） -->
+                    <FrameLayout
+                        android:id="@+id/cardDailySign"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/card_spacing"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background">
+
+                        <LinearLayout
+                            android:id="@+id/dailySignRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/card_height"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="QQ 日签打卡"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/card_title_size"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvDailySignSubtitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="点击修改时间"
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <FrameLayout
+                                android:id="@+id/dailySignSwitchSlot"
+                                android:layout_width="52dp"
+                                android:layout_height="32dp" />
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <!-- 大会员签到（等级加速） -->
+                    <FrameLayout
+                        android:id="@+id/cardBigVip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/card_spacing"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background">
+
+                        <LinearLayout
+                            android:id="@+id/bigVipRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/card_height"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="大会员签到"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/card_title_size"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvBigVipSubtitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="点击修改时间"
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <FrameLayout
+                                android:id="@+id/bigVipSwitchSlot"
+                                android:layout_width="52dp"
+                                android:layout_height="32dp" />
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <!-- 自动加好友（等级加速） -->
+                    <FrameLayout
+                        android:id="@+id/cardAddFriend"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/card_spacing"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background">
+
+                        <LinearLayout
+                            android:id="@+id/addFriendRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/card_height"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="自动加好友"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/card_title_size"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvAddFriendSubtitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="点击修改时间"
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <FrameLayout
+                                android:id="@+id/addFriendSwitchSlot"
+                                android:layout_width="52dp"
+                                android:layout_height="32dp" />
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <!-- 空间浏览（等级加速） -->
+                    <FrameLayout
+                        android:id="@+id/cardSpaceBrowse"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/card_spacing"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background">
+
+                        <LinearLayout
+                            android:id="@+id/spaceBrowseRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/card_height"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="空间浏览"
+                                    android:textColor="#000000"
+                                    android:textSize="@dimen/card_title_size"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvSpaceBrowseSubtitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="点击修改时间"
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="@dimen/card_sub_size" android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <FrameLayout
+                                android:id="@+id/spaceBrowseSwitchSlot"
+                                android:layout_width="52dp"
+                                android:layout_height="32dp" />
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <!-- 运行日志：标题右侧「启动」的执行过程与结果，逐行实时追加 -->
+                    <FrameLayout
+                        android:id="@+id/cardRunLog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/card_spacing"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="运行日志"
+                                android:textColor="#000000"
+                                android:textSize="@dimen/card_title_size"
+                                android:textStyle="bold" />
+
+                            <ScrollView
+                                android:id="@+id/runLogScroll"
+                                android:layout_width="match_parent"
+                                android:layout_height="132dp"
+                                android:layout_marginTop="8dp"
+                                android:scrollbars="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvRunLog"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:lineSpacingExtra="2dp"
+                                    android:text="点右上角「启动」可立即执行全部功能"
+                                    android:textColor="#33404D"
+                                    android:textSize="11sp"
+                                    android:typeface="monospace" />
+                            </ScrollView>
                         </LinearLayout>
                     </FrameLayout>
                 </LinearLayout>

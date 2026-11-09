@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 卡片间距：主页入口卡、各二级页功能卡、聊天功能页卡、搜索结果卡统一间距。
+         单一来源，改这里即可全局生效，避免 XML 与代码各写各的值导致不同步。 -->
+    <dimen name="card_spacing">6dp</dimen>
+    <!-- 子界面功能列表卡统一高度（不含主页入口卡，主页保持自适应）。
+         双行合并卡 = card_height + card_height = 124dp（分割线叠绘，不额外占高）。 -->
+    <dimen name="card_height">62dp</dimen>
+    <!-- 功能列表卡字号：标题与副标题统一。粗体/深色由各处 textStyle、textColor 保证，
+         缩小字号只影响大小，不影响粗细。 -->
+    <dimen name="card_title_size">16sp</dimen>
+    <dimen name="card_sub_size">12sp</dimen>
+</resources>

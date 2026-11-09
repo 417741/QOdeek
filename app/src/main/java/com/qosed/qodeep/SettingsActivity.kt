@@ -2,7 +2,9 @@ package com.qosed.qodeep
 
 import android.content.Context
 import android.content.res.AssetManager
+import android.content.res.Configuration
 import android.content.res.Resources
+import android.util.DisplayMetrics
 import android.graphics.Bitmap
 import android.graphics.BitmapShader
 import android.graphics.Canvas
@@ -12,6 +14,7 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
+import android.graphics.Outline
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
@@ -19,25 +22,163 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.animation.LinearInterpolator
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.qosed.qodeep.chat.ChatConfig
+import com.qosed.qodeep.chat.ChatDetailDialog
+import com.qosed.qodeep.chat.ChatFeatures
+import com.qosed.qodeep.chat.ChatKeys
+import com.qosed.qodeep.chat.ChatPanelBuilder
 import com.qosed.qodeep.levelboost.MoodConfig
 import com.qosed.qodeep.levelboost.MoodScheduler
 import org.json.JSONObject
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.zip.ZipFile
+
+/**
+ * 模块 UI 的唯一尺寸基准：屏幕宽度归一化。
+ *
+ * 不同品牌手机的 PPI、系统「显示大小 / 字体大小」设置各不相同，直接沿用系统
+ * densityDpi 会让同一套 dp/sp 在各手机上占屏比例不同（表现为「别的手机特别大」）。
+ * 这里强制把真实屏幕宽度映射为固定的 [DESIGN_WIDTH_DP]，所有手机一律按同一
+ * 比例绘制：62dp 的卡片在任何品牌手机上都是屏宽的 62/400，完全一致。
+ *
+ * 代码里所有 dp 换算必须走 [dp]，禁止再读 context.resources.displayMetrics.density；
+ * XML 里的 dp/sp 由 [lockedConfig] / [lockedMetrics] 锁定的模块 Resources 解析。
+ */
+object UiScale {
+    /** 设计稿宽度（dp）。改这一处即可整体等比缩放全部界面，一处生效全局统一。
+     *  数值调大 → 界面整体变小；调小 → 整体变大。 */
+    private const val DESIGN_WIDTH_DP = 400f
+
+    @Volatile
+    private var scaleDpi = 0
+
+    /** 所有密度都由整数 densityDpi 导出，保证与系统按 Configuration 重算的结果完全一致。 */
+    val densityDpi: Int get() = if (scaleDpi > 0) scaleDpi else 480
+    val density: Float get() = densityDpi / 160f
+
+    fun init(context: Context) {
+        if (scaleDpi > 0) return
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as? android.view.WindowManager
+        val dm = runCatching {
+            val real = DisplayMetrics()
+            @Suppress("DEPRECATION")
+            wm?.defaultDisplay?.getRealMetrics(real)
+            if (real.widthPixels > 0) real else Resources.getSystem().displayMetrics
+        }.getOrDefault(Resources.getSystem().displayMetrics)
+        // 取物理短边作基准：横竖屏切换不会让界面大小跳动，各品牌按各自短边等比。
+        // getRealMetrics 给的是物理像素，不受系统「显示大小 / 字体大小」设置影响。
+        // 关键：UI 与背景封面都用屏幕比例缩放，才能保证列表和背景的相对位置、
+        // 遮挡关系在不同分辨率的手机上完全一致。
+        val short = minOf(dm.widthPixels, dm.heightPixels)
+        if (short > 0) scaleDpi = ((short / DESIGN_WIDTH_DP) * 160f + 0.5f).toInt().coerceIn(160, 1280)
+    }
+
+    fun lockedConfig(base: Configuration): Configuration = Configuration(base).apply {
+        fontScale = 1.0f
+        densityDpi = this@UiScale.densityDpi
+        // 不动 screenWidthDp / smallestScreenWidthDp：它们决定资源限定符选择，
+        // 改了会让 QQ 壳主题选到另一套资源（寄生环境有 Resources$NotFoundException 风险）。
+        // 尺寸一致性只需 density，与这两个字段无关。
+    }
+
+    fun lockedMetrics(base: DisplayMetrics): DisplayMetrics = DisplayMetrics().apply {
+        setTo(base)
+        density = this@UiScale.density
+        densityDpi = this@UiScale.densityDpi
+        scaledDensity = density
+    }
+
+    fun dp(v: Int): Int = (v * density + 0.5f).toInt()
+    fun dp(v: Float): Float = v * density
+
+    /**
+     * 把一棵刚 inflate 出来的 View 树里已解析成 px 的尺寸，按
+     * 「UiScale 目标密度 / 实际 inflate 密度」重算一遍。
+     *
+     * 这是跨品牌一致的硬兜底：不依赖 createPackageContext / Configuration /
+     * DisplayMetrics 锁定是否生效（寄生环境里这些都可能被宿主 QQ 绕过），
+     * 只改 View 上已经算好的 px，任何路径下都必然生效。
+     */
+    fun normalize(root: android.view.View) {
+        // 直接取 View 自己解析 XML 属性时用的 Resources，避免外部传错 Context
+        val dm = root.resources.displayMetrics
+        val kLayout = if (dm.density > 0f) density / dm.density else 1f
+        val kText = if (dm.scaledDensity > 0f) density / dm.scaledDensity else kLayout
+        // 总是遍历：k=1 时乘 1 幂等，但把 sp 语义的字号固化成 px，
+        // 后续系统字体设置变化也不会再影响已生成的界面。
+        normalizeView(root, kLayout, kText)
+    }
+
+    private fun normalizeView(v: android.view.View, k: Float, kt: Float) {
+        v.layoutParams?.let { lp ->
+            if (lp.width > 0) lp.width = (lp.width * k + 0.5f).toInt()
+            if (lp.height > 0) lp.height = (lp.height * k + 0.5f).toInt()
+            if (lp is android.view.ViewGroup.MarginLayoutParams) {
+                lp.topMargin = (lp.topMargin * k).toInt()
+                lp.bottomMargin = (lp.bottomMargin * k).toInt()
+                // layout_marginStart/End 是独立字段，只改 left/right 会漏掉
+                if (lp.isMarginRelative) {
+                    lp.marginStart = (lp.marginStart * k).toInt()
+                    lp.marginEnd = (lp.marginEnd * k).toInt()
+                } else {
+                    lp.leftMargin = (lp.leftMargin * k).toInt()
+                    lp.rightMargin = (lp.rightMargin * k).toInt()
+                }
+            }
+            v.layoutParams = lp
+        }
+        // paddingStart/End 同理，用 setPaddingRelative 才不会丢相对 padding
+        v.setPaddingRelative(
+            (v.paddingStart * k).toInt(), (v.paddingTop * k).toInt(),
+            (v.paddingEnd * k).toInt(), (v.paddingBottom * k).toInt()
+        )
+        if (v.minimumHeight > 0) v.minimumHeight = (v.minimumHeight * k).toInt()
+        if (v.minimumWidth > 0) v.minimumWidth = (v.minimumWidth * k).toInt()
+        if (v is TextView) {
+            v.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, v.textSize * kt)
+            if (v.compoundDrawablePadding != 0) {
+                v.compoundDrawablePadding = (v.compoundDrawablePadding * k).toInt()
+            }
+            if (v.lineSpacingExtra != 0f) {
+                v.setLineSpacing(v.lineSpacingExtra * k, v.lineSpacingMultiplier)
+            }
+        }
+        if (v is android.view.ViewGroup) {
+            for (i in 0 until v.childCount) normalizeView(v.getChildAt(i), k, kt)
+        }
+    }
+}
+
+/**
+ * 模块 UI 字号统一入口：直接按 UiScale 写成 px。
+ * 直接给 textSize 赋值是 sp 语义，会再乘 View 的 scaledDensity（跟随系统字体大小），
+ * 在寄生环境里 View 的 Context 可能是 QQ 宿主，字号就不可控了。
+ */
+fun TextView.fixedTextSize(sp: Float) {
+    setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, UiScale.dp(sp))
+}
 
 /**
  * 进程内封面位图缓存。
@@ -77,6 +218,40 @@ class SettingsActivity : ComponentActivity() {
 
     private val main = Handler(Looper.getMainLooper())
     private var animLoadedKey: String? = null
+
+    /** 复读图标选择器：选完把图片拷到模块数据目录，路径存 chat.json。 */
+    private val repeatIconPicker = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            Thread {
+                try {
+                    val dir = File(Env.moduleDataDir, "data")
+                    dir.mkdirs()
+                    val file = File(dir, "repeat_icon.img")
+                    contentResolver.openInputStream(uri)?.use { input ->
+                        file.outputStream().use { output -> input.copyTo(output) }
+                    }
+                    ChatConfig.putString("repeat_msg_icon", file.absolutePath)
+                    main.post {
+                        android.widget.Toast.makeText(
+                            applicationContext, "复读图标已更新", android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } catch (t: Throwable) {
+                    android.util.Log.w("QOdeep", "保存复读图标失败: $t")
+                }
+            }.start()
+        } else {
+            // 取消选择 = 清空自定义图标，回到默认纸飞机
+            ChatConfig.putString("repeat_msg_icon", "")
+            main.post {
+                android.widget.Toast.makeText(
+                    applicationContext, "已恢复默认图标", android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
     /** 首页标题图标是否在自转（时钟驱动，与入口头像同步）；二级页/暂停时置 false。 */
     @Volatile
     private var titleSpinning = false
@@ -93,6 +268,24 @@ class SettingsActivity : ComponentActivity() {
         javaClass.classLoader ?: super.getClassLoader()
 
     /**
+     * 只覆盖 Configuration，绝不替换资源表：QQ 壳主题引用的资源 ID 仍在原表里可正常解析，
+     * 因此不会触发寄生环境的 Resources$NotFoundException。
+     */
+    private fun lockedUiConfig(res: Resources): Configuration = UiScale.lockedConfig(res.configuration)
+
+
+
+    override fun attachBaseContext(newBase: Context) {
+        UiScale.init(newBase)
+        super.attachBaseContext(newBase)
+        // 只覆盖 Configuration，绝不直接改 Activity.resources.displayMetrics：
+        // 寄生环境那是 QQ 宿主共享的 Resources 实例，改了会影响整个 QQ 进程。
+        // 模块 UI 全部用 mctx 的独立锁定 Resources，见 moduleContext()。
+        runCatching { applyOverrideConfiguration(UiScale.lockedConfig(newBase.resources.configuration)) }
+            .onFailure { android.util.Log.w("QOdeep", "锁定 UI 缩放失败: $it") }
+    }
+
+    /**
      * 寄生环境关键 2：Activity 的 getResources() 默认是 QQ 宿主 APK 的资源表，
      * 而 R.layout.activity_settings / @drawable/bg_frosted_card 等都是模块 APK 的资源 ID，
      * 在 QQ 资源表里不存在 → setContentView 抛 Resources$NotFoundException。
@@ -107,6 +300,9 @@ class SettingsActivity : ComponentActivity() {
 
     private fun moduleContext(): Context {
         moduleCtx?.let { return it }
+        // attachBaseContext 在寄生环境未必被调到，这里再算一次（幂等），
+        // 保证 UiScale 一定拿到真实屏幕物理短边。
+        UiScale.init(this)
         // 首选：模块是正常安装的 APK，用 createPackageContext 拿模块自己的 Resources/ClassLoader。
         // 全程系统封装，不反射 AssetManager、不手动 addAssetPath/addLoaders，
         // 在 MIUI/Android 14 上不会出现空资源表或 hidden API 失败。
@@ -114,9 +310,28 @@ class SettingsActivity : ComponentActivity() {
             createPackageContext(
                 MODULE_PACKAGE,
                 Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
-            ).let {
-                moduleCtx = it
-                return it
+            ).let { base ->
+                // 只让资源走锁定配置，Context 本身（theme / ClassLoader）保持原样，
+                // 避免 createConfigurationContext 丢掉壳主题导致 inflate 解析 ?attr 失败
+                val lockedRes = base.createConfigurationContext(lockedUiConfig(base.resources)).resources
+                // 直接强制 DisplayMetrics：XML inflate 时所有 dp/sp 都按这三个值换算，
+                // 不依赖 ROM 是否真的把 Configuration.densityDpi 应用到 metrics
+                lockedRes.displayMetrics.apply {
+                    density = UiScale.density
+                    densityDpi = UiScale.densityDpi
+                    scaledDensity = UiScale.density
+                }
+                moduleCtx = object : android.content.ContextWrapper(base) {
+                    override fun getResources(): Resources = lockedRes
+                    override fun getSystemService(name: String): Any? {
+                        if (name == Context.LAYOUT_INFLATER_SERVICE) {
+                            val raw = super.getSystemService(name)
+                            if (raw is android.view.LayoutInflater) return raw.cloneInContext(this)
+                        }
+                        return super.getSystemService(name)
+                    }
+                }
+                return moduleCtx!!
             }
         } catch (t: Throwable) {
             android.util.Log.w("QOdeep", "createPackageContext 失败，回退 buildModuleResources: $t")
@@ -148,7 +363,12 @@ class SettingsActivity : ComponentActivity() {
                 return built
             }
         }
-        android.util.Log.w("QOdeep", "moduleContext 全部失败，退回宿主 resources")
+        android.util.Log.w("QOdeep", "moduleContext 资源表全失败，改用宿主 Context + 锁定尺寸重算")
+        // 绝不直接 return this：那样 inflate 会完全沿用 QQ 宿主的 density/fontScale，
+        // 各品牌手机、系统「显示大小/字体大小」都会把同一套布局渲染成不同大小。
+        // 此时 mctx 只能是 `this`，但 inflate 后会走 normalizeUi() 把 px 尺寸重算，
+        // 这条路径同样得到与 UiScale 一致的结果。
+        moduleCtx = this
         return this
     }
 
@@ -159,6 +379,9 @@ class SettingsActivity : ComponentActivity() {
      * - Android 10 及以下：回退反射 addAssetPath。
      */
     private fun buildModuleResources(apkPath: String, base: Resources): Resources {
+        // 与 lockedUiConfig 同一套缩放：density / scaledDensity 都取 UiScale 的归一化值
+        val cfg = UiScale.lockedConfig(base.configuration)
+        val dm = UiScale.lockedMetrics(base.displayMetrics)
         if (Build.VERSION.SDK_INT >= 30) {
             val pfd = android.os.ParcelFileDescriptor.open(
                 File(apkPath), android.os.ParcelFileDescriptor.MODE_READ_ONLY
@@ -168,7 +391,7 @@ class SettingsActivity : ComponentActivity() {
             val am = AssetManager::class.java.getDeclaredConstructor()
                 .apply { isAccessible = true }
                 .newInstance()
-            return Resources(am, base.displayMetrics, base.configuration).apply {
+            return Resources(am, dm, cfg).apply {
                 addLoaders(loader)
             }
         }
@@ -177,7 +400,7 @@ class SettingsActivity : ComponentActivity() {
             .getDeclaredMethod("addAssetPath", String::class.java)
             .apply { isAccessible = true }
             .invoke(am, apkPath)
-        return Resources(am, base.displayMetrics, base.configuration)
+        return Resources(am, dm, cfg)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -278,6 +501,10 @@ class SettingsActivity : ComponentActivity() {
             android.view.LayoutInflater.from(this)
                 .inflate(R.layout.activity_settings, null, false)
         }
+        // 关键：无论上面走哪条路径，都把已解析成 px 的尺寸重算到统一基准，
+        // 让所有品牌手机 / 系统字体设置下渲染结果完全一致。
+        runCatching { UiScale.normalize(content) }
+            .onFailure { android.util.Log.w("QOdeep", "UI 尺寸归一化失败: $it") }
         setContentView(content)
 
         val root = findViewById<FrameLayout>(R.id.root)
@@ -294,6 +521,7 @@ class SettingsActivity : ComponentActivity() {
         val bgAnim = findViewById<WebView>(R.id.bgAnim)
         val tvHint = findViewById<TextView>(R.id.tvHint)
         val cardTitle = findViewById<FrameLayout>(R.id.cardTitle)
+        val cardAccount = findViewById<FrameLayout>(R.id.cardAccount)
         val cardBg = findViewById<FrameLayout>(R.id.cardBg)
         val cardDexkit = findViewById<FrameLayout>(R.id.cardDexkit)
         val cardSettings = findViewById<FrameLayout>(R.id.cardSettings)
@@ -329,11 +557,32 @@ class SettingsActivity : ComponentActivity() {
         val checkinSwitchSlot = findViewById<FrameLayout>(R.id.checkinSwitchSlot)
         val checkinDeleteSwitchSlot = findViewById<FrameLayout>(R.id.checkinDeleteSwitchSlot)
         val tvCheckinSubtitle = findViewById<TextView>(R.id.tvCheckinSubtitle)
+        val cardDailySign = findViewById<FrameLayout>(R.id.cardDailySign)
+        val dailySignRow = findViewById<LinearLayout>(R.id.dailySignRow)
+        val dailySignSwitchSlot = findViewById<FrameLayout>(R.id.dailySignSwitchSlot)
+        val tvDailySignSubtitle = findViewById<TextView>(R.id.tvDailySignSubtitle)
+        val cardBigVip = findViewById<FrameLayout>(R.id.cardBigVip)
+        val bigVipRow = findViewById<LinearLayout>(R.id.bigVipRow)
+        val bigVipSwitchSlot = findViewById<FrameLayout>(R.id.bigVipSwitchSlot)
+        val tvBigVipSubtitle = findViewById<TextView>(R.id.tvBigVipSubtitle)
+        val cardAddFriend = findViewById<FrameLayout>(R.id.cardAddFriend)
+        val addFriendRow = findViewById<LinearLayout>(R.id.addFriendRow)
+        val addFriendSwitchSlot = findViewById<FrameLayout>(R.id.addFriendSwitchSlot)
+        val tvAddFriendSubtitle = findViewById<TextView>(R.id.tvAddFriendSubtitle)
+        val cardSpaceBrowse = findViewById<FrameLayout>(R.id.cardSpaceBrowse)
+        val spaceBrowseRow = findViewById<LinearLayout>(R.id.spaceBrowseRow)
+        val spaceBrowseSwitchSlot = findViewById<FrameLayout>(R.id.spaceBrowseSwitchSlot)
+        val tvSpaceBrowseSubtitle = findViewById<TextView>(R.id.tvSpaceBrowseSubtitle)
+        val cardRunLog = findViewById<FrameLayout>(R.id.cardRunLog)
+        val chatContent = findViewById<FrameLayout>(R.id.chatContent)
+        val runLogScroll = findViewById<ScrollView>(R.id.runLogScroll)
+        val tvRunLog = findViewById<TextView>(R.id.tvRunLog)
+        val btnRunAll = findViewById<TextView>(R.id.btnRunAll)
 
         // 卡片液态玻璃：统一走 LiquidGlass 设计系统（浅冷灰透明玻璃 + 细白描边 + 大圆角）。
         // 不用 XML drawable —— 寄生环境资源引用不可靠，圆角还决定玻璃层的裁剪轮廓。
         // detailContent 只作二级内容容器，本身不做玻璃卡；DexKit 卡已移入其中，单独保持玻璃质感
-        val glassCards = listOf(cardTitle, cardBg, cardDiy, cardDexkit, cardSettings, cardChat, cardLevel, cardMoodSwitch, cardCheckin, cardUiStyle, cardShimmer, cardLiquidGlassBar, cardBasic, cardKeepAlive)
+        val glassCards = listOf(cardTitle, cardAccount, cardBg, cardDiy, cardDexkit, cardSettings, cardChat, cardLevel, cardMoodSwitch, cardCheckin, cardDailySign, cardBigVip, cardAddFriend, cardSpaceBrowse, cardRunLog, cardUiStyle, cardShimmer, cardLiquidGlassBar, cardBasic, cardKeepAlive, findViewById<View>(R.id.searchBox))
 
         // 四档 UI 风格：
         //  0 第一套（默认）：浅冷灰透明玻璃 + 蓝色流光
@@ -353,10 +602,13 @@ class SettingsActivity : ComponentActivity() {
         // 流光开关：默认开启
         LiquidGlass.shimmerOn = uiPrefs.getBoolean("shimmer_on", true)
 
+        // 聊天功能页卡片是运行时生成的，风格切换时一并重刷（详情卡区在页面下面的 chatPanel 里）
+        var chatPanel: ChatPanelBuilder? = null
+
         fun applyUiStyle(mode: Int) {
             LiquidGlass.uiMode = mode
             LiquidGlass.iceUi = mode == 1
-            for (c in glassCards) {
+            for (c in glassCards + (chatPanel?.glassCards ?: emptyList())) {
                 when (mode) {
                     1 -> LiquidGlass.applyIceFrosted(c)
                     2 -> LiquidGlass.applyLiquidFrosted(c)
@@ -372,6 +624,165 @@ class SettingsActivity : ComponentActivity() {
             }
         }
         applyUiStyle(uiMode)
+
+        // ---- 账号卡：收起显示头像+昵称+QQ号，点击展开模块版本与 QQ 版本 ----
+        // 数据全部走 HostEnv（等价 QE 旧版 MobileQQ.peekAppRuntime() 反射）：
+        // uin 用 getCurrentAccountUin，昵称用 getCurrentNickname/getCurrentAccount 多级反射，
+        // 不联网、不受公开接口缓存影响，换头像/昵称后实时读新值。
+        runCatching {
+            val dp = UiScale.density
+            fun Int.dpx() = (this * dp).toInt()
+
+            fun readNickFromObj(obj: Any?): String? {
+                if (obj == null) return null
+                for (f in arrayOf("nickname", "nickName", "mNickname", "strNick")) {
+                    val v = com.qosed.qodeep.chat.ChatRef.getString(obj, f)
+                    if (!v.isNullOrEmpty()) return v
+                }
+                for (m in arrayOf("getNickname", "getNick")) {
+                    val v = com.qosed.qodeep.chat.ChatRef.invoke(obj, com.qosed.qodeep.chat.ChatRef.methodByName(obj.javaClass, m, 0)) as? String
+                    if (!v.isNullOrEmpty()) return v
+                }
+                return null
+            }
+            fun resolveNickname(): String {
+                val app = com.qosed.qodeep.chat.qq.HostEnv.appRuntime() ?: return ""
+                // 1) getCurrentNickname()
+                var v = com.qosed.qodeep.chat.ChatRef.invoke(app, com.qosed.qodeep.chat.ChatRef.methodByName(app.javaClass, "getCurrentNickname", 0)) as? String
+                if (!v.isNullOrEmpty()) return v
+                // 2) getCurrentAccount() 返回对象里读昵称
+                val acct = com.qosed.qodeep.chat.ChatRef.invoke(app, com.qosed.qodeep.chat.ChatRef.methodByName(app.javaClass, "getCurrentAccount", 0))
+                v = readNickFromObj(acct)
+                if (!v.isNullOrEmpty()) return v
+                // 3) currentAccount 字段
+                v = readNickFromObj(com.qosed.qodeep.chat.ChatRef.getField(app, "currentAccount"))
+                if (!v.isNullOrEmpty()) return v
+                // 4) 直接读 app 上的昵称字段
+                return readNickFromObj(app).orEmpty()
+            }
+
+            val accountUin = com.qosed.qodeep.chat.qq.HostEnv.currentUin()
+            val nickname = resolveNickname()
+
+            val panel = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(16.dpx(), 14.dpx(), 16.dpx(), 14.dpx())
+            }
+
+            // 头像：透明头像直接透出卡片背景，不垫白底；加载完成前用浅灰圆形占位
+            val avatarBox = FrameLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(56.dpx(), 56.dpx()).apply { marginEnd = 12.dpx() }
+            }
+            val avatar = ImageView(this).apply {
+                layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setBackgroundColor(0x1A000000)
+                clipToOutline = true
+                outlineProvider = object : ViewOutlineProvider() {
+                    override fun getOutline(view: View, outline: Outline) {
+                        outline.setOval(0, 0, view.width, view.height)
+                    }
+                }
+            }
+            avatarBox.addView(avatar)
+
+            val nameCol = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            val tvName = TextView(this).apply {
+                text = nickname.ifEmpty { "QQ用户" }
+                textSize = 18f
+                setTextColor(0xFF000000.toInt())
+                typeface = Typeface.defaultFromStyle(Typeface.BOLD)
+            }
+            val tvUin = TextView(this).apply {
+                textSize = 14f
+                text = SpannableStringBuilder("QQ: ").apply {
+                    setSpan(ForegroundColorSpan(0xFF9E9E9E.toInt()), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    append(accountUin.ifEmpty { "未知" })
+                    setSpan(ForegroundColorSpan(0xFF1A1A1A.toInt()), 4, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }
+            nameCol.addView(tvName)
+            nameCol.addView(tvUin)
+
+            val headRow = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            headRow.addView(avatarBox)
+            headRow.addView(nameCol)
+            panel.addView(headRow)
+
+            // 展开区：分隔线 + 模块版本 / QQ 版本两行，默认隐藏
+            val expandView = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; visibility = View.GONE }
+            expandView.addView(View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1.dpx()).apply { topMargin = 12.dpx() }
+                setBackgroundColor(0x1A000000)
+            })
+            fun versionRow(label: String, value: String): View = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 10.dpx(), 0, 0)
+                addView(TextView(this@SettingsActivity).apply {
+                    text = label; textSize = 15f; setTextColor(0xFF9E9E9E.toInt())
+                })
+                addView(TextView(this@SettingsActivity).apply {
+                    text = value; textSize = 16f; setTextColor(0xFF1A1A1A.toInt())
+                    typeface = Typeface.defaultFromStyle(Typeface.BOLD)
+                    gravity = Gravity.END
+                    layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                })
+            }
+            // 模块版本：直接读模块 APK 的 versionName（寄生环境查模块包信息会被拒，BuildConfig 又未开启生成）
+            val moduleVer = runCatching {
+                val pm = packageManager
+                val apk = Env.moduleApkPath.ifEmpty { applicationInfo.sourceDir }
+                pm.getPackageArchiveInfo(apk, 0)?.versionName.orEmpty()
+            }.getOrDefault("")
+            val qqVer = runCatching { packageManager.getPackageInfo(packageName, 0).versionName.orEmpty() }.getOrDefault("")
+            expandView.addView(versionRow("模块版本", moduleVer.ifEmpty { "未知" }))
+            expandView.addView(versionRow("QQ版本", qqVer.ifEmpty { "未知" }))
+            panel.addView(expandView)
+
+            cardAccount.addView(panel)
+
+            // 点击切换展开/收起
+            var expanded = false
+            cardAccount.setOnClickListener {
+                expanded = !expanded
+                expandView.visibility = if (expanded) View.VISIBLE else View.GONE
+            }
+
+            // 头像：QQ 官方头像接口 + 时间戳参数，换头像后加载到新图（避免 Glide 缓存旧图）
+            if (accountUin.isNotEmpty()) {
+                val faceUrl = "https://q1.qlogo.cn/g?b=qq&nk=$accountUin&s=100&t=${System.currentTimeMillis()}"
+                runCatching {
+                    Glide.with(this)
+                        .load(faceUrl)
+                        .into(avatar)
+                }
+            }
+        }.onFailure { android.util.Log.w("QOdeep", "账号卡构建失败: $it") }
+
+        // 聊天功能页：卡片由功能清单驱动生成，开关直接写 chat.json（宿主 hook 每次回调读文件）
+        runCatching {
+            val panel = ChatPanelBuilder(
+                context = mctx,
+                onSwitchChanged = { f, on ->
+                    if (on && ChatFeatures.NEEDS_RESTART.contains(f.key)) {
+                        android.widget.Toast.makeText(applicationContext, "已启用，重启 QQ 后生效", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                },
+                onDetail = { f ->
+                    if (f.key == ChatKeys.REPEAT_MSG) {
+                        repeatIconPicker.launch("image/*")
+                    } else {
+                        ChatDetailDialog.show(this, f, mctx)
+                    }
+                }
+            )
+            chatPanel = panel
+            chatContent.addView(panel.build())
+            applyUiStyle(uiMode)
+        }.onFailure { android.util.Log.w("QOdeep", "聊天功能页构建失败: $it") }
 
         // 圆形返回按钮：QQ 原生式纯白底 + 短款 Material 向左箭头（全代码绘制，不依赖 XML drawable）
         btnBack.background = GradientDrawable().apply {
@@ -399,6 +810,8 @@ class SettingsActivity : ComponentActivity() {
             titleIcon.visibility = View.GONE  // 二级界面一律不显示首页头像
             stopTitleSpin()                // 二级页停转，不空耗刷新
             btnBack.visibility = View.VISIBLE  // 标题栏内部左侧出现圆形返回箭头
+            // 「启动」按钮只属于等级加速页：点了就无视开关与当日标记立即执行全部功能
+            btnRunAll.visibility = if (title == "等级加速") View.VISIBLE else View.GONE
             mainCards.visibility = View.GONE   // 隐藏主页卡片列表
             // 设置页下方显示 DexKit 缓存卡；等级加速页显示定时发说说卡；布局页显示更换背景卡；
             // 基础功能页显示 QQ保活 + 悬浮窗合并卡；聊天功能只保留标题
@@ -406,10 +819,12 @@ class SettingsActivity : ComponentActivity() {
             detailContent.visibility = if (title == "设置") View.VISIBLE else View.GONE
             levelContent.visibility = if (title == "等级加速") View.VISIBLE else View.GONE
             basicContent.visibility = if (title == "基础功能") View.VISIBLE else View.GONE
+            chatContent.visibility = if (title == "聊天功能") View.VISIBLE else View.GONE
         }
         fun backHome() {
             tvTitle.text = "豆包"
             btnBack.visibility = View.GONE
+            btnRunAll.visibility = View.GONE
             if (iconBmp != null) {
                 titleIcon.visibility = View.VISIBLE
                 startTitleSpin()           // 回首页接着转，角度由时钟推导、不重置
@@ -418,23 +833,255 @@ class SettingsActivity : ComponentActivity() {
             detailContent.visibility = View.GONE
             levelContent.visibility = View.GONE
             basicContent.visibility = View.GONE
+            chatContent.visibility = View.GONE
             mainCards.visibility = View.VISIBLE
         }
-        btnBack.setOnClickListener { backHome() }
+        // 返回箭头的点击在搜索逻辑定义之后注册（需访问 searchPanel / closeSearch）
         cardSettings.setOnClickListener { openDetail("设置") }
         cardDiy.setOnClickListener { openDetail("布局") }
         cardChat.setOnClickListener { openDetail("聊天功能") }
         cardLevel.setOnClickListener { openDetail("等级加速") }
         cardBasic.setOnClickListener { openDetail("基础功能") }
 
+        // ---- 搜索：标题栏右侧黑色放大镜，首页与所有二级界面常驻。
+        // 点击弹出标题下方搜索框，实时过滤全部功能项，点结果跳到对应页并滚动定位。
+        // 图标与搜索框背景全部代码绘制（寄生环境不引用 XML drawable）。 ----
+        val btnSearch = findViewById<ImageView>(R.id.btnSearch)
+        val searchPanel = findViewById<LinearLayout>(R.id.searchPanel)
+        val searchBox = findViewById<View>(R.id.searchBox)
+        val etSearch = findViewById<EditText>(R.id.etSearch)
+        val searchResults = findViewById<LinearLayout>(R.id.searchResults)
+        val ivSearchInBox = findViewById<ImageView>(R.id.ivSearchInBox)
+        val scrollHost = findViewById<ScrollView>(R.id.scroll)
+        // 所有动态尺寸/字号统一取 UiScale 的归一化基准，不再读任何 Context 的 density
+        val uiRes = mctx.resources
+        fun sdp(v: Int): Int = UiScale.dp(v)
+        fun sdpf(v: Float): Float = UiScale.dp(v)
+        // 返回 UiScale 基准下的 px：getDimension 是 sp*scaledDensity，换算到 UiScale.density
+        fun sspDimen(id: Int): Float {
+            val sd = uiRes.displayMetrics.scaledDensity
+            return uiRes.getDimension(id) * (UiScale.density / sd)
+        }
+        // dimen 的 px 按实际 density 还原为 dp，再乘目标密度，跨品牌恒定
+        fun sdim(id: Int): Int = UiScale.dp(uiRes.getDimension(id) / uiRes.displayMetrics.density).toInt()
+        btnSearch.setImageDrawable(MaterialSearchIconDrawable(0xFF1A1A1A.toInt()))
+        ivSearchInBox.setImageDrawable(MaterialSearchIconDrawable(0xFF9E9E9E.toInt()))
+
+        class Entry(val group: String, val title: String, val sub: String, val target: View)
+
+        // 收集文本：递归取容器内前两个非空 TextView 文本（标题 + 副标题/状态）
+        fun textsOf(root: View): List<String> {
+            val out = mutableListOf<String>()
+            fun walk(v: View) {
+                if (out.size >= 2) return
+                if (v is TextView && !v.text.isNullOrBlank()) out += v.text.toString().trim()
+                if (v is ViewGroup) for (i in 0 until v.childCount) walk(v.getChildAt(i))
+            }
+            walk(root)
+            return out
+        }
+
+        // 构建索引：主页 + 各二级页/聊天功能页内的每张功能卡。
+        // 直接遍历现有视图树，无需另维护一份功能清单，新增卡片自动可搜。
+        // 判定规则：只把「直接子节点里就有标题文本」的容器当成一张卡，否则继续深入。
+        // 之前用"容器里能找到任何文本就记卡"，二级页的外层包装容器会把整页吞成
+        // 一条（只取到第一张卡的标题），页内其余功能全部搜不到。
+        fun buildIndex(): List<Entry> {
+            val list = mutableListOf<Entry>()
+            val pages = listOf(
+                "首页" to mainCards, "布局" to diyContent, "设置" to detailContent,
+                "等级加速" to levelContent, "基础功能" to basicContent,
+                "聊天功能" to chatContent
+            )
+            for ((group, container) in pages) {
+                fun collect(v: ViewGroup) {
+                    for (i in 0 until v.childCount) {
+                        val c = v.getChildAt(i)
+                        if (c.visibility == View.GONE) continue
+                        var hasDirectText = false
+                        if (c is ViewGroup) {
+                            for (j in 0 until c.childCount) {
+                                if (c.getChildAt(j) is TextView) { hasDirectText = true; break }
+                            }
+                        }
+                        if (hasDirectText) {
+                            val t = textsOf(c)
+                            // 超长文本是日志/状态区，不是功能标题，跳过
+                            if (t.isNotEmpty() && t[0].length <= 20) {
+                                list += Entry(group, t[0], t.getOrElse(1) { "" }, c)
+                            }
+                        } else if (c is ViewGroup) collect(c)
+                    }
+                }
+                if (container is ViewGroup) collect(container)
+            }
+            return list
+        }
+
+        // 目标 View 在 ScrollView 内容里累计的 Y 偏移，用于结果定位滚动
+        fun offsetInScroll(v: View): Int {
+            var y = 0
+            var cur: View = v
+            while (cur !== scrollHost && cur.parent is View) {
+                y += cur.top
+                cur = cur.parent as View
+            }
+            return y
+        }
+
+        var searchIndex: List<Entry>? = null
+
+        // 搜索前所在页面：null=主页，其余为二级页标题。
+        // 搜索全程不改变标题栏与各页面状态，关闭时原地恢复，
+        // 避免「在聊天功能里点搜索却先跳回主界面」。
+        var searchFrom: String? = null
+
+        fun currentPage(): String? = when {
+            diyContent.visibility == View.VISIBLE -> "布局"
+            detailContent.visibility == View.VISIBLE -> "设置"
+            levelContent.visibility == View.VISIBLE -> "等级加速"
+            basicContent.visibility == View.VISIBLE -> "基础功能"
+            chatContent.visibility == View.VISIBLE -> "聊天功能"
+            else -> null
+        }
+
+        fun showPageContent(page: String?) {
+            mainCards.visibility = if (page == null) View.VISIBLE else View.GONE
+            diyContent.visibility = if (page == "布局") View.VISIBLE else View.GONE
+            detailContent.visibility = if (page == "设置") View.VISIBLE else View.GONE
+            levelContent.visibility = if (page == "等级加速") View.VISIBLE else View.GONE
+            basicContent.visibility = if (page == "基础功能") View.VISIBLE else View.GONE
+            chatContent.visibility = if (page == "聊天功能") View.VISIBLE else View.GONE
+        }
+
+        fun hideAllPageContent() {
+            mainCards.visibility = View.GONE
+            diyContent.visibility = View.GONE
+            detailContent.visibility = View.GONE
+            levelContent.visibility = View.GONE
+            basicContent.visibility = View.GONE
+            chatContent.visibility = View.GONE
+        }
+
+        fun closeSearch(goHome: Boolean = true) {
+            searchPanel.visibility = View.GONE
+            etSearch.setText("")
+            runCatching {
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                imm.hideSoftInputFromWindow(etSearch.windowToken, 0)
+            }
+            if (goHome) showPageContent(searchFrom)
+            searchFrom = null
+        }
+
+        btnBack.setOnClickListener {
+            if (searchPanel.visibility == View.VISIBLE) closeSearch() else backHome()
+        }
+
+        fun renderResults(query: String) {
+            val q = query.trim()
+            // 未输入关键字：不显示结果列表，恢复进入搜索前的页面，UI 与打开前完全一致
+            if (q.isEmpty()) {
+                searchResults.removeAllViews()
+                showPageContent(searchFrom)
+                return
+            }
+            if (searchIndex == null) searchIndex = buildIndex()
+            val items = searchIndex!!.filter {
+                it.title.contains(q, true) || it.sub.contains(q, true) || it.group.contains(q, true)
+            }
+            searchResults.removeAllViews()
+            hideAllPageContent()
+            if (items.isEmpty()) {
+                val empty = TextView(mctx).apply {
+                    text = "没有匹配的功能"
+                    setTextColor(0xFF3A3F44.toInt())
+                    fixedTextSize(14f)
+                    gravity = Gravity.CENTER
+                    setPadding(0, sdp(28), 0, sdp(28))
+                }
+                searchResults.addView(empty)
+                return
+            }
+            for (e in items) {
+                val row = LinearLayout(mctx).apply {
+                    orientation = LinearLayout.VERTICAL
+                    // 结果卡用与主题完全一致的玻璃背景（四档 UI 同款，含流光）
+                    when (LiquidGlass.uiMode) {
+                        1 -> LiquidGlass.applyIceFrosted(this)
+                        2 -> LiquidGlass.applyLiquidFrosted(this)
+                        3 -> LiquidGlass.applyDropletFrosted(this)
+                        else -> LiquidGlass.applyFrosted(this)
+                    }
+                    setPadding(sdp(18), sdp(15), sdp(18), sdp(15))
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { topMargin = sdim(R.dimen.card_spacing) }
+                }
+                row.addView(TextView(mctx).apply {
+                    text = e.title
+                    setTextColor(0xFF000000.toInt())
+                    setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, sspDimen(R.dimen.card_title_size))
+                    setTypeface(typeface, Typeface.BOLD)
+                })
+                val subLine = buildString {
+                    append(e.group)
+                    if (e.sub.isNotBlank() && e.sub != e.title) append(" · ").append(e.sub)
+                }
+                row.addView(TextView(mctx).apply {
+                    text = subLine
+                    setTextColor(0xFF1A1A1A.toInt())
+                    setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, sspDimen(R.dimen.card_sub_size))
+                    typeface = Typeface.DEFAULT_BOLD
+                    setPadding(0, sdp(3), 0, 0)
+                })
+                row.setOnClickListener {
+                    closeSearch(goHome = false)
+                    if (e.group == "首页") backHome() else openDetail(e.group)
+                    searchPanel.post {
+                        runCatching { scrollHost.smoothScrollTo(0, (offsetInScroll(e.target) - sdp(12)).coerceAtLeast(0)) }
+                    }
+                }
+                searchResults.addView(row)
+            }
+        }
+
+        btnSearch.setOnClickListener {
+            if (searchPanel.visibility == View.VISIBLE) {
+                closeSearch()
+            } else {
+                // 原地展开搜索框：记录当前页，标题栏/页面状态都不动
+                searchFrom = currentPage()
+                searchPanel.visibility = View.VISIBLE
+                renderResults(etSearch.text.toString())
+                etSearch.requestFocus()
+                runCatching {
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                    imm.showSoftInput(etSearch, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+                }
+            }
+        }
+        etSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (searchPanel.visibility == View.VISIBLE) renderResults(s?.toString() ?: "")
+            }
+        })
+
         // 自研弹窗宿主（弃用 XPopup 弹窗壳：库资源在寄生环境解析错乱出灰团/圆角失效）
-        val popupHost = KitPopupHost(this)
+        val popupHost = KitPopupHost(this, mctx)
 
         // 系统返回键：有弹窗先关弹窗；二级内容时回到主页，主页时退出
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (popupHost.isShowing) {
                     if (popupHost.dismissable()) popupHost.dismiss()
+                    return
+                }
+                // 搜索面板打开时：关闭搜索并原地回到进入搜索前的页面
+                if (searchPanel.visibility == View.VISIBLE) {
+                    closeSearch()
                     return
                 }
                 if (mainCards.visibility == View.GONE) {
@@ -704,6 +1351,102 @@ class SettingsActivity : ComponentActivity() {
             ) { refreshCheckin() }
             popupHost.showCenter(sheet)
             sheet.onDismiss = { popupHost.dismiss() }
+        }
+
+        // ---- 等级加速：日签打卡 / 大会员签到 / 自动加好友 / 空间浏览 ----
+        // 四个功能结构一致（开关 + 自定义时间），统一用 registerTimeCard 绑定。
+
+        fun addTimeCard(
+            card: FrameLayout,
+            row: LinearLayout,
+            switchSlot: FrameLayout,
+            subtitle: TextView,
+            enabledKey: String,
+            timeKey: String,
+            defTime: String,
+            title: String
+        ) {
+            fun refresh() {
+                val time = MoodConfig.getString(timeKey, defTime)
+                    .trim().takeIf { MoodScheduler.HH_MM_REGEX.matches(it) } ?: defTime
+                subtitle.text = "点击修改时间 · $time"
+            }
+            refresh()
+
+            val sw = MoodSwitch(mctx).apply {
+                checked = MoodConfig.getBoolean(enabledKey, false)
+                onChanged = { on -> MoodConfig.putBoolean(enabledKey, on) }
+            }
+            switchSlot.addView(
+                sw,
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
+
+            row.setOnClickListener {
+                val sheet = MoodTimeSheet(mctx, timeKey, defTime, title) { refresh() }
+                popupHost.showCenter(sheet)
+                sheet.onDismiss = { popupHost.dismiss() }
+            }
+        }
+
+        addTimeCard(
+            cardDailySign, dailySignRow, dailySignSwitchSlot, tvDailySignSubtitle,
+            MoodScheduler.KEY_DAILY_SIGN_ENABLED, MoodScheduler.KEY_DAILY_SIGN_TIME,
+            MoodScheduler.DEFAULT_DAILY_SIGN_TIME, "QQ 日签打卡设置"
+        )
+        addTimeCard(
+            cardBigVip, bigVipRow, bigVipSwitchSlot, tvBigVipSubtitle,
+            MoodScheduler.KEY_BIGVIP_ENABLED, MoodScheduler.KEY_BIGVIP_TIME,
+            MoodScheduler.DEFAULT_BIGVIP_TIME, "大会员签到设置"
+        )
+        addTimeCard(
+            cardAddFriend, addFriendRow, addFriendSwitchSlot, tvAddFriendSubtitle,
+            MoodScheduler.KEY_ADD_FRIEND_ENABLED, MoodScheduler.KEY_ADD_FRIEND_TIME,
+            MoodScheduler.DEFAULT_ADD_FRIEND_TIME, "自动加好友设置"
+        )
+        addTimeCard(
+            cardSpaceBrowse, spaceBrowseRow, spaceBrowseSwitchSlot, tvSpaceBrowseSubtitle,
+            MoodScheduler.KEY_SPACE_BROWSE_ENABLED, MoodScheduler.KEY_SPACE_BROWSE_TIME,
+            MoodScheduler.DEFAULT_SPACE_BROWSE_TIME, "空间浏览设置"
+        )
+
+        // ---- 标题右侧「启动」：无视开关与当日标记立即执行全部功能，过程实时打进日志卡 ----
+        btnRunAll.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = UiScale.dp(17f)
+            setColor(0xE62F6FE0.toInt())
+        }
+        val runLog = ArrayList<String>()
+        val runLogTime = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+
+        fun appendRunLog(line: String) {
+            runLog.add("${runLogTime.format(Date())}  $line")
+            if (runLog.size > 300) runLog.removeAt(0)
+            tvRunLog.text = runLog.joinToString("\n")
+            runLogScroll.post { runLogScroll.fullScroll(View.FOCUS_DOWN) }
+        }
+
+        btnRunAll.setOnClickListener {
+            runLog.clear()
+            tvRunLog.text = ""
+            appendRunLog("开始执行（无视开关与当日标记）")
+            btnRunAll.isEnabled = false
+            btnRunAll.alpha = 0.45f
+            MoodScheduler.runAllNow { line ->
+                runOnUiThread {
+                    appendRunLog(line)
+                    // 收尾行到达后恢复按钮，允许再次点击
+                    if (line.startsWith("全部执行结束") || line.contains("未登录") ||
+                        line.startsWith("执行异常") || line.contains("还没结束")
+                    ) {
+                        btnRunAll.isEnabled = true
+                        btnRunAll.alpha = 1f
+                    }
+                }
+            }
         }
 
         // 更换背景卡 → 宫格选择弹窗
@@ -1119,6 +1862,43 @@ private class MaterialBackArrowDrawable(private val color: Int) : android.graphi
     override fun getOpacity(): Int = android.graphics.PixelFormat.TRANSLUCENT
 }
 
+/** 标题栏搜索图标：Material 风格黑色放大镜（圆环 + 右下短柄），全代码绘制矢量。 */
+private class MaterialSearchIconDrawable(private val color: Int) : android.graphics.drawable.Drawable() {
+
+    private val paint = Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+        this.color = color
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+    }
+
+    override fun draw(canvas: Canvas) {
+        val w = bounds.width().toFloat()
+        val h = bounds.height().toFloat()
+        if (w <= 0f || h <= 0f) return
+        val s = minOf(w, h) / 24f
+        canvas.save()
+        canvas.translate(bounds.left + w / 2f - 12f * s, bounds.top + h / 2f - 12f * s)
+        canvas.scale(s, s)
+        paint.strokeWidth = 2.2f
+        // 镜身圆环（镜心略偏左上，给右下柄留空间）
+        canvas.drawCircle(10.5f, 10.5f, 6.2f, paint)
+        // 镜柄
+        canvas.drawLine(15.2f, 15.2f, 20f, 20f, paint)
+        canvas.restore()
+    }
+
+    override fun setAlpha(alpha: Int) {
+        paint.alpha = alpha
+    }
+
+    override fun setColorFilter(colorFilter: android.graphics.ColorFilter?) {
+        paint.colorFilter = colorFilter
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun getOpacity(): Int = android.graphics.PixelFormat.TRANSLUCENT
+}
+
 /** 更换背景弹窗：三列宫格显示各节令静态封面，点选立即生效并持久化。 */
 class BgPickerSheet(
     context: Context,
@@ -1134,6 +1914,8 @@ class BgPickerSheet(
     init {
         // 寄生环境必须用模块 ClassLoader + 模块资源 inflate
         android.view.LayoutInflater.from(context).inflate(R.layout.popup_bg_picker, this, true)
+        // 只归一化 XML inflate 出来的子 View，别碰 Sheet 自身（layoutParams 由外部按目标 px 设置）
+        runCatching { for (i in 0 until childCount) UiScale.normalize(getChildAt(i)) }
         // 液态玻璃弹窗卡片：跟随当前 UI 风格（冰块 or 浅冷灰），带流光
         LiquidGlass.applyThemed(this)
         val grid = findViewById<RecyclerView>(R.id.bgGrid)
@@ -1142,6 +1924,7 @@ class BgPickerSheet(
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
                 val v = android.view.LayoutInflater.from(context)
                     .inflate(R.layout.item_bg_thumb, parent, false)
+                runCatching { UiScale.normalize(v) }
                 return object : RecyclerView.ViewHolder(v) {}
             }
 
@@ -1152,12 +1935,12 @@ class BgPickerSheet(
                 val iv = h.itemView.findViewById<ImageView>(R.id.ivThumb)
                 val tv = h.itemView.findViewById<TextView>(R.id.tvName)
                 val selected = item.key == currentKey
-                val radius = 16f * context.resources.displayMetrics.density
+                val radius = UiScale.dp(16f)
                 val bg = GradientDrawable().apply {
                     cornerRadius = radius
                     setColor(0xFFFFFFFF.toInt())
                     setStroke(
-                        if (selected) (2f * context.resources.displayMetrics.density).toInt() else 0,
+                        if (selected) UiScale.dp(2) else 0,
                         0xFF0A7AFF.toInt()
                     )
                 }
@@ -1165,7 +1948,7 @@ class BgPickerSheet(
                 iv.clipToOutline = true
                 iv.outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
                 tv.text = item.name
-                tv.setTextColor(if (selected) 0xFF0A7AFF.toInt() else 0xFF5A6068.toInt())
+                tv.setTextColor(if (selected) 0xFF0A7AFF.toInt() else 0xFF1A1A1A.toInt())
                 // 缩略图不用 Glide（寄生环境图片加载不可靠，失败时留灰块）：
                 // 直接用 BitmapFactory 同步读本地封面，读不到就保持白底，绝不出现灰块。
                 val cover = dir?.let { File(it, "${item.key}_cover.jpg") }
@@ -1196,6 +1979,7 @@ class DexProgressSheet(context: Context) : FrameLayout(context) {
 
     init {
         android.view.LayoutInflater.from(context).inflate(R.layout.popup_dex_progress, this, true)
+        runCatching { for (i in 0 until childCount) UiScale.normalize(getChildAt(i)) }
         // 液态玻璃弹窗卡片：跟随当前 UI 风格，带流光
         LiquidGlass.applyThemed(this)
         // 进度条：纯代码不确定动画（一个来回扫动的蓝色圆角条），
@@ -1203,7 +1987,7 @@ class DexProgressSheet(context: Context) : FrameLayout(context) {
         bar = View(context).apply {
             background = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                cornerRadius = 3f * context.resources.displayMetrics.density
+                cornerRadius = UiScale.dp(3f)
                 setColor(0xFF0A7AFF.toInt())
             }
         }
@@ -1394,7 +2178,7 @@ private class MoodSwitch(context: Context) : View(context) {
 
     // 与页面冷灰玻璃语言一致：中性灰玻璃轨道 + 细白描边 + 冷白玻璃圆点。
     // 开态不再用蓝色大色块，改用中性冷灰（同卡片玻璃色系），关态更淡，两者仅深浅区分。
-    private val density = context.resources.displayMetrics.density
+    private val density = UiScale.density
     private val trackOnTop = 0xFF9AA1A9.toInt()      // 开态：中性冷灰玻璃（上略亮）
     private val trackOnBottom = 0xFF7A828C.toInt()
     private val trackOffTop = 0x4D000000.toInt()     // 关态：淡黑玻璃，透出卡片底
@@ -1475,7 +2259,7 @@ private class UiStyleSlider(context: Context) : View(context) {
         }
     var onChanged: ((Int) -> Unit)? = null
 
-    private val density = context.resources.displayMetrics.density
+    private val density = UiScale.density
     private val trackOnTop = 0xFF9AA1A9.toInt()
     private val trackOnBottom = 0xFF7A828C.toInt()
     private val borderColor = 0x8FFFFFFF.toInt()
@@ -1536,6 +2320,227 @@ private class UiStyleSlider(context: Context) : View(context) {
 }
 
 /** 定时说说/签到配置弹窗：发送时间 + 内容，保存时校验并持久化到 settings/mood.json。 */
+/**
+ * HH:mm 时间输入：小时与分钟是两个独立数字框，中间冒号为固定 TextView。
+ * 整条只包着文字（无多余内边距/最小高度）；分钟框删空后继续按删除键会自动跳到
+ * 小时框接着删，冒号不会挡住连续删除，不必手动点小时框。
+ */
+class TimeInputView(context: Context) : LinearLayout(context) {
+    private val etHour = numberBox("HH")
+    private val etMinute = numberBox("mm")
+
+    init {
+        orientation = HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+        layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        minimumHeight = 0
+        background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(0xFFF2F3F5.toInt())
+        }
+        setPadding(dp(8), dp(2), dp(8), dp(2))
+        val boxLp = { LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) }
+        addView(etHour, boxLp())
+        addView(TextView(context).apply {
+            text = ":"
+            setTextColor(0xFF000000.toInt())
+            fixedTextSize(15f)
+            typeface = Typeface.DEFAULT_BOLD
+            gravity = Gravity.CENTER
+            includeFontPadding = false
+            setPadding(dp(2), 0, dp(2), 0)
+        }, boxLp())
+        addView(etMinute, boxLp())
+        // 小时输满两位自动把焦点交给分钟框（仅用户正在输入时，初始化赋值不抢焦点）
+        etHour.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (s?.length == 2 && etHour.hasFocus()) etMinute.requestFocus()
+            }
+        })
+        // 分钟已空时再按删除键：跳到小时框并删掉小时末位，实现连续回删
+        etMinute.onEmptyBackspace = {
+            etHour.requestFocus()
+            etHour.setSelection(etHour.text.length)
+            val h = etHour.text
+            if (h.isNotEmpty()) h.delete(h.length - 1, h.length)
+        }
+    }
+
+    /**
+     * 拦截输入法在空文本框里按下的删除键。软键盘通常走 deleteSurroundingText
+     * 而非 KeyEvent，所以两条路径都要拦；onKeyListener 拦不到软键盘。
+     */
+    private inner class TimeBox(context: Context) : EditText(context) {
+        var onEmptyBackspace: (() -> Unit)? = null
+
+        override fun onCreateInputConnection(outAttrs: android.view.inputmethod.EditorInfo): android.view.inputmethod.InputConnection? {
+            val base = super.onCreateInputConnection(outAttrs) ?: return null
+            return object : android.view.inputmethod.InputConnectionWrapper(base, false) {
+                override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+                    if (text.isNullOrEmpty() && beforeLength > 0) {
+                        onEmptyBackspace?.invoke()
+                        return true
+                    }
+                    return super.deleteSurroundingText(beforeLength, afterLength)
+                }
+
+                override fun sendKeyEvent(event: android.view.KeyEvent): Boolean {
+                    if (event.action == android.view.KeyEvent.ACTION_DOWN &&
+                        event.keyCode == android.view.KeyEvent.KEYCODE_DEL && text.isNullOrEmpty()
+                    ) {
+                        onEmptyBackspace?.invoke()
+                        return true
+                    }
+                    return super.sendKeyEvent(event)
+                }
+            }
+        }
+    }
+
+    private fun numberBox(hint: String): TimeBox = TimeBox(context).apply {
+        this.hint = hint
+        setHintTextColor(0xFFB4B8BF.toInt())
+        setTextColor(0xFF000000.toInt())
+        fixedTextSize(15f)
+        typeface = Typeface.DEFAULT_BOLD
+        gravity = Gravity.CENTER
+        inputType = InputType.TYPE_CLASS_NUMBER
+        filters = arrayOf<android.text.InputFilter>(android.text.InputFilter.LengthFilter(2))
+        background = null
+        isSingleLine = true
+        // 贴合文字：去掉系统自带上下留白和默认最小高度，空内容时仍保留可点区域
+        includeFontPadding = false
+        minHeight = 0
+        minimumHeight = 0
+        minWidth = dp(24)
+        setPadding(0, 0, 0, 0)
+    }
+
+    fun setTime(value: String) {
+        val parts = value.split(":")
+        etHour.setText(parts.getOrNull(0)?.take(2) ?: "")
+        etMinute.setText(parts.getOrNull(1)?.take(2) ?: "")
+        etHour.setSelection(etHour.text.length)
+    }
+
+    fun setHintTime(value: String) {
+        val parts = value.split(":")
+        etHour.hint = parts.getOrNull(0)?.takeIf { it.isNotBlank() } ?: "HH"
+        etMinute.hint = parts.getOrNull(1)?.takeIf { it.isNotBlank() } ?: "mm"
+    }
+
+    /** 返回规范化 HH:mm（不足两位补零）；某一段为空时保持原样，交给正则校验报错。 */
+    fun time(): String {
+        val h = etHour.text.toString().trim()
+        val m = etMinute.text.toString().trim()
+        if (h.isEmpty() || m.isEmpty()) return "$h:$m"
+        return "${h.padStart(2, '0')}:${m.padStart(2, '0')}"
+    }
+
+    private fun dp(v: Int): Int = UiScale.dp(v)
+}
+
+/**
+ * 只配置时间的弹窗（等级加速类功能用：日签/大会员/加好友/空间浏览）。
+ * 结构与 MoodConfigSheet 一致，仅去掉内容输入框。
+ */
+class MoodTimeSheet(
+    context: Context,
+    private val keyTime: String,
+    private val defTime: String,
+    private val title: String,
+    private val onSaved: () -> Unit
+) : LinearLayout(context) {
+
+    var onDismiss: (() -> Unit)? = null
+
+    private lateinit var etTime: TimeInputView
+    private lateinit var tvError: TextView
+
+    init {
+        orientation = VERTICAL
+        LiquidGlass.applyThemed(this)
+        clipToOutline = true
+        outlineProvider = android.view.ViewOutlineProvider.BACKGROUND
+        val pad = dp(20)
+        setPadding(pad, pad, pad, pad)
+
+        addView(TextView(context).apply {
+            text = this@MoodTimeSheet.title
+            setTextColor(0xFF000000.toInt())
+            fixedTextSize(18f)
+            typeface = Typeface.DEFAULT_BOLD
+        })
+        addView(TextView(context).apply {
+            text = "仅需 HH:mm，无需日期，每天同一时间触发一次"
+            setTextColor(0xFF1A1A1A.toInt())
+            fixedTextSize(12f)
+            typeface = Typeface.DEFAULT_BOLD
+            setPadding(0, dp(4), 0, 0)
+        })
+
+        addView(TextView(context).apply {
+            text = "触发时间"
+            setTextColor(0xFF000000.toInt())
+            fixedTextSize(14f)
+            typeface = Typeface.DEFAULT_BOLD
+            setPadding(0, dp(16), 0, dp(6))
+        })
+        etTime = TimeInputView(context)
+        etTime.setHintTime(defTime)
+        addView(etTime, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
+
+        tvError = TextView(context).apply {
+            setTextColor(0xFFE5484D.toInt())
+            fixedTextSize(12f)
+            visibility = View.GONE
+            setPadding(0, dp(6), 0, 0)
+        }
+        addView(tvError)
+
+        val row = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            gravity = Gravity.END
+            setPadding(0, dp(18), 0, 0)
+        }
+        row.addView(TextView(context).apply {
+            text = "取消"
+            setTextColor(0xFF444444.toInt())
+            fixedTextSize(15f)
+            setPadding(dp(16), dp(8), dp(16), dp(8))
+            setOnClickListener { onDismiss?.invoke() }
+        })
+        row.addView(TextView(context).apply {
+            text = "保存"
+            setTextColor(0xFF0A7AFF.toInt())
+            fixedTextSize(15f)
+            typeface = Typeface.DEFAULT_BOLD
+            setPadding(dp(16), dp(8), dp(8), dp(8))
+            setOnClickListener { save() }
+        })
+        addView(row)
+
+        etTime.setTime(MoodConfig.getString(keyTime, defTime))
+    }
+
+    private fun save() {
+        val time = etTime.time()
+        if (!MoodScheduler.HH_MM_REGEX.matches(time)) {
+            tvError.text = "时间格式应为 HH:mm（如 08:30）"
+            tvError.visibility = View.VISIBLE
+            return
+        }
+        MoodConfig.putString(keyTime, time)
+        onSaved()
+        onDismiss?.invoke()
+    }
+
+    private fun dp(v: Int): Int = UiScale.dp(v)
+}
+
 class MoodConfigSheet(
     context: Context,
     private val keyTime: String = MoodScheduler.KEY_TIME,
@@ -1548,7 +2553,7 @@ class MoodConfigSheet(
 
     var onDismiss: (() -> Unit)? = null
 
-    private lateinit var etTime: EditText
+    private lateinit var etTime: TimeInputView
     private lateinit var etText: EditText
     private lateinit var tvError: TextView
 
@@ -1563,20 +2568,21 @@ class MoodConfigSheet(
 
         addView(TextView(context).apply {
             text = this@MoodConfigSheet.title
-            setTextColor(0xFF111111.toInt())
-            textSize = 18f
+            setTextColor(0xFF000000.toInt())
+            fixedTextSize(18f)
             typeface = Typeface.DEFAULT_BOLD
         })
         addView(TextView(context).apply {
             text = "仅需 HH:mm，无需日期，每天同一时间触发一次"
-            setTextColor(0xFF5A6068.toInt())
-            textSize = 12f
+            setTextColor(0xFF1A1A1A.toInt())
+            fixedTextSize(12f)
+            typeface = Typeface.DEFAULT_BOLD
             setPadding(0, dp(4), 0, 0)
         })
 
         addView(editLabel("发送时间"))
-        etTime = editField(InputType.TYPE_CLASS_TEXT, defTime, false)
-        addView(etTime)
+        etTime = TimeInputView(context).also { it.setHintTime(defTime) }
+        addView(etTime, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
 
         addView(editLabel("说说内容"))
         etText = editField(
@@ -1588,7 +2594,7 @@ class MoodConfigSheet(
 
         tvError = TextView(context).apply {
             setTextColor(0xFFE5484D.toInt())
-            textSize = 12f
+            fixedTextSize(12f)
             visibility = View.GONE
             setPadding(0, dp(6), 0, 0)
         }
@@ -1601,27 +2607,27 @@ class MoodConfigSheet(
         }
         row.addView(TextView(context).apply {
             text = "取消"
-            setTextColor(0xFF6B7280.toInt())
-            textSize = 15f
+            setTextColor(0xFF444444.toInt())
+            fixedTextSize(15f)
             setPadding(dp(16), dp(8), dp(16), dp(8))
             setOnClickListener { onDismiss?.invoke() }
         })
         row.addView(TextView(context).apply {
             text = "保存"
             setTextColor(0xFF0A7AFF.toInt())
-            textSize = 15f
+            fixedTextSize(15f)
             typeface = Typeface.DEFAULT_BOLD
             setPadding(dp(16), dp(8), dp(8), dp(8))
             setOnClickListener { save() }
         })
         addView(row)
 
-        etTime.setText(MoodConfig.getString(keyTime, defTime))
+        etTime.setTime(MoodConfig.getString(keyTime, defTime))
         etText.setText(MoodConfig.getString(keyText, ""))
     }
 
     private fun save() {
-        val time = etTime.text.toString().trim()
+        val time = etTime.time()
         if (!MoodScheduler.HH_MM_REGEX.matches(time)) {
             tvError.text = "时间格式应为 HH:mm（如 08:30）"
             tvError.visibility = View.VISIBLE
@@ -1635,16 +2641,16 @@ class MoodConfigSheet(
 
     private fun editLabel(text: String): TextView = TextView(context).apply {
         this.text = text
-        setTextColor(0xFF111111.toInt())
-        textSize = 14f
+        setTextColor(0xFF000000.toInt())
+        fixedTextSize(14f)
         typeface = Typeface.DEFAULT_BOLD
         setPadding(0, dp(16), 0, dp(6))
     }
 
     private fun editField(type: Int, hint: String, multiline: Boolean): EditText =
         EditText(context).apply {
-            setTextColor(0xFF111111.toInt())
-            textSize = 15f
+            setTextColor(0xFF000000.toInt())
+            fixedTextSize(15f)
             setHintTextColor(0xFFB4B8BF.toInt())
             setHint(hint)
             inputType = type
@@ -1661,5 +2667,5 @@ class MoodConfigSheet(
             setPadding(dp(12), dp(10), dp(12), dp(10))
         }
 
-    private fun dp(v: Int): Int = (v * context.resources.displayMetrics.density).toInt()
+    private fun dp(v: Int): Int = UiScale.dp(v)
 }
